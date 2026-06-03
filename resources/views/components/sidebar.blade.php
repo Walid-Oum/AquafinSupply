@@ -76,7 +76,7 @@ $role = 'technieker';
                 </li>
 
                 <li>
-                    <a href="#"
+                    <a href="{{route('tickets.index')}}"
                        class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
                         Tickets
                     </a>

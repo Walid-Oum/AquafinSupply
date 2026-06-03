@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 
@@ -13,18 +14,22 @@ class TicketController extends Controller
     }
 
     public function create(){
-        return view('tickets.create');
+        $orders = Order::where('user_id', auth()->user()->id)->get();
+        return view('tickets.create', ['orders' => $orders]);
     }
     public function store(Request $request){
         $validated = $request->validate([
+            'order_id' => ['required', 'exists:orders,id'],
             'subject' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
         ]);
+        $order = Order::where('id', $validated['order_id'])->where('user_id', auth()->user()->id)->firstOrFail();
         Ticket::create([
             'user_id' => auth()->user()->id,
-            'subject' => $request->subject,
-            'description' => $request->description,
-            'order_id' => null,
+            'order_id' => $order->id,
+            'subject' => $validated['subject'],
+            'description' => $validated['description'],
+
 
         ]);
         return redirect()->route('tickets.index')->with('success', 'Ticket created successfully');
