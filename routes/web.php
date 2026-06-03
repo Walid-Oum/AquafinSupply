@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 
+
+Route::middleware('auth')->prefix('tickets')->group(function () {
+    Route::get('/', [\App\Http\Controllers\TicketController::class, 'index'])->name('tickets.index');
+});
+
 Route::get('/', function () {
     return view('welcome');
 });
