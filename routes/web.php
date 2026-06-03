@@ -28,6 +28,8 @@ Route::get('/bestellingen/{id}', [OrderController::class,'show'])
 //tickets
 Route::middleware('auth')->prefix('tickets')->group(function () {
     Route::get('/', [\App\Http\Controllers\TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/create', [\App\Http\Controllers\TicketController::class, 'create'])->name('tickets.create');
+    Route::post('/', [\App\Http\Controllers\TicketController::class, 'store'])->name('tickets.store');
 });
 
 Route::get('/dashboard', function () {
