@@ -2,13 +2,28 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Userzone\CartController;
+use App\Http\Controllers\Userzone\OrderController;
+use App\Http\Controllers\Userzone\ProfileController;
 
 
 
 
-Route::get('/test', function () {
-    return view('userzone.test');
-});
+
+/*
+|--------------------------------------------------------------------------
+| Bestellingen
+|--------------------------------------------------------------------------
+| Routes voor het winkelmandje en het beheer van bestellingen.
+*/
+Route::get('/winkelmandje', [CartController::class,'index'])
+    ->name('cart.index');
+
+Route::get('/bestellingen', [OrderController::class,'index'])
+    ->name('orders.index');
+
+Route::get('/bestellingen/{id}', [OrderController::class,'show'])
+    ->name('orders.show');
 
 
 

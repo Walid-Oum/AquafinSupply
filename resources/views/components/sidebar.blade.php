@@ -62,14 +62,14 @@ $role = 'technieker';
                 </li>
 
                 <li>
-                    <a href="#"
+                    <a href="{{ route('cart.index') }}"
                        class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
                         Winkelmandje
                     </a>
                 </li>
 
                 <li>
-                    <a href="#"
+                    <a href="{{ route('orders.index') }}"
                        class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
                         Bestellingen
                     </a>
