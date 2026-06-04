@@ -1,5 +1,6 @@
 <x-app-layout>
-    <x-page-header>Materiaal bewerken</x-page-header>
+    <x-page-header title="Materiaal bewerken" />
+
 
     <x-card>
         <form action="{{ route('materials.update', $material->id) }}" method="POST">

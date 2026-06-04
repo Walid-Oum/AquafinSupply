@@ -50,7 +50,7 @@ $role = Auth::user()->role;
             @if($role == 'technieker')
 
                 <li>
-                    <a href="{{ route('materials.index') }}"
+                    <a href="#"
                        class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
                         Materialen
                     </a>
@@ -125,7 +125,7 @@ $role = Auth::user()->role;
                 </li>
 
                 <li>
-                    <a href="#"
+                    <a href="{{ route('materials.index') }}"
                        class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
                         Materialen
                     </a>
