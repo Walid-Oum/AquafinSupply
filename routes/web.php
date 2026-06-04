@@ -1,14 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Userzone\CartController;
 use App\Http\Controllers\Userzone\OrderController;
 use App\Http\Controllers\Userzone\ProfileController;
 
 
-
-
+Route::get('/', function () {
+    return view('welcome');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -25,11 +25,11 @@ Route::get('/bestellingen', [OrderController::class,'index'])
 Route::get('/bestellingen/{id}', [OrderController::class,'show'])
     ->name('orders.show');
 
-
-
-
-Route::get('/', function () {
-    return view('welcome');
+//tickets
+Route::middleware('auth')->prefix('tickets')->group(function () {
+    Route::get('/', [\App\Http\Controllers\TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/create', [\App\Http\Controllers\TicketController::class, 'create'])->name('tickets.create');
+    Route::post('/', [\App\Http\Controllers\TicketController::class, 'store'])->name('tickets.store');
 });
 
 Route::get('/dashboard', function () {
