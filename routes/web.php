@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Userzone\CartController;
 use App\Http\Controllers\Userzone\OrderController;
 use App\Http\Controllers\Userzone\ProfileController;
-
+use App\Http\Controllers\MaterialController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -40,6 +40,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Materialen routes (Teamlid 1)
+Route::middleware(['auth'])->group(function () {
+    Route::resource('materials', MaterialController::class);
 });
 
 require __DIR__.'/auth.php';
