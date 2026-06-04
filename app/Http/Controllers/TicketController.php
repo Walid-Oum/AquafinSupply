@@ -43,4 +43,10 @@ class TicketController extends Controller
     }
 
     //
+
+
+    public function showHouseware(Ticket $ticket){
+        $ticket->load(['user', 'order']);
+        return view('tickets.showHouseware', ['ticket' => $ticket]);
+    }
 }
