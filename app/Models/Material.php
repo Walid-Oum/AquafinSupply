@@ -18,4 +18,9 @@ class Material extends Model
         'is_active' => 'boolean',
         'stock' => 'integer',
     ];
+
+    public function orderItems()
+{
+    return $this->hasMany(OrderItem::class);
+}
 }

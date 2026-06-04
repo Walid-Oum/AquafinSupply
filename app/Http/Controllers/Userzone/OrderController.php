@@ -24,46 +24,66 @@ class OrderController extends Controller
 
 public function store(Request $request)
 {
-   $request->validate([
-    'delivery_date' => 'required|date|after:today',
-    'comment' => 'nullable|string'
-]);
+    $request->validate([
+        'delivery_date' => 'required|date|after_or_equal:today',
+    ], [
+        'delivery_date.required' => 'Leverdatum is verplicht.',
+        'delivery_date.after_or_equal' => 'Leverdatum mag niet in het verleden liggen.',
+    ]);
 
     $cart = session()->get('cart', []);
 
     if (empty($cart)) {
 
-        return redirect()->back()
-            ->with('error', 'Winkelmandje is leeg');
+        return redirect()
+            ->route('cart.index')
+            ->with('error', 'Winkelmandje is leeg.');
+    }
 
+    foreach ($cart as $item) {
+
+        $material = \App\Models\Material::find($item['id']);
+
+        if (!$material) {
+
+            return redirect()
+                ->route('cart.index')
+                ->with('error', 'Materiaal bestaat niet meer.');
+        }
+
+        if ($item['quantity'] > $material->stock) {
+
+            return redirect()
+                ->route('cart.index')
+                ->with('error', 'Onvoldoende voorraad voor ' . $material->name);
+        }
     }
 
     $order = Order::create([
-
         'user_id' => Auth::id(),
         'delivery_date' => $request->delivery_date,
         'comment' => $request->comment,
         'status' => 'Nieuw',
-
     ]);
 
     foreach ($cart as $item) {
 
+        $material = \App\Models\Material::find($item['id']);
+
         OrderItem::create([
-
             'order_id' => $order->id,
-            'material_id' => $item['id'],
+            'material_id' => $material->id,
             'quantity' => $item['quantity'],
-
         ]);
 
+        $material->decrement('stock', $item['quantity']);
     }
 
     session()->forget('cart');
 
     return redirect()
         ->route('orders.index')
-        ->with('success', 'Bestelling succesvol geplaatst');
+        ->with('success', 'Bestelling succesvol geplaatst.');
 }
 
 

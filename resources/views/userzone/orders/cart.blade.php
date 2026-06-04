@@ -90,11 +90,13 @@
 
            <x-card>
 
-    <form action="{{ route('orders.store') }}" method="POST">
+    
 
-        @csrf
+        <form action="{{ route('orders.store') }}" method="POST">
 
-        <div class="space-y-5">
+    @csrf
+
+    <div class="space-y-5">
 
             <div>
 
@@ -103,11 +105,9 @@
                 </label>
 
                 <input
-                    type="date"
-                    name="delivery_date"
-                     min="{{ date('Y-m-d') }}"
-                    required
-                    class="w-full border rounded-lg px-4 py-3">
+    type="date"
+    name="delivery_date"
+    class="w-full border rounded-lg px-4 py-3">
 
             </div>
 
