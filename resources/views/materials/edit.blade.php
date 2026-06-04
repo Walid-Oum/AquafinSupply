@@ -31,6 +31,26 @@
                 @enderror
             </div>
 
+            <div class="mb-4">
+                <label class="block font-bold mb-2">
+                    Voorraad *
+                </label>
+
+                <input
+                    type="number"
+                    name="stock"
+                    min="0"
+                    value="{{ old('stock', $material->stock) }}"
+                    class="w-full border rounded px-3 py-2"
+                    required>
+
+                @error('stock')
+                <p class="text-red-500 text-sm mt-1">
+                    {{ $message }}
+                </p>
+                @enderror
+            </div>
+
            <div class="mb-4">
     <label class="block font-bold mb-2">Status *</label>
 

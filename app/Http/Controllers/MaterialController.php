@@ -65,6 +65,7 @@ public function update(Request $request, $id)
 $request->validate([
     'name' => 'required|string|max:255',
     'category' => 'required|string|max:255',
+    'stock' => 'required|integer|min:0',
     'is_active' => 'required|boolean',
 ]);
 
@@ -73,6 +74,7 @@ $material->update([
     'name' => $request->name,
     'category' => $request->category,
     'description' => $request->description,
+    'stock' => $request->stock,
     'is_active' => $request->is_active,
 ]);
 return redirect()->route('materials.index')->with('success', 'Materiaal bijgewerkt!');
