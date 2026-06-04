@@ -1,7 +1,7 @@
 @php
 
 
-$role = auth()->user()->role ?? 'technieker';
+$role = Auth
 
 @endphp
 
