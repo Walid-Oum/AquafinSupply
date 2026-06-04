@@ -41,7 +41,7 @@
                         <th class="text-left">Categorie</th>
                         <th class="text-left">Voorraad</th>
                         <th class="text-left">Status</th>
-                        <th class="text-left">Bestel</th>
+                        <th class="text-center">Actie</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,13 +57,13 @@
                                 <span class="text-red-600">Inactief</span>
                             @endif
                         </td>
-                        <td>
-                            <form action="{{ route('cart.add', $material->id) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded text-sm">Bestellen</button>
-                            </form>
-                            <a href="{{ route('technician.materials.show', $material->id) }}" class="text-blue-500 ml-2">Bekijk</a>
-                        </td>
+               <td class="text-center p-3">
+    <a
+        href="{{ route('technician.materials.show', $material->id) }}"
+        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg inline-block">
+        Bekijk
+    </a>
+</td>
                     </tr>
                     @empty
                         <tr>

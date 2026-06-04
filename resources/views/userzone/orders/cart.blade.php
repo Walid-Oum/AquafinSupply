@@ -18,16 +18,12 @@
             <table class="w-full">
 
                 <thead>
-
                     <tr class="border-b">
-
                         <th class="text-left p-3">Materiaal</th>
                         <th class="text-left p-3">Categorie</th>
                         <th class="text-left p-3">Aantal</th>
                         <th class="text-left p-3">Actie</th>
-
                     </tr>
-
                 </thead>
 
                 <tbody>
@@ -44,22 +40,48 @@
                                 {{ $item['category'] }}
                             </td>
 
-                            <td class="p-3">
+                          <td class="p-3">
 
-                                <input
-                                    type="number"
-                                    value="{{ $item['quantity'] }}"
-                                    min="1"
-                                    class="border rounded-lg px-3 py-2 w-20">
+    <form action="{{ route('cart.update', $id) }}"
+          method="POST"
+          class="flex items-center gap-2">
 
-                            </td>
+        @csrf
+        @method('PATCH')
+
+        <input
+            type="number"
+            name="quantity"
+            value="{{ $item['quantity'] }}"
+            min="1"
+            class="border rounded-lg px-3 py-2 w-20">
+
+        <button
+            type="submit"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg">
+
+            Opslaan
+
+        </button>
+
+    </form>
+
+</td>
 
                             <td class="p-3">
 
                                 <form action="{{ route('cart.remove', $id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <x-button type="submit">Verwijderen</x-button>
+
+                                    <button
+                                        type="submit"
+                                        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+
+                                        Verwijderen
+
+                                    </button>
+
                                 </form>
 
                             </td>
@@ -74,7 +96,9 @@
 
         @else
 
-            <p class="text-gray-600 text-center py-4">Je winkelmandje is leeg.</p>
+            <p class="text-gray-600 text-center py-8 text-lg">
+                Je winkelmandje is leeg.
+            </p>
 
         @endif
 
@@ -84,52 +108,64 @@
 
         <div class="mt-6">
 
-            <x-card>
+           <x-card>
 
-                <div class="space-y-5">
+    
 
-                    <div>
+        <form action="{{ route('orders.store') }}" method="POST">
 
-                        <label class="block mb-2 font-semibold">
+    @csrf
 
-                            Leverdatum
+    <div class="space-y-5">
 
-                        </label>
+            <div>
 
-                        <input
-                            type="date"
-                            class="w-full border rounded-lg px-4 py-3">
+                <label class="block mb-2 font-semibold">
+                    Leverdatum
+                </label>
 
-                    </div>
+                <input
+    type="date"
+    name="delivery_date"
+    class="w-full border rounded-lg px-4 py-3">
 
-                    <div>
+            </div>
 
-                        <label class="block mb-2 font-semibold">
+            <div>
 
-                            Opmerking
+                <label class="block mb-2 font-semibold">
+                    Opmerking
+                </label>
 
-                        </label>
+                <textarea
+                    name="comment"
+                    rows="4"
+                    class="w-full border rounded-lg px-4 py-3"
+                    placeholder="Extra informatie..."></textarea>
 
-                        <textarea
-                            rows="4"
-                            class="w-full border rounded-lg px-4 py-3"
-                            placeholder="Extra informatie..."></textarea>
+            </div>
 
-                    </div>
+            <div>
 
-                    <div>
+                <button
+                    type="submit"
+                    class="inline-flex items-center gap-3
+                           bg-blue-600 hover:bg-blue-700
+                           text-white font-bold
+                           px-8 py-4 rounded-xl
+                           shadow-lg transition">
 
-                        <x-button>
+                    🛒 Bestelling plaatsen
 
-                            Bestelling plaatsen
+                </button>
 
-                        </x-button>
+            </div>
 
-                    </div>
+        </div>
 
-                </div>
+    </form>
 
-            </x-card>
+</x-card>
 
         </div>
 

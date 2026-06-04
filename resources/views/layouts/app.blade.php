@@ -21,7 +21,44 @@
 
         @include('components.navbar')
 
+        @if(session('success'))
+
+    <div class="mx-6 mt-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+
+        {{ session('success') }}
+
+    </div>
+
+@endif
+
+@if(session('error'))
+
+    <div class="mx-6 mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+
+        {{ session('error') }}
+
+    </div>
+
+@endif
+@if ($errors->any())
+
+    <div class="mx-6 mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+
+        <ul>
+
+            @foreach ($errors->all() as $error)
+
+                <li>{{ $error }}</li>
+
+            @endforeach
+
+        </ul>
+
+    </div>
+
+@endif
         <main class="p-8">
+ 
 
             {{ $slot }}
 

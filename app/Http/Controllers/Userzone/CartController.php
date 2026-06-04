@@ -4,55 +4,74 @@ namespace App\Http\Controllers\Userzone;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Material;
 
 class CartController extends Controller
 {
-    /**
-     * Toont het winkelmandje van de technieker.
-     */
     public function index()
     {
-        $cart = session()->get('cart', []);
-        return view('userzone.orders.cart', compact('cart'));
+        return view('userzone.orders.cart');
     }
 
-    /**
-     * Voegt een materiaal toe aan het winkelmandje.
-     */
     public function add($id)
     {
-        $material = \App\Models\Material::findOrFail($id);
-        
+        $material = Material::findOrFail($id);
+
         $cart = session()->get('cart', []);
-        
+
         if (isset($cart[$id])) {
+
             $cart[$id]['quantity']++;
+
         } else {
+
             $cart[$id] = [
                 'id' => $material->id,
                 'name' => $material->name,
                 'category' => $material->category,
                 'quantity' => 1,
             ];
+
         }
-        
+
         session()->put('cart', $cart);
-        
-        return redirect()->back()->with('success', $material->name . ' toegevoegd aan winkelmandje!');
+
+        return redirect()->back()
+            ->with('success', 'Materiaal toegevoegd aan winkelmandje');
+    }
+  
+
+    public function update(Request $request, $id)
+{
+    $request->validate([
+        'quantity' => 'required|integer|min:1',
+    ]);
+
+    $cart = session()->get('cart', []);
+
+    if (isset($cart[$id])) {
+
+        $cart[$id]['quantity'] = $request->quantity;
+
+        session()->put('cart', $cart);
     }
 
-    /**
-     * Verwijdert een materiaal uit het winkelmandje.
-     */
+    return redirect()
+        ->route('cart.index')
+        ->with('success', 'Aantal bijgewerkt.');
+}
     public function remove($id)
     {
         $cart = session()->get('cart', []);
-        
+
         if (isset($cart[$id])) {
+
             unset($cart[$id]);
+
             session()->put('cart', $cart);
         }
-        
-        return redirect()->route('cart.index')->with('success', 'Item verwijderd!');
+
+        return redirect()->back()
+            ->with('success', 'Materiaal verwijderd');
     }
 }
