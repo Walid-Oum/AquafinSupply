@@ -46,10 +46,23 @@
                                 <span class="text-red-600">Inactief</span>
                             @endif
                         </td>
-                        <td>
-                            <a href="{{ route('materials.show', $material->id) }}" class="text-blue-500">Bekijk</a>
-                            <a href="{{ route('materials.edit', $material->id) }}" class="text-yellow-500 ml-2">Bewerk</a>
-                        </td>
+                        <td class="space-x-3">
+
+   
+
+    <a href="{{ route('materials.show', $material->id) }}"
+       class="text-blue-500">
+        Bekijk
+    </a>
+
+    <a href="{{ route('materials.edit', $material->id) }}"
+       class="text-yellow-500">
+        Bewerk
+    </a>
+
+</td>
+
+</td>
                     </tr>
                     @empty
                     <tr>

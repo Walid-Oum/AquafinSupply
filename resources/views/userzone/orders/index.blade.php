@@ -24,7 +24,9 @@
                     <th class="p-3 text-left">
                         Technieker
                     </th>
-
+                 <th class="p-3 text-left">
+             Besteld op
+              </th>
                     <th class="p-3 text-left">
                         Leverdatum
                     </th>
@@ -54,6 +56,9 @@
     <td class="p-3">
         {{ $order->user->name }}
     </td>
+    <td class="p-3">
+    {{ $order->created_at->format('d/m/Y') }}
+</td>
 
     <td class="p-3">
         {{ $order->delivery_date }}

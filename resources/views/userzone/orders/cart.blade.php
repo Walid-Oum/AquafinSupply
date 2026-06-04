@@ -18,53 +18,12 @@
             <table class="w-full">
 
                 <thead>
-
                     <tr class="border-b">
-
                         <th class="text-left p-3">Materiaal</th>
                         <th class="text-left p-3">Categorie</th>
                         <th class="text-left p-3">Aantal</th>
                         <th class="text-left p-3">Actie</th>
-
                     </tr>
-
-<<<<<<< HEAD
-           <tbody>
-
-    @foreach($materials as $material)
-
-        <tr class="border-b">
-
-            <td class="p-3">
-
-                {{ $material->name }}
-
-            </td>
-
-            <td class="p-3">
-
-                <input
-                    type="number"
-                    value="1"
-                    min="1"
-                    class="border rounded-lg px-3 py-2 w-20">
-
-            </td>
-
-            <td class="p-3">
-
-                Voorraad: {{ $material->stock }}
-
-            </td>
-
-        </tr>
-
-    @endforeach
-
-</tbody>
-
-        </table>
-=======
                 </thead>
 
                 <tbody>
@@ -82,13 +41,11 @@
                             </td>
 
                             <td class="p-3">
-
                                 <input
                                     type="number"
                                     value="{{ $item['quantity'] }}"
                                     min="1"
                                     class="border rounded-lg px-3 py-2 w-20">
-
                             </td>
 
                             <td class="p-3">
@@ -96,7 +53,15 @@
                                 <form action="{{ route('cart.remove', $id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <x-button type="submit">Verwijderen</x-button>
+
+                                    <button
+                                        type="submit"
+                                        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+
+                                        Verwijderen
+
+                                    </button>
+
                                 </form>
 
                             </td>
@@ -111,10 +76,11 @@
 
         @else
 
-            <p class="text-gray-600 text-center py-4">Je winkelmandje is leeg.</p>
+            <p class="text-gray-600 text-center py-8 text-lg">
+                Je winkelmandje is leeg.
+            </p>
 
         @endif
->>>>>>> origin/main
 
     </x-card>
 
@@ -122,52 +88,64 @@
 
         <div class="mt-6">
 
-            <x-card>
+           <x-card>
 
-                <div class="space-y-5">
+    <form action="{{ route('orders.store') }}" method="POST">
 
-                    <div>
+        @csrf
 
-                        <label class="block mb-2 font-semibold">
+        <div class="space-y-5">
 
-                            Leverdatum
+            <div>
 
-                        </label>
+                <label class="block mb-2 font-semibold">
+                    Leverdatum
+                </label>
 
-                        <input
-                            type="date"
-                            class="w-full border rounded-lg px-4 py-3">
+                <input
+                    type="date"
+                    name="delivery_date"
+                     min="{{ date('Y-m-d') }}"
+                    required
+                    class="w-full border rounded-lg px-4 py-3">
 
-                    </div>
+            </div>
 
-                    <div>
+            <div>
 
-                        <label class="block mb-2 font-semibold">
+                <label class="block mb-2 font-semibold">
+                    Opmerking
+                </label>
 
-                            Opmerking
+                <textarea
+                    name="comment"
+                    rows="4"
+                    class="w-full border rounded-lg px-4 py-3"
+                    placeholder="Extra informatie..."></textarea>
 
-                        </label>
+            </div>
 
-                        <textarea
-                            rows="4"
-                            class="w-full border rounded-lg px-4 py-3"
-                            placeholder="Extra informatie..."></textarea>
+            <div>
 
-                    </div>
+                <button
+                    type="submit"
+                    class="inline-flex items-center gap-3
+                           bg-blue-600 hover:bg-blue-700
+                           text-white font-bold
+                           px-8 py-4 rounded-xl
+                           shadow-lg transition">
 
-                    <div>
+                    🛒 Bestelling plaatsen
 
-                        <x-button>
+                </button>
 
-                            Bestelling plaatsen
+            </div>
 
-                        </x-button>
+        </div>
 
-                    </div>
+    </form>
 
-                </div>
-
-            </x-card>
+</x-card>
 
         </div>
 

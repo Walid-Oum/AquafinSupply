@@ -63,14 +63,18 @@ return view('materials.edit', compact('material'));
 public function update(Request $request, $id)
 {
 $request->validate([
-'name' => 'required|string|max:255',
-'category' => 'required|string|max:255',
-'stock' => 'required|integer|min:0',
+    'name' => 'required|string|max:255',
+    'category' => 'required|string|max:255',
+    'is_active' => 'required|boolean',
 ]);
 
 $material = Material::findOrFail($id);
-$material->update($request->all());
-
+$material->update([
+    'name' => $request->name,
+    'category' => $request->category,
+    'description' => $request->description,
+    'is_active' => $request->is_active,
+]);
 return redirect()->route('materials.index')->with('success', 'Materiaal bijgewerkt!');
 }
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
+use App\Models\OrderItem;
 
 class OrderController extends Controller
 {
@@ -21,12 +22,51 @@ class OrderController extends Controller
     );
 }
 
-    public function store(Request $request)
+public function store(Request $request)
 {
+   $request->validate([
+    'delivery_date' => 'required|date|after:today',
+    'comment' => 'nullable|string'
+]);
 
+    $cart = session()->get('cart', []);
+
+    if (empty($cart)) {
+
+        return redirect()->back()
+            ->with('error', 'Winkelmandje is leeg');
+
+    }
+
+    $order = Order::create([
+
+        'user_id' => Auth::id(),
+        'delivery_date' => $request->delivery_date,
+        'comment' => $request->comment,
+        'status' => 'Nieuw',
+
+    ]);
+
+    foreach ($cart as $item) {
+
+        OrderItem::create([
+
+            'order_id' => $order->id,
+            'material_id' => $item['id'],
+            'quantity' => $item['quantity'],
+
+        ]);
+
+    }
+
+    session()->forget('cart');
+
+    return redirect()
+        ->route('orders.index')
+        ->with('success', 'Bestelling succesvol geplaatst');
 }
 
-   use App\Models\Order;
+
 
 public function show($id)
 {
