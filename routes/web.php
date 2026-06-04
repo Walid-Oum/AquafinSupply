@@ -38,6 +38,7 @@ Route::middleware('auth')->prefix('tickets')->group(function () {
 
 Route::middleware('auth')->prefix('magazijn/tickets')->group(function () {
     Route::get('/', [\App\Http\Controllers\TicketController::class, 'all'])->name('tickets.all');
+    Route::get('/{ticket}', [\App\Http\Controllers\TicketController::class, 'showHouseware'])->name('tickets.showHouseware');
 });
 
 Route::get('/dashboard', function () {
