@@ -26,10 +26,18 @@ Route::get('/bestellingen/{id}', [OrderController::class,'show'])
     ->name('orders.show');
 
 //tickets
+
+//technieker
 Route::middleware('auth')->prefix('tickets')->group(function () {
     Route::get('/', [\App\Http\Controllers\TicketController::class, 'index'])->name('tickets.index');
     Route::get('/create', [\App\Http\Controllers\TicketController::class, 'create'])->name('tickets.create');
     Route::post('/', [\App\Http\Controllers\TicketController::class, 'store'])->name('tickets.store');
+});
+
+//magazijnmedewerker
+
+Route::middleware('auth')->prefix('magazijn/tickets')->group(function () {
+    Route::get('/', [\App\Http\Controllers\TicketController::class, 'all'])->name('tickets.all');
 });
 
 Route::get('/dashboard', function () {
