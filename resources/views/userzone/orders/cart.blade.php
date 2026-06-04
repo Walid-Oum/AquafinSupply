@@ -27,63 +27,39 @@
 
             </thead>
 
-            <tbody>
+           <tbody>
 
-                {{-- Tijdelijke data --}}
+    @foreach($materials as $material)
 
-                <tr class="border-b">
+        <tr class="border-b">
 
-                    <td class="p-3">
-                        Dompelpomp
-                    </td>
+            <td class="p-3">
 
-                    <td class="p-3">
+                {{ $material->name }}
 
-                        <input
-                            type="number"
-                            value="1"
-                            min="1"
-                            class="border rounded-lg px-3 py-2 w-20">
+            </td>
 
-                    </td>
+            <td class="p-3">
 
-                    <td class="p-3">
+                <input
+                    type="number"
+                    value="1"
+                    min="1"
+                    class="border rounded-lg px-3 py-2 w-20">
 
-                        <x-button>
-                            Verwijderen
-                        </x-button>
+            </td>
 
-                    </td>
+            <td class="p-3">
 
-                </tr>
+                Voorraad: {{ $material->stock }}
 
-                <tr>
+            </td>
 
-                    <td class="p-3">
-                        Rioolstop
-                    </td>
+        </tr>
 
-                    <td class="p-3">
+    @endforeach
 
-                        <input
-                            type="number"
-                            value="2"
-                            min="1"
-                            class="border rounded-lg px-3 py-2 w-20">
-
-                    </td>
-
-                    <td class="p-3">
-
-                        <x-button>
-                            Verwijderen
-                        </x-button>
-
-                    </td>
-
-                </tr>
-
-            </tbody>
+</tbody>
 
         </table>
 

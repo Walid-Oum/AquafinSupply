@@ -17,27 +17,27 @@ US17 - Inhoud bestelling bekijken
         <div class="space-y-4">
 
             <div>
-                <strong>Bestelling ID:</strong> #{{ $id }}
+                <strong>Bestelling ID:</strong> #{{ $order->id }}
             </div>
 
             <div>
-                <strong>Technieker:</strong> Samia
+                <strong>Technieker:</strong> {{ $order->user->name }}
             </div>
 
             <div>
-                <strong>Leverdatum:</strong> 15/06/2026
+                <strong>Leverdatum:</strong> {{ $order->delivery_date }}
             </div>
 
             <div>
                 <strong>Status:</strong>
 
-                <x-status-badge status="Nieuw"/>
+                <x-status-badge :status="$order->status"/>
             </div>
 
             <div>
                 <strong>Opmerking:</strong>
 
-                Materiaal nodig voor onderhoudswerken.
+{{ $order->comment ?? 'Geen opmerking' }}
             </div>
 
         </div>
@@ -72,35 +72,29 @@ US17 - Inhoud bestelling bekijken
 
                 </thead>
 
-                <tbody>
+               <tbody>
 
-                    {{-- Tijdelijke voorbeelddata --}}
+@foreach($order->items as $item)
 
-                    <tr class="border-b">
+<tr>
 
-                        <td class="p-3">
-                            Materiaal 1
-                        </td>
+    <td class="p-3">
 
-                        <td class="p-3">
-                            2
-                        </td>
+        {{ $item->material->name }}
 
-                    </tr>
+    </td>
 
-                    <tr>
+    <td class="p-3">
 
-                        <td class="p-3">
-                            Materiaal 2
-                        </td>
+        {{ $item->quantity }}
 
-                        <td class="p-3">
-                            1
-                        </td>
+    </td>
 
-                    </tr>
+</tr>
 
-                </tbody>
+@endforeach
+
+</tbody>
 
             </table>
 

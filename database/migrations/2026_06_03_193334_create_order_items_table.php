@@ -15,9 +15,9 @@ return new class extends Migration
 
         $table->id();
 
-        $table->foreignId('order_id');
+        $table->foreignId('order_id')->constrained();
 
-        $table->unsignedBigInteger('material_id');
+$table->foreignId('material_id')->constrained();
 
         $table->integer('quantity');
 

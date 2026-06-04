@@ -36,6 +36,19 @@ Route::get('/bestellingen/{id}', [OrderController::class,'show'])
 */
 Route::get('/admin/orders', [AdminOrderController::class,'index'])
     ->name('admin.orders.index');
+ // winkelmandje
+
+    Route::post('/cart/add/{id}', [CartController::class, 'add'])
+    ->name('cart.add');
+
+Route::post('/cart/remove/{id}', [CartController::class, 'remove'])
+    ->name('cart.remove');
+
+Route::post('/bestelling/plaatsen', [OrderController::class, 'store'])
+    ->name('orders.store');
+
+
+
 
 //technieker
 //technieker

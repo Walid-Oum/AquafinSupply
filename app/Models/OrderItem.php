@@ -18,4 +18,8 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Order::class);
     }
+    public function material()
+{
+    return $this->belongsTo(Material::class);
+}
 }
