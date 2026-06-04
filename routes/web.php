@@ -6,6 +6,7 @@ use App\Http\Controllers\Userzone\OrderController;
 use App\Http\Controllers\Userzone\ProfileController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\Technician\MaterialController as TechnicianMaterialController;
 
 
 Route::get('/', function () {
@@ -76,9 +77,22 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Materialen routes (Teamlid 1)
+// Materialen routes (Teamlid 1 - Admin)
 Route::middleware(['auth'])->group(function () {
     Route::resource('materials', MaterialController::class);
+});
+
+// Technieker materialen routes
+Route::prefix('technician')->name('technician.')->middleware(['auth'])->group(function () {
+    Route::get('/materials', [TechnicianMaterialController::class, 'index'])->name('materials.index');
+    Route::get('/materials/{id}', [TechnicianMaterialController::class, 'show'])->name('materials.show');
+});
+
+// Winkelmandje routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 });
 
 require __DIR__.'/auth.php';

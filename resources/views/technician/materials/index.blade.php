@@ -1,0 +1,77 @@
+<x-app-layout>
+    <x-page-header title="Materialen overzicht" />
+
+    <!-- Zoekbalk -->
+    <div class="mb-4">
+        <form method="GET" action="{{ route('technician.materials.index') }}" class="flex gap-2">
+            <input type="text" name="search" placeholder="Zoeken op naam..." value="{{ request('search') }}" class="border rounded px-3 py-2 w-64">
+            <button type="submit" class="bg-gray-500 text-white px-4 py-2 rounded">Zoek</button>
+        </form>
+    </div>
+
+    <!-- Filter en Sorteer -->
+    <div class="mb-4">
+        <form method="GET" action="{{ route('technician.materials.index') }}" class="flex gap-2">
+            <select name="category" class="border rounded px-3 py-2">
+                <option value="">Alle categorieën</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category }}" {{ request('category') == $category ? 'selected' : '' }}>
+                        {{ $category }}
+                    </option>
+                @endforeach
+            </select>
+            
+            <select name="sort" class="border rounded px-3 py-2">
+                <option value="">Sorteer op naam</option>
+                <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>A-Z</option>
+                <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Z-A</option>
+            </select>
+            
+            <button type="submit" class="bg-gray-500 text-white px-4 py-2 rounded">Filter & Sorteer</button>
+            <a href="{{ route('technician.materials.index') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Reset</a>
+        </form>
+    </div>
+
+    <x-card>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr>
+                        <th class="text-left">Naam</th>
+                        <th class="text-left">Categorie</th>
+                        <th class="text-left">Voorraad</th>
+                        <th class="text-left">Status</th>
+                        <th class="text-left">Bestel</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($materials as $material)
+                    <tr>
+                        <td>{{ $material->name }}</td>
+                        <td>{{ $material->category }}</td>
+                        <td>{{ $material->stock }}</td>
+                        <td>
+                            @if($material->is_active)
+                                <span class="text-green-600">Actief</span>
+                            @else
+                                <span class="text-red-600">Inactief</span>
+                            @endif
+                        </td>
+                        <td>
+                            <form action="{{ route('cart.add', $material->id) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded text-sm">Bestellen</button>
+                            </form>
+                            <a href="{{ route('technician.materials.show', $material->id) }}" class="text-blue-500 ml-2">Bekijk</a>
+                        </td>
+                    </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center">Geen materialen gevonden.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </x-card>
+</x-app-layout>
