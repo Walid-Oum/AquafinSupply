@@ -13,131 +13,126 @@
 
     <x-card>
 
-        <table class="w-full">
+        @if(session()->has('cart') && count(session()->get('cart')) > 0)
 
-            <thead>
+            <table class="w-full">
 
-                <tr class="border-b">
+                <thead>
 
-                    <th class="text-left p-3">Materiaal</th>
-                    <th class="text-left p-3">Aantal</th>
-                    <th class="text-left p-3">Actie</th>
+                    <tr class="border-b">
 
-                </tr>
+                        <th class="text-left p-3">Materiaal</th>
+                        <th class="text-left p-3">Categorie</th>
+                        <th class="text-left p-3">Aantal</th>
+                        <th class="text-left p-3">Actie</th>
 
-            </thead>
+                    </tr>
 
-            <tbody>
+                </thead>
 
-                {{-- Tijdelijke data --}}
+                <tbody>
 
-                <tr class="border-b">
+                    @foreach(session()->get('cart') as $id => $item)
 
-                    <td class="p-3">
-                        Dompelpomp
-                    </td>
+                        <tr class="border-b">
 
-                    <td class="p-3">
+                            <td class="p-3">
+                                {{ $item['name'] }}
+                            </td>
 
-                        <input
-                            type="number"
-                            value="1"
-                            min="1"
-                            class="border rounded-lg px-3 py-2 w-20">
+                            <td class="p-3">
+                                {{ $item['category'] }}
+                            </td>
 
-                    </td>
+                            <td class="p-3">
 
-                    <td class="p-3">
+                                <input
+                                    type="number"
+                                    value="{{ $item['quantity'] }}"
+                                    min="1"
+                                    class="border rounded-lg px-3 py-2 w-20">
 
-                        <x-button>
-                            Verwijderen
-                        </x-button>
+                            </td>
 
-                    </td>
+                            <td class="p-3">
 
-                </tr>
+                                <form action="{{ route('cart.remove', $id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <x-button type="submit">Verwijderen</x-button>
+                                </form>
 
-                <tr>
+                            </td>
 
-                    <td class="p-3">
-                        Rioolstop
-                    </td>
+                        </tr>
 
-                    <td class="p-3">
+                    @endforeach
 
-                        <input
-                            type="number"
-                            value="2"
-                            min="1"
-                            class="border rounded-lg px-3 py-2 w-20">
+                </tbody>
 
-                    </td>
+            </table>
 
-                    <td class="p-3">
+        @else
 
-                        <x-button>
-                            Verwijderen
-                        </x-button>
+            <p class="text-gray-600 text-center py-4">Je winkelmandje is leeg.</p>
 
-                    </td>
-
-                </tr>
-
-            </tbody>
-
-        </table>
+        @endif
 
     </x-card>
 
-    <div class="mt-6">
+    @if(session()->has('cart') && count(session()->get('cart')) > 0)
 
-        <x-card>
+        <div class="mt-6">
 
-            <div class="space-y-5">
+            <x-card>
 
-                <div>
+                <div class="space-y-5">
 
-                    <label class="block mb-2 font-semibold">
+                    <div>
 
-                        Leverdatum
+                        <label class="block mb-2 font-semibold">
 
-                    </label>
+                            Leverdatum
 
-                    <input
-                        type="date"
-                        class="w-full border rounded-lg px-4 py-3">
+                        </label>
+
+                        <input
+                            type="date"
+                            class="w-full border rounded-lg px-4 py-3">
+
+                    </div>
+
+                    <div>
+
+                        <label class="block mb-2 font-semibold">
+
+                            Opmerking
+
+                        </label>
+
+                        <textarea
+                            rows="4"
+                            class="w-full border rounded-lg px-4 py-3"
+                            placeholder="Extra informatie..."></textarea>
+
+                    </div>
+
+                    <div>
+
+                        <x-button>
+
+                            Bestelling plaatsen
+
+                        </x-button>
+
+                    </div>
 
                 </div>
 
-                <div>
+            </x-card>
 
-                    <label class="block mb-2 font-semibold">
+        </div>
 
-                        Opmerking
-
-                    </label>
-
-                    <textarea
-                        rows="4"
-                        class="w-full border rounded-lg px-4 py-3"
-                        placeholder="Extra informatie..."></textarea>
-
-                </div>
-
-                <div>
-
-                    <x-button>
-
-                        Bestelling plaatsen
-
-                    </x-button>
-
-                </div>
-
-            </div>
-
-        </x-card>
-
-    </div>
+    @endif
 
 </x-app-layout>
