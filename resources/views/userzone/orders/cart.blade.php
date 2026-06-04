@@ -40,13 +40,33 @@
                                 {{ $item['category'] }}
                             </td>
 
-                            <td class="p-3">
-                                <input
-                                    type="number"
-                                    value="{{ $item['quantity'] }}"
-                                    min="1"
-                                    class="border rounded-lg px-3 py-2 w-20">
-                            </td>
+                          <td class="p-3">
+
+    <form action="{{ route('cart.update', $id) }}"
+          method="POST"
+          class="flex items-center gap-2">
+
+        @csrf
+        @method('PATCH')
+
+        <input
+            type="number"
+            name="quantity"
+            value="{{ $item['quantity'] }}"
+            min="1"
+            class="border rounded-lg px-3 py-2 w-20">
+
+        <button
+            type="submit"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg">
+
+            Opslaan
+
+        </button>
+
+    </form>
+
+</td>
 
                             <td class="p-3">
 

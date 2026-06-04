@@ -91,7 +91,8 @@ public function store(Request $request)
 public function show($id)
 {
     $order = Order::with('items.material')
-        ->findOrFail($id);
+    ->where('user_id', Auth::id())
+    ->findOrFail($id);
 
     return view(
         'userzone.orders.show',
