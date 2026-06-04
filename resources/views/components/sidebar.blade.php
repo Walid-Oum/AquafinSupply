@@ -1,12 +1,7 @@
 @php
 
-// TEMPORAIRE POUR LES TESTS
 
-$role = 'technieker';
-
-// $role = 'magazijn';
-
-// $role = 'admin';
+$role = auth()->user()->role ?? 'technieker';
 
 @endphp
 
