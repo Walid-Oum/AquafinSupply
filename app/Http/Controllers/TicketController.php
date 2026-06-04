@@ -36,5 +36,11 @@ class TicketController extends Controller
 
     }
 
+
+    public function all(){
+        $tickets = Ticket::with(['user', 'order'])->get();
+        return view('tickets.all', ['tickets' => $tickets]);
+    }
+
     //
 }
