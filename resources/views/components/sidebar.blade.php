@@ -1,7 +1,7 @@
 @php
 
 
-$role = Auth
+$role = Auth:user()->role;
 
 @endphp
 
