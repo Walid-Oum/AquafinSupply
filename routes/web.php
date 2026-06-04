@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Userzone\CartController;
 use App\Http\Controllers\Userzone\OrderController;
 use App\Http\Controllers\Userzone\ProfileController;
-
+use App\Http\Controllers\Admin\AdminOrderController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -26,6 +26,15 @@ Route::get('/bestellingen/{id}', [OrderController::class,'show'])
     ->name('orders.show');
 
 //tickets
+
+/*
+|--------------------------------------------------------------------------
+| Administrator
+|--------------------------------------------------------------------------
+| Overzicht van alle bestellingen
+*/
+Route::get('/admin/orders', [AdminOrderController::class,'index'])
+    ->name('admin.orders.index');
 
 //technieker
 Route::middleware('auth')->prefix('tickets')->group(function () {
