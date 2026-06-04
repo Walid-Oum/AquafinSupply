@@ -5,6 +5,8 @@ use App\Http\Controllers\Userzone\CartController;
 use App\Http\Controllers\Userzone\OrderController;
 use App\Http\Controllers\Userzone\ProfileController;
 use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\MaterialController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -26,7 +28,6 @@ Route::get('/bestellingen/{id}', [OrderController::class,'show'])
     ->name('orders.show');
 
 //tickets
-
 /*
 |--------------------------------------------------------------------------
 | Administrator
@@ -36,6 +37,7 @@ Route::get('/bestellingen/{id}', [OrderController::class,'show'])
 Route::get('/admin/orders', [AdminOrderController::class,'index'])
     ->name('admin.orders.index');
 
+//technieker
 //technieker
 Route::middleware('auth')->prefix('tickets')->group(function () {
     Route::get('/', [\App\Http\Controllers\TicketController::class, 'index'])->name('tickets.index');
@@ -47,6 +49,8 @@ Route::middleware('auth')->prefix('tickets')->group(function () {
 
 Route::middleware('auth')->prefix('magazijn/tickets')->group(function () {
     Route::get('/', [\App\Http\Controllers\TicketController::class, 'all'])->name('tickets.all');
+    Route::get('/{ticket}', [\App\Http\Controllers\TicketController::class, 'showHouseware'])->name('tickets.showHouseware');
+
 });
 
 Route::get('/dashboard', function () {
@@ -57,6 +61,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Materialen routes (Teamlid 1)
+Route::middleware(['auth'])->group(function () {
+    Route::resource('materials', MaterialController::class);
 });
 
 require __DIR__.'/auth.php';

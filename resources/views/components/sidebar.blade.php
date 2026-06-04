@@ -1,12 +1,7 @@
 @php
 
-// TEMPORAIRE POUR LES TESTS
 
-$role = 'technieker';
-
-// $role = 'magazijn';
-
-// $role = 'admin';
+$role = Auth::user()->role;
 
 @endphp
 
@@ -55,7 +50,7 @@ $role = 'technieker';
             @if($role == 'technieker')
 
                 <li>
-                    <a href="#"
+                    <a href="{{ route('materials.index') }}"
                        class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
                         Materialen
                     </a>
