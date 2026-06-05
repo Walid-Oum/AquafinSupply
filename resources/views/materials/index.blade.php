@@ -30,6 +30,7 @@
                         <th class="text-left">Categorie</th>
                         <th class="text-left">Voorraad</th>
                         <th class="text-left">Minimum voorraad</th>
+                        <th class="text-left">Vooraadstatus</th>
                         <th class="text-left">Status</th>
                         <th class="text-left">Acties</th>
                     </tr>
@@ -54,9 +55,26 @@
                             @endif
 
                         </td>
-
                         <td>
                             {{ $material->minimum_stock }}
+                        </td>
+
+                        <td>
+
+                            @if($material->stock <= $material->minimum_stock)
+
+                                <span class="text-red-600 font-bold">
+            Lage voorraad
+        </span>
+
+                            @else
+
+                                <span class="text-green-600">
+            OK
+        </span>
+
+                            @endif
+
                         </td>
 
                         <td>

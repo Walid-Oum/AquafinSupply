@@ -84,14 +84,14 @@ $request->validate([
 ]);
 
 $material = Material::findOrFail($id);
-$material->update([
-    'name' => $request->name,
-    'category' => $request->category,
-    'description' => $request->description,
-    'stock' => $request->stock,
-    'is_active' => $request->is_active,
-    'minimum_stock' => $request->minimum_stock,
-]);
+    $material->update([
+        'name' => $request->name,
+        'category' => $request->category,
+        'description' => $request->description,
+        'stock' => $request->stock,
+        'minimum_stock' => $request->minimum_stock,
+        'is_active' => $request->is_active,
+    ]);
 return redirect()->route('materials.index')->with('success', 'Materiaal bijgewerkt!');
 }
 
