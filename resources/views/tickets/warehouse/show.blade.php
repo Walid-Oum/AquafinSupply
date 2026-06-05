@@ -6,7 +6,7 @@
                 <p class="text-gray-600">Bekijk hier de details van dit ticket.</p>
             </div>
 
-            <a href="{{ route('tickets.all') }}"
+            <a href="{{ route('tickets.warehouse.index') }}"
                class="rounded-lg bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300">
                 Terug
             </a>

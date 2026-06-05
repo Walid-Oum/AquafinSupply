@@ -1,11 +1,38 @@
 <x-app-layout>
     <x-page-header title="Materialen overzicht" />
+    @if($lowStockMaterials->count() > 0)
+
+        <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+
+            <strong>Lage voorraad waarschuwing</strong>
+
+            <ul class="mt-2 list-disc list-inside">
+
+                @foreach($lowStockMaterials as $material)
+
+                    <li>
+                        {{ $material->name }}
+                        -
+                        voorraad:
+                        {{ $material->stock }}
+                        /
+                        minimum:
+                        {{ $material->minimum_stock }}
+                    </li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endif
 
     <div class="mb-4 flex justify-between items-center">
         <a href="{{ route('materials.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded">
             + Nieuw materiaal
         </a>
-        
+
         <!-- Filter op categorie -->
         <form method="GET" action="{{ route('materials.index') }}" class="flex gap-2">
             <select name="category" class="border rounded px-3 py-2">
@@ -48,7 +75,7 @@
                         </td>
                         <td class="space-x-3">
 
-   
+
 
     <a href="{{ route('materials.show', $material->id) }}"
        class="text-blue-500">
