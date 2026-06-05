@@ -51,9 +51,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Materialen routes (Teamlid 1)
+// Materialen routes 
 Route::middleware(['auth'])->group(function () {
     Route::resource('materials', MaterialController::class);
 });
 
+// Gebruikersbeheer & Rollen 
+// Beveilig deze groep: de gebruiker moet ingelogd zijn ('auth') EN de rol 'admin' hebben
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    
+    // Dit maakt automatisch alle routes aan voor jouw UserController 
+    Route::resource('users', \App\Http\Controllers\UserController::class);
+    
+});
 require __DIR__.'/auth.php';
