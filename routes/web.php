@@ -57,8 +57,6 @@ Route::middleware('auth')
             ->name('materials.show');
     });
 
-   
-
 /*
 |--------------------------------------------------------------------------
 | Winkelmandje
@@ -75,9 +73,9 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])
         ->name('cart.remove');
-        
-        Route::patch('/cart/update/{id}', [CartController::class, 'update'])
-    ->name('cart.update');
+
+    Route::patch('/cart/update/{id}', [CartController::class, 'update'])
+        ->name('cart.update');
 });
 
 /*
@@ -119,10 +117,25 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin/orders', [AdminOrderController::class, 'index'])
         ->name('admin.orders.index');
+
+    Route::get('/admin/orders/{id}', [AdminOrderController::class, 'show'])
+        ->name('admin.orders.show');
 });
 
-Route::get('/admin/orders/{id}', [AdminOrderController::class, 'show'])
-    ->name('admin.orders.show');
+/*
+|--------------------------------------------------------------------------
+| Admin Gebruikersbeheer & Rollen
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+        Route::resource('users', \App\Http\Controllers\UserController::class);
+    });
+
 /*
 |--------------------------------------------------------------------------
 | Tickets Technieker
@@ -154,10 +167,13 @@ Route::middleware('auth')
     ->group(function () {
 
         Route::get('/', [\App\Http\Controllers\TicketController::class, 'all'])
-            ->name('tickets.all');
+            ->name('tickets.warehouse.index');
 
-        Route::get('/{ticket}', [\App\Http\Controllers\TicketController::class, 'showHouseware'])
-            ->name('tickets.showHouseware');
+        Route::get('/{ticket}', [\App\Http\Controllers\TicketController::class, 'showWarehouse'])
+            ->name('tickets.warehouse.show');
+
+        Route::patch('/{ticket}/status', [\App\Http\Controllers\TicketController::class, 'updateStatus'])
+            ->name('tickets.warehouse.updateStatus');
     });
 
 require __DIR__.'/auth.php';
