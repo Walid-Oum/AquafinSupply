@@ -1,6 +1,6 @@
 <div class="bg-white h-20 border-b flex justify-end items-center px-8">
 
-    <div class="flex items-center gap-4">
+    <a href="{{ route('profile.edit') }}" class="flex items-center gap-4 p-2 rounded-xl hover:bg-gray-50 transition-colors duration-150 cursor-pointer group">
 
         <div
             class="w-12 h-12 rounded-full
@@ -10,28 +10,25 @@
                    text-white
                    flex items-center
                    justify-center
-                   font-bold">
+                   font-bold
+                   uppercase">
 
-            T
+            {{ substr(Auth::user()->name, 0, 1) }}
 
         </div>
 
         <div>
 
-            <p class="font-semibold text-gray-700">
-
-                Test User
-
+            <p class="font-semibold text-gray-700 leading-tight">
+                {{ Auth::user()->name }}
             </p>
 
-            <p class="text-sm text-gray-500">
-
-                Profiel
-
+            <p class="text-xs text-gray-400 group-hover:text-[#1E6BA8] transition-colors capitalize">
+                {{ Auth::user()->role }} • <span class="underline">Wijzigen</span>
             </p>
 
         </div>
 
-    </div>
+    </a>
 
 </div>
