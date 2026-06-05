@@ -31,15 +31,15 @@ class AuthenticatedSessionController extends Controller
     $user = Auth::user();
 
     if ($user->role === 'technieker') {
-        return redirect()->route('materials.index');
+        return redirect()->route('dashboard');
     }
 
     if ($user->role === 'magazijn') {
-        return redirect()->route('materials.index');
+        return redirect()->route('dashboard');
     }
 
     if ($user->role === 'admin') {
-        return redirect()->route('admin.users.index');
+        return redirect()->route('dashboard');
     }
 
     return redirect('/');
