@@ -7,9 +7,7 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\Technician\MaterialController as TechnicianMaterialController;
 use App\Http\Controllers\Admin\AdminOrderController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', '/login');
 
 /*
 |--------------------------------------------------------------------------
