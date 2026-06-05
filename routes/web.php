@@ -11,167 +11,85 @@ Route::redirect('/', '/login');
 
 /*
 |--------------------------------------------------------------------------
-| Dashboard
+| Dashboard & Profiel (Toegankelijk voor IEDEREEN die ingelogd is)
 |--------------------------------------------------------------------------
 */
+Route::middleware(['auth', 'verified'])->group(function () {
+    
+    Route::get('/dashboard', function () {
+        return view('userzone.dashboard');
+    })->name('dashboard');
 
-Route::get('/dashboard', function () {
-    return view('userzone.dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-/*
-|--------------------------------------------------------------------------
-| Profile
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('auth')->group(function () {
-
-    Route::get('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'edit'])
-        ->name('profile.edit');
-
-    Route::patch('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'update'])
-        ->name('profile.update');
-
-    Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])
-        ->name('profile.destroy');
+    Route::get('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 /*
 |--------------------------------------------------------------------------
-| Technieker - Materialen
+| ZONE: Technieker (Alleen Techniekers en Admins mogen hierbij)
 |--------------------------------------------------------------------------
 */
+Route::middleware(['auth', 'role:technieker,admin'])->group(function () {
 
-Route::middleware('auth')
-    ->prefix('technician')
-    ->name('technician.')
-    ->group(function () {
-
-        Route::get('/materials', [TechnicianMaterialController::class, 'index'])
-            ->name('materials.index');
-
-        Route::get('/materials/{id}', [TechnicianMaterialController::class, 'show'])
-            ->name('materials.show');
+    // Technieker - Materialen bekijken
+    Route::prefix('technician')->name('technician.')->group(function () {
+        Route::get('/materials', [TechnicianMaterialController::class, 'index'])->name('materials.index');
+        Route::get('/materials/{id}', [TechnicianMaterialController::class, 'show'])->name('materials.show');
     });
 
-/*
-|--------------------------------------------------------------------------
-| Winkelmandje
-|--------------------------------------------------------------------------
-*/
+    // Winkelmandje van de technieker
+    Route::get('/winkelmandje', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::patch('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
 
-Route::middleware('auth')->group(function () {
+    // Bestellingen van de technieker
+    Route::get('/bestellingen', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/bestellingen/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/bestelling/plaatsen', [OrderController::class, 'store'])->name('orders.store');
 
-    Route::get('/winkelmandje', [CartController::class, 'index'])
-        ->name('cart.index');
-
-    Route::post('/cart/add/{id}', [CartController::class, 'add'])
-        ->name('cart.add');
-
-    Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])
-        ->name('cart.remove');
-
-    Route::patch('/cart/update/{id}', [CartController::class, 'update'])
-        ->name('cart.update');
+    // Eigen tickets aanmaken/bekijken
+    Route::prefix('tickets')->group(function () {
+        Route::get('/', [\App\Http\Controllers\TicketController::class, 'index'])->name('tickets.index');
+        Route::get('/create', [\App\Http\Controllers\TicketController::class, 'create'])->name('tickets.create');
+        Route::post('/', [\App\Http\Controllers\TicketController::class, 'store'])->name('tickets.store');
+    });
 });
 
 /*
 |--------------------------------------------------------------------------
-| Bestellingen
+| ZONE: Magazijn (Alleen Magazijnmedewerkers en Admins mogen hierbij)
 |--------------------------------------------------------------------------
 */
+Route::middleware(['auth', 'role:magazijn,admin'])->group(function () {
 
-Route::middleware('auth')->group(function () {
-
-    Route::get('/bestellingen', [OrderController::class, 'index'])
-        ->name('orders.index');
-
-    Route::get('/bestellingen/{id}', [OrderController::class, 'show'])
-        ->name('orders.show');
-
-    Route::post('/bestelling/plaatsen', [OrderController::class, 'store'])
-        ->name('orders.store');
+    // Tickets verwerken in het magazijn
+    Route::prefix('magazijn/tickets')->group(function () {
+        Route::get('/', [\App\Http\Controllers\TicketController::class, 'all'])->name('tickets.warehouse.index');
+        Route::get('/{ticket}', [\App\Http\Controllers\TicketController::class, 'showWarehouse'])->name('tickets.warehouse.show');
+        Route::patch('/{ticket}/status', [\App\Http\Controllers\TicketController::class, 'updateStatus'])->name('tickets.warehouse.updateStatus');
+    });
 });
 
 /*
 |--------------------------------------------------------------------------
-| Admin Materialen
+| ZONE: Admin (STRIKT ALLEEN VOOR ADMINS - Technieker en Magazijn worden geweigerd)
 |--------------------------------------------------------------------------
 */
+Route::middleware(['auth', 'role:admin'])->group(function () {
 
-Route::middleware('auth')->group(function () {
-
+    // Admin Materialenbeheer (CRUD)
     Route::resource('materials', MaterialController::class);
-});
 
-/*
-|--------------------------------------------------------------------------
-| Admin Bestellingen
-|--------------------------------------------------------------------------
-*/
+    // Admin Bestellingenoverzicht
+    Route::get('/admin/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/admin/orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
 
-Route::middleware('auth')->group(function () {
-
-    Route::get('/admin/orders', [AdminOrderController::class, 'index'])
-        ->name('admin.orders.index');
-
-    Route::get('/admin/orders/{id}', [AdminOrderController::class, 'show'])
-        ->name('admin.orders.show');
-});
-
-/*
-|--------------------------------------------------------------------------
-| Admin Gebruikersbeheer & Rollen
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware(['auth', 'role:admin'])
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(function () {
-
+    // Admin Gebruikersbeheer & Rollen toewijzen
+    Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', \App\Http\Controllers\UserController::class);
     });
-
-/*
-|--------------------------------------------------------------------------
-| Tickets Technieker
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('auth')
-    ->prefix('tickets')
-    ->group(function () {
-
-        Route::get('/', [\App\Http\Controllers\TicketController::class, 'index'])
-            ->name('tickets.index');
-
-        Route::get('/create', [\App\Http\Controllers\TicketController::class, 'create'])
-            ->name('tickets.create');
-
-        Route::post('/', [\App\Http\Controllers\TicketController::class, 'store'])
-            ->name('tickets.store');
-    });
-
-/*
-|--------------------------------------------------------------------------
-| Tickets Magazijn
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('auth')
-    ->prefix('magazijn/tickets')
-    ->group(function () {
-
-        Route::get('/', [\App\Http\Controllers\TicketController::class, 'all'])
-            ->name('tickets.warehouse.index');
-
-        Route::get('/{ticket}', [\App\Http\Controllers\TicketController::class, 'showWarehouse'])
-            ->name('tickets.warehouse.show');
-
-        Route::patch('/{ticket}/status', [\App\Http\Controllers\TicketController::class, 'updateStatus'])
-            ->name('tickets.warehouse.updateStatus');
-    });
+});
 
 require __DIR__.'/auth.php';
