@@ -118,7 +118,7 @@ $role = Auth::user()->role;
             @if($role == 'admin')
 
                 <li>
-                    <a href="#"
+                    <a href="{{ route('admin.users.index') }}"
                        class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
                         Gebruikers
                     </a>
