@@ -57,7 +57,7 @@ Route::middleware('auth')
             ->name('materials.show');
     });
 
-   
+
 
 /*
 |--------------------------------------------------------------------------
@@ -75,7 +75,7 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])
         ->name('cart.remove');
-        
+
         Route::patch('/cart/update/{id}', [CartController::class, 'update'])
     ->name('cart.update');
 });
@@ -156,8 +156,9 @@ Route::middleware('auth')
         Route::get('/', [\App\Http\Controllers\TicketController::class, 'all'])
             ->name('tickets.all');
 
-        Route::get('/{ticket}', [\App\Http\Controllers\TicketController::class, 'showHouseware'])
-            ->name('tickets.showHouseware');
+        Route::get('/{ticket}', [\App\Http\Controllers\TicketController::class, 'showWarehouse'])->name('tickets.warehouse.show');
+
+        Route::patch('/{ticket}/status', [\App\Http\Controllers\TicketController::class, 'updateStatus'])->name('tickets.warehouse.updateStatus');
     });
 
 require __DIR__.'/auth.php';
