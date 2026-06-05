@@ -18,10 +18,23 @@ $query->where('category', $request->category);
 
 $materials = $query->get();
 
+$lowStockMaterials = Material::whereColumn(
+        'stock',
+        '<=',
+        'minimum_stock'
+    )->get();
+
 // Haal alle unieke categorieën op voor de filter dropdown
 $categories = Material::select('category')->distinct()->pluck('category');
 
-return view('materials.index', compact('materials', 'categories'));
+    return view(
+        'materials.index',
+        compact(
+            'materials',
+            'categories',
+            'lowStockMaterials'
+        )
+    );
 }
 
 public function create()
