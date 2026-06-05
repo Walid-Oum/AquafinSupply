@@ -25,13 +25,13 @@ class CartController extends Controller
 
         } else {
 
-            $cart[$id] = [
-                'id' => $material->id,
-                'name' => $material->name,
-                'category' => $material->category,
-                'quantity' => 1,
-            ];
-
+           $cart[$id] = [
+    'id' => $material->id,
+    'name' => $material->name,
+    'category' => $material->category,
+    'stock' => $material->stock,
+    'quantity' => 1,
+];
         }
 
         session()->put('cart', $cart);

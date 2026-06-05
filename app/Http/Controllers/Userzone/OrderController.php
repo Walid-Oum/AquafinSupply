@@ -36,8 +36,9 @@ public function store(Request $request)
     if (empty($cart)) {
 
         return redirect()
-            ->route('cart.index')
-            ->with('error', 'Winkelmandje is leeg.');
+    ->back()
+    ->withInput()
+    ->with('error', 'Winkelmandje is leeg.');
     }
 
     foreach ($cart as $item) {
@@ -47,15 +48,17 @@ public function store(Request $request)
         if (!$material) {
 
             return redirect()
-                ->route('cart.index')
-                ->with('error', 'Materiaal bestaat niet meer.');
+    ->back()
+    ->withInput()
+    ->with('error', 'Materiaal bestaat niet meer.');
         }
 
         if ($item['quantity'] > $material->stock) {
 
-            return redirect()
-                ->route('cart.index')
-                ->with('error', 'Onvoldoende voorraad voor ' . $material->name);
+           return redirect()
+    ->back()
+    ->withInput()
+    ->with('error', 'Onvoldoende voorraad');
         }
     }
 

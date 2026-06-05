@@ -21,6 +21,7 @@
                     <tr class="border-b">
                         <th class="text-left p-3">Materiaal</th>
                         <th class="text-left p-3">Categorie</th>
+                        <th class="text-left p-3">Voorraad</th>
                         <th class="text-left p-3">Aantal</th>
                         <th class="text-left p-3">Actie</th>
                     </tr>
@@ -40,6 +41,10 @@
                                 {{ $item['category'] }}
                             </td>
 
+                            <td class="p-3">
+    {{ $item['stock'] }}
+</td>
+
                           <td class="p-3">
 
     <form action="{{ route('cart.update', $id) }}"
@@ -49,20 +54,16 @@
         @csrf
         @method('PATCH')
 
-        <input
-            type="number"
-            name="quantity"
-            value="{{ $item['quantity'] }}"
-            min="1"
-            class="border rounded-lg px-3 py-2 w-20">
+       <input
+    type="number"
+    name="quantity"
+    value="{{ $item['quantity'] }}"
+    min="1"
+    max="{{ $item['stock'] }}"
+    onchange="this.form.submit()"
+    class="border rounded-lg px-3 py-2 w-20">
 
-        <button
-            type="submit"
-            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg">
-
-            Opslaan
-
-        </button>
+       
 
     </form>
 
@@ -124,9 +125,10 @@
                     Leverdatum
                 </label>
 
-                <input
+             <input
     type="date"
     name="delivery_date"
+    value="{{ old('delivery_date') }}"
     class="w-full border rounded-lg px-4 py-3">
 
             </div>
@@ -137,11 +139,11 @@
                     Opmerking
                 </label>
 
-                <textarea
-                    name="comment"
-                    rows="4"
-                    class="w-full border rounded-lg px-4 py-3"
-                    placeholder="Extra informatie..."></textarea>
+               <textarea
+    name="comment"
+    rows="4"
+    class="w-full border rounded-lg px-4 py-3"
+    placeholder="Extra informatie...">{{ old('comment') }}</textarea>
 
             </div>
 
