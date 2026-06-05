@@ -10,24 +10,21 @@
                    text-white
                    flex items-center
                    justify-center
-                   font-bold">
+                   font-bold
+                   uppercase">
 
-            T
+            {{ substr(Auth::user()->name, 0, 1) }}
 
         </div>
 
         <div>
 
             <p class="font-semibold text-gray-700">
-
-                Test User
-
+                {{ Auth::user()->name }}
             </p>
 
-            <p class="text-sm text-gray-500">
-
-                Profiel
-
+            <p class="text-sm text-gray-500 capitalize">
+                {{ Auth::user()->role }}
             </p>
 
         </div>
