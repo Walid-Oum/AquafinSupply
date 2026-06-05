@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-page-header>Nieuw materiaal toevoegen</x-page-header>
+    <x-page-header title="Nieuw materiaal toevoegen" />
 
     <x-card>
         <form action="{{ route('materials.store') }}" method="POST">

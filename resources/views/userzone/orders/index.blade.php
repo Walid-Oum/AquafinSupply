@@ -24,7 +24,9 @@
                     <th class="p-3 text-left">
                         Technieker
                     </th>
-
+                 <th class="p-3 text-left">
+             Besteld op
+              </th>
                     <th class="p-3 text-left">
                         Leverdatum
                     </th>
@@ -41,80 +43,60 @@
 
             </thead>
 
-            <tbody>
+           <tbody>
 
-                {{-- Tijdelijke voorbeelddata --}}
+@forelse($orders as $order)
 
-                <tr class="border-b">
+<tr>
 
-                    <td class="p-3">
-                        #001
-                    </td>
+    <td class="p-3">
+        #{{ $order->id }}
+    </td>
 
-                    <td class="p-3">
-                        Samia
-                    </td>
+    <td class="p-3">
+        {{ $order->user->name }}
+    </td>
+    <td class="p-3">
+    {{ $order->created_at->format('d/m/Y') }}
+</td>
 
-                    <td class="p-3">
-                        15/06/2026
-                    </td>
+    <td class="p-3">
+        {{ $order->delivery_date }}
+    </td>
 
-                    <td class="p-3">
+    <td class="p-3">
+        {{ $order->status }}
+    </td>
 
-                        <x-status-badge status="Nieuw"/>
+    <td class="p-3">
 
-                    </td>
+        <a href="{{ route('orders.show', $order->id) }}">
 
-                    <td class="p-3">
+            <x-button>
+                Bekijken
+            </x-button>
 
-                        <a href="/bestellingen/1">
+        </a>
 
-                            <x-button>
-                                Bekijken
-                            </x-button>
+    </td>
 
-                        </a>
+</tr>
 
-                    </td>
+@empty
 
-                </tr>
+<tr>
 
-                <tr>
+    <td colspan="5" class="text-center p-4">
 
-                    <td class="p-3">
-                        #002
-                    </td>
+        Geen bestellingen gevonden.
 
-                    <td class="p-3">
-                        Samia
-                    </td>
+    </td>
 
-                    <td class="p-3">
-                        18/06/2026
-                    </td>
+</tr>
 
-                    <td class="p-3">
+@endforelse
 
-                        <x-status-badge status="In voorbereiding"/>
-
-                    </td>
-
-                    <td class="p-3">
-
-                        <a href="/bestellingen/2">
-
-                            <x-button>
-                                Bekijken
-                            </x-button>
-
-                        </a>
-
-                    </td>
-
-                </tr>
-
-            </tbody>
-
+</tbody>
         </table>
 
     </x-card>

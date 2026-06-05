@@ -39,14 +39,26 @@ class TicketController extends Controller
 
     public function all(){
         $tickets = Ticket::with(['user', 'order'])->get();
-        return view('tickets.all', ['tickets' => $tickets]);
+        return view('tickets.warehouse.all', ['tickets' => $tickets]);
     }
 
     //
 
-
-    public function showHouseware(Ticket $ticket){
+    //show functie voor de magazijnmedewerker
+    public function showWarehouse(Ticket $ticket){
         $ticket->load(['user', 'order']);
-        return view('tickets.showHouseware', ['ticket' => $ticket]);
+        return view('tickets.warehouse.show', ['ticket' => $ticket]);
     }
+
+    public function updateStatus(Ticket $ticket, Request $request){
+        $validated = $request->validate([
+            'status' => ['required', 'string'],
+        ]);
+        $ticket->update([
+            'status' => $validated['status'],
+        ]);
+        return redirect()->route('tickets.warehouse.show', $ticket)->with('success', 'Ticket updated successfully');
+    }
+
+
 }

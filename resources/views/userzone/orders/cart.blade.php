@@ -13,131 +13,162 @@
 
     <x-card>
 
-        <table class="w-full">
+        @if(session()->has('cart') && count(session()->get('cart')) > 0)
 
-            <thead>
+            <table class="w-full">
 
-                <tr class="border-b">
+                <thead>
+                    <tr class="border-b">
+                        <th class="text-left p-3">Materiaal</th>
+                        <th class="text-left p-3">Categorie</th>
+                        <th class="text-left p-3">Aantal</th>
+                        <th class="text-left p-3">Actie</th>
+                    </tr>
+                </thead>
 
-                    <th class="text-left p-3">Materiaal</th>
-                    <th class="text-left p-3">Aantal</th>
-                    <th class="text-left p-3">Actie</th>
+                <tbody>
 
-                </tr>
+                    @foreach(session()->get('cart') as $id => $item)
 
-            </thead>
+                        <tr class="border-b">
 
-            <tbody>
+                            <td class="p-3">
+                                {{ $item['name'] }}
+                            </td>
 
-                {{-- Tijdelijke data --}}
+                            <td class="p-3">
+                                {{ $item['category'] }}
+                            </td>
 
-                <tr class="border-b">
+                          <td class="p-3">
 
-                    <td class="p-3">
-                        Dompelpomp
-                    </td>
+    <form action="{{ route('cart.update', $id) }}"
+          method="POST"
+          class="flex items-center gap-2">
 
-                    <td class="p-3">
+        @csrf
+        @method('PATCH')
 
-                        <input
-                            type="number"
-                            value="1"
-                            min="1"
-                            class="border rounded-lg px-3 py-2 w-20">
+        <input
+            type="number"
+            name="quantity"
+            value="{{ $item['quantity'] }}"
+            min="1"
+            class="border rounded-lg px-3 py-2 w-20">
 
-                    </td>
+        <button
+            type="submit"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg">
 
-                    <td class="p-3">
+            Opslaan
 
-                        <x-button>
-                            Verwijderen
-                        </x-button>
+        </button>
 
-                    </td>
+    </form>
 
-                </tr>
+</td>
 
-                <tr>
+                            <td class="p-3">
 
-                    <td class="p-3">
-                        Rioolstop
-                    </td>
+                                <form action="{{ route('cart.remove', $id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
 
-                    <td class="p-3">
+                                    <button
+                                        type="submit"
+                                        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
 
-                        <input
-                            type="number"
-                            value="2"
-                            min="1"
-                            class="border rounded-lg px-3 py-2 w-20">
+                                        Verwijderen
 
-                    </td>
+                                    </button>
 
-                    <td class="p-3">
+                                </form>
 
-                        <x-button>
-                            Verwijderen
-                        </x-button>
+                            </td>
 
-                    </td>
+                        </tr>
 
-                </tr>
+                    @endforeach
 
-            </tbody>
+                </tbody>
 
-        </table>
+            </table>
+
+        @else
+
+            <p class="text-gray-600 text-center py-8 text-lg">
+                Je winkelmandje is leeg.
+            </p>
+
+        @endif
 
     </x-card>
 
-    <div class="mt-6">
+    @if(session()->has('cart') && count(session()->get('cart')) > 0)
 
-        <x-card>
+        <div class="mt-6">
 
-            <div class="space-y-5">
+           <x-card>
 
-                <div>
+    
 
-                    <label class="block mb-2 font-semibold">
+        <form action="{{ route('orders.store') }}" method="POST">
 
-                        Leverdatum
+    @csrf
 
-                    </label>
+    <div class="space-y-5">
 
-                    <input
-                        type="date"
-                        class="w-full border rounded-lg px-4 py-3">
+            <div>
 
-                </div>
+                <label class="block mb-2 font-semibold">
+                    Leverdatum
+                </label>
 
-                <div>
-
-                    <label class="block mb-2 font-semibold">
-
-                        Opmerking
-
-                    </label>
-
-                    <textarea
-                        rows="4"
-                        class="w-full border rounded-lg px-4 py-3"
-                        placeholder="Extra informatie..."></textarea>
-
-                </div>
-
-                <div>
-
-                    <x-button>
-
-                        Bestelling plaatsen
-
-                    </x-button>
-
-                </div>
+                <input
+    type="date"
+    name="delivery_date"
+    class="w-full border rounded-lg px-4 py-3">
 
             </div>
 
-        </x-card>
+            <div>
 
-    </div>
+                <label class="block mb-2 font-semibold">
+                    Opmerking
+                </label>
+
+                <textarea
+                    name="comment"
+                    rows="4"
+                    class="w-full border rounded-lg px-4 py-3"
+                    placeholder="Extra informatie..."></textarea>
+
+            </div>
+
+            <div>
+
+                <button
+                    type="submit"
+                    class="inline-flex items-center gap-3
+                           bg-blue-600 hover:bg-blue-700
+                           text-white font-bold
+                           px-8 py-4 rounded-xl
+                           shadow-lg transition">
+
+                    🛒 Bestelling plaatsen
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</x-card>
+
+        </div>
+
+    @endif
 
 </x-app-layout>

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-page-header>Materiaal detail</x-page-header>
+    <x-page-header title="Materialen overzicht" />
 
     <x-card>
         <div class="mb-4">
