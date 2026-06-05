@@ -80,6 +80,7 @@ $request->validate([
     'category' => 'required|string|max:255',
     'stock' => 'required|integer|min:0',
     'is_active' => 'required|boolean',
+    'minimum_stock' => 'required|integer|min:0',
 ]);
 
 $material = Material::findOrFail($id);
@@ -89,6 +90,7 @@ $material->update([
     'description' => $request->description,
     'stock' => $request->stock,
     'is_active' => $request->is_active,
+    'minimum_stock' => $request->minimum_stock,
 ]);
 return redirect()->route('materials.index')->with('success', 'Materiaal bijgewerkt!');
 }

@@ -1,32 +1,5 @@
 <x-app-layout>
     <x-page-header title="Materialen overzicht" />
-    @if($lowStockMaterials->count() > 0)
-
-        <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-
-            <strong>Lage voorraad waarschuwing</strong>
-
-            <ul class="mt-2 list-disc list-inside">
-
-                @foreach($lowStockMaterials as $material)
-
-                    <li>
-                        {{ $material->name }}
-                        -
-                        voorraad:
-                        {{ $material->stock }}
-                        /
-                        minimum:
-                        {{ $material->minimum_stock }}
-                    </li>
-
-                @endforeach
-
-            </ul>
-
-        </div>
-
-    @endif
 
     <div class="mb-4 flex justify-between items-center">
         <a href="{{ route('materials.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded">
@@ -56,6 +29,7 @@
                         <th class="text-left">Naam</th>
                         <th class="text-left">Categorie</th>
                         <th class="text-left">Voorraad</th>
+                        <th class="text-left">Minimum voorraad</th>
                         <th class="text-left">Status</th>
                         <th class="text-left">Acties</th>
                     </tr>
@@ -65,13 +39,42 @@
                     <tr>
                         <td>{{ $material->name }}</td>
                         <td>{{ $material->category }}</td>
-                        <td>{{ $material->stock }}</td>
                         <td>
-                            @if($material->is_active)
-                                <span class="text-green-600">Actief</span>
+
+                            @if($material->stock <= $material->minimum_stock)
+
+                                <span class="text-red-600 font-bold">
+            {{ $material->stock }}
+        </span>
+
                             @else
-                                <span class="text-red-600">Inactief</span>
+
+                                {{ $material->stock }}
+
                             @endif
+
+                        </td>
+
+                        <td>
+                            {{ $material->minimum_stock }}
+                        </td>
+
+                        <td>
+
+                            @if($material->is_active)
+
+                                <span class="text-green-600">
+            Actief
+        </span>
+
+                            @else
+
+                                <span class="text-red-600">
+            Inactief
+        </span>
+
+                            @endif
+
                         </td>
                         <td class="space-x-3">
 
@@ -89,7 +92,6 @@
 
 </td>
 
-</td>
                     </tr>
                     @empty
                     <tr>
