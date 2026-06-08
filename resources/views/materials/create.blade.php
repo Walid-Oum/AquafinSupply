@@ -2,7 +2,7 @@
     <x-page-header title="Nieuw materiaal toevoegen" />
 
     <x-card>
-        <form action="{{ route('materials.store') }}" method="POST">
+        <form action="{{ route('materials.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="mb-4">
@@ -25,6 +25,15 @@
                 <label class="block font-bold mb-2">Beschrijving</label>
                 <textarea name="description" rows="4" class="w-full border rounded px-3 py-2">{{ old('description') }}</textarea>
                 @error('description')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label class="block font-bold mb-2">Afbeelding</label>
+                <input type="file" name="image" class="w-full border rounded px-3 py-2">
+                <p class="text-sm text-gray-500 mt-1">Toegestane formaten: JPEG, PNG, JPG. Max 2MB.</p>
+                @error('image')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
