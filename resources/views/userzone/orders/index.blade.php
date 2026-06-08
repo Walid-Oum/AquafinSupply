@@ -64,9 +64,13 @@
         {{ $order->delivery_date }}
     </td>
 
-    <td class="p-3">
-        {{ $order->status }}
-    </td>
+    
+                        <td class="p-3">
+
+                            <x-status-badge
+                                :status="$order->status" />
+
+                        </td>
 
     <td class="p-3">
 
