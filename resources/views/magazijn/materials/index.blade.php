@@ -52,9 +52,13 @@
                             Nieuw voorraad
                         </th>
 
-                        <th class="text-left p-3">
-                            Actie
-                        </th>
+                       <th class="text-center">
+    Opslaan
+</th>
+
+<th class="text-center">
+    Bekijk
+</th>
 
                     </tr>
 
@@ -84,38 +88,45 @@
 
                         </td>
 
-                        <td class="p-3">
+                    <td class="text-center">
 
-                            <form
-                                action="{{ route('magazijn.materials.update',$material->id) }}"
-                                method="POST"
-                                class="flex gap-2">
+    <form
+        action="{{ route('magazijn.materials.update', $material->id) }}"
+        method="POST"
+        class="flex items-center justify-center gap-2">
 
-                                @csrf
+        @csrf
+        @method('PATCH')
 
-                                @method('PATCH')
+        <input
+            type="number"
+            name="stock"
+            value="{{ $material->stock }}"
+            class="border rounded-lg px-3 py-2 w-24">
 
-                                <input
-                                    type="number"
-                                    name="stock"
-                                    min="0"
-                                    value="{{ $material->stock }}"
-                                    class="border rounded px-3 py-2 w-24">
+</td>
 
-                        </td>
+<td class="text-center">
 
-                        <td class="p-3">
+        <x-button>
+            Opslaan
+        </x-button>
 
-                                <x-button>
+    </form>
 
-                                    Opslaan
+</td>
 
-                                </x-button>
+<td class="text-center">
 
-                            </form>
+    <a
+        href="{{ route('magazijn.materials.show', $material->id) }}"
+        class="font-semibold text-[#0F4C81] hover:underline">
 
-                        </td>
+        Bekijk
 
+    </a>
+
+</td>
                     </tr>
 
                     @empty

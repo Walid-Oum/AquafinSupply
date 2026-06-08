@@ -75,6 +75,12 @@
                             <span>Tickets</span>
                         </a>
                     </li>
+                     <li>
+                        <a href="#"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                            Overstromingsrisico
+                        </a>
+                    </li>
 
                 @endif
 
@@ -130,6 +136,12 @@
                         <a href="{{ route('admin.orders.index') }}"
                            class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
                             Bestellingen
+                        </a>
+                    </li>
+                     <li>
+                        <a href="#"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                            Overstromingsrisico
                         </a>
                     </li>
 
