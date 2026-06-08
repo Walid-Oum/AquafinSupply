@@ -12,7 +12,6 @@ class MaterialController extends Controller
     {
         $query = Material::query();
 
-        // Filter op categorie
         if ($request->has('category') && $request->category != '') {
             $query->where('category', $request->category);
         }
@@ -25,8 +24,9 @@ class MaterialController extends Controller
             'minimum_stock'
         )->get();
 
-        // Haal alle unieke categorieën op voor de filter dropdown
-        $categories = Material::select('category')->distinct()->pluck('category');
+        $categories = Material::select('category')
+            ->distinct()
+            ->pluck('category');
 
         return view(
             'materials.index',
@@ -53,8 +53,11 @@ class MaterialController extends Controller
         ]);
 
         $imagePath = null;
+
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('materials', 'public');
+            $imagePath = $request
+                ->file('image')
+                ->store('materials', 'public');
         }
 
         Material::create([
@@ -62,23 +65,45 @@ class MaterialController extends Controller
             'category' => $request->category,
             'description' => $request->description,
             'stock' => $request->stock,
+            'minimum_stock' => $request->minimum_stock ?? 0,
             'is_active' => true,
             'image' => $imagePath,
         ]);
 
-        return redirect()->route('materials.index')->with('success', 'Materiaal toegevoegd!');
+        return redirect()
+            ->route('materials.index')
+            ->with(
+                'success',
+                'Materiaal toegevoegd!'
+            );
     }
 
     public function show($id)
     {
         $material = Material::findOrFail($id);
-        return view('materials.show', compact('material'));
+
+        if (auth()->user()->role == 'magazijn') {
+
+            return view(
+                'magazijn.materials.show',
+                compact('material')
+            );
+        }
+
+        return view(
+            'materials.show',
+            compact('material')
+        );
     }
 
     public function edit($id)
     {
         $material = Material::findOrFail($id);
-        return view('materials.edit', compact('material'));
+
+        return view(
+            'materials.edit',
+            compact('material')
+        );
     }
 
     public function update(Request $request, $id)
@@ -95,12 +120,15 @@ class MaterialController extends Controller
         $material = Material::findOrFail($id);
 
         if ($request->hasFile('image')) {
-            // Verwijder oude afbeelding als die bestaat
+
             if ($material->image) {
-                Storage::disk('public')->delete($material->image);
+                Storage::disk('public')
+                    ->delete($material->image);
             }
-            $imagePath = $request->file('image')->store('materials', 'public');
-            $material->image = $imagePath;
+
+            $material->image = $request
+                ->file('image')
+                ->store('materials', 'public');
         }
 
         $material->update([
@@ -108,24 +136,87 @@ class MaterialController extends Controller
             'category' => $request->category,
             'description' => $request->description,
             'stock' => $request->stock,
-            'is_active' => $request->is_active,
             'minimum_stock' => $request->minimum_stock,
+            'is_active' => $request->is_active,
+            'image' => $material->image,
         ]);
 
-        return redirect()->route('materials.index')->with('success', 'Materiaal bijgewerkt!');
+        return redirect()
+            ->route('materials.index')
+            ->with(
+                'success',
+                'Materiaal bijgewerkt!'
+            );
     }
 
     public function destroy($id)
     {
         $material = Material::findOrFail($id);
-        
-        // Verwijder de afbeelding als die bestaat
-        if ($material->image) 
-            Storage::disk('public')->delete($material->image);
+
+        if ($material->image) {
+
+            Storage::disk('public')
+                ->delete($material->image);
+
         }
-        
+
         $material->delete();
 
-        return redirect()->route('materials.index')->with('success', 'Materiaal verwijderd!');
+        return redirect()
+            ->route('materials.index')
+            ->with(
+                'success',
+                'Materiaal verwijderd!'
+            );
     }
-}   
+
+    /*
+    |--------------------------------------------------------------------------
+    | MAGAZIJN
+    |--------------------------------------------------------------------------
+    */
+
+    public function warehouseIndex(Request $request)
+    {
+        $query = Material::query();
+
+        if ($request->search) {
+
+            $query->where(
+                'name',
+                'like',
+                '%' . $request->search . '%'
+            );
+
+        }
+
+        $materials = $query
+            ->orderBy('name')
+            ->get();
+
+        return view(
+            'magazijn.materials.index',
+            compact('materials')
+        );
+    }
+
+    public function warehouseUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'stock' => 'required|integer|min:0'
+        ]);
+
+        $material = Material::findOrFail($id);
+
+        $material->update([
+            'stock' => $request->stock
+        ]);
+
+        return redirect()
+            ->back()
+            ->with(
+                'success',
+                'Voorraad bijgewerkt.'
+            );
+    }
+}

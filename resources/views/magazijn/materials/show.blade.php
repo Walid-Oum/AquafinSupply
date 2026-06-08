@@ -4,11 +4,21 @@
 
     <x-card>
 
-        @if($material->photo)
-            <img
-                src="{{ asset('storage/' . $material->photo) }}"
-                class="w-64 rounded-lg mb-6">
-        @endif
+       @if($material->image)
+
+    <img
+        src="{{ asset('storage/' . $material->image) }}"
+        class="w-64 rounded-lg mb-6">
+
+@else
+
+    <div class="w-64 h-40 rounded-lg mb-6 bg-gray-100 flex items-center justify-center text-gray-500">
+
+        Geen afbeelding
+
+    </div>
+
+@endif
 
         <div class="space-y-3">
 
