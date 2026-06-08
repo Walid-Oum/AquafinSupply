@@ -149,4 +149,15 @@ public function warehouseUpdate(Request $request, Order $order)
             'Status succesvol gewijzigd.'
         );
 }
+
+public function warehouseShow($id)
+{
+    $order = Order::with('items.material', 'user')
+        ->findOrFail($id);
+
+    return view(
+        'magazijn.orders.show',
+        compact('order')
+    );
+}
 }
