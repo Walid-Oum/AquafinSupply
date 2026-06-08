@@ -64,6 +64,10 @@
                             Actie
                         </th>
 
+                        <th class="text-center">
+    Bekijk
+</th>
+
                     </tr>
 
                 </thead>
@@ -130,6 +134,17 @@
                             </form>
 
                         </td>
+                        <td class="text-center">
+
+    <a
+        href="{{ route('magazijn.orders.show', $order->id) }}"
+        class="font-semibold text-[#0F4C81] hover:underline">
+
+        Bekijk
+
+    </a>
+
+</td>
 
                     </tr>
 

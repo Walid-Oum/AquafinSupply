@@ -63,8 +63,20 @@ return redirect()->route('materials.index')->with('success', 'Materiaal toegevoe
 
 public function show($id)
 {
-$material = Material::findOrFail($id);
-return view('materials.show', compact('material'));
+    $material = Material::findOrFail($id);
+
+    if (auth()->user()->role == 'magazijn') {
+
+        return view(
+            'magazijn.materials.show',
+            compact('material')
+        );
+    }
+
+    return view(
+        'materials.show',
+        compact('material')
+    );
 }
 
 public function edit($id)

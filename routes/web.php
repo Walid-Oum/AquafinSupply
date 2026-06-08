@@ -102,6 +102,16 @@ Route::patch(
     [MaterialController::class, 'warehouseUpdate']
 )->name('magazijn.materials.update');
 
+Route::get(
+    '/magazijn/material/{id}',
+    [MaterialController::class, 'show']
+)->name('magazijn.materials.show');
+
+Route::get(
+    '/magazijn/bestellingen/{id}',
+    [App\Http\Controllers\Userzone\OrderController::class, 'warehouseShow']
+)->name('magazijn.orders.show');
+
 
 });
 /*
