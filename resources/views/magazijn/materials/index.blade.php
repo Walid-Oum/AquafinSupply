@@ -86,6 +86,16 @@
 
                         <td class="p-3">
 
+    <div class="flex items-center gap-3">
+
+        <a
+            href="{{ route('materials.show', $material->id) }}"
+            class="text-blue-500">
+
+            Bekijk
+
+        </a>
+
                             <form
                                 action="{{ route('magazijn.materials.update',$material->id) }}"
                                 method="POST"
