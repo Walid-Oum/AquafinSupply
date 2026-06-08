@@ -160,4 +160,15 @@ public function warehouseShow($id)
         compact('order')
     );
 }
+
+public function warehouseEdit($id)
+{
+    $order = Order::with('items.material', 'user')
+        ->findOrFail($id);
+
+    return view(
+        'magazijn.orders.edit',
+        compact('order')
+    );
+}
 }

@@ -74,19 +74,29 @@
 
         </div>
 
-        <div class="mt-6">
+       <div class="mt-6 flex gap-3">
 
-            <a href="{{ route('magazijn.orders.index') }}">
+    <a href="{{ route('magazijn.orders.edit', $order->id) }}">
 
-                <x-button>
+        <x-button>
 
-                    Terug
+            Bewerk
 
-                </x-button>
+        </x-button>
 
-            </a>
+    </a>
 
-        </div>
+    <a href="{{ route('magazijn.orders.index') }}">
+
+        <x-button>
+
+            Terug
+
+        </x-button>
+
+    </a>
+
+</div>
 
     </x-card>
 
