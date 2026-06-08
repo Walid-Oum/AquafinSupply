@@ -72,6 +72,38 @@ Route::middleware(['auth', 'role:magazijn,admin'])->group(function () {
     });
 });
 
+
+
+
+/*
+|--------------------------------------------------------------------------
+| ZONE: Magazijn (Alleen Magazijnmedewerkers )
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:magazijn'])->group(function () {
+
+    Route::get(
+    '/magazijn/bestellingen',
+    [App\Http\Controllers\Userzone\OrderController::class, 'warehouseIndex']
+)->name('magazijn.orders.index');
+
+Route::patch(
+    '/magazijn/bestellingen/{order}',
+    [App\Http\Controllers\Userzone\OrderController::class, 'warehouseUpdate']
+)->name('magazijn.orders.update');
+
+Route::get(
+    '/magazijn/voorraad',
+    [MaterialController::class, 'warehouseIndex']
+)->name('magazijn.materials.index');
+
+Route::patch(
+    '/magazijn/voorraad/{id}',
+    [MaterialController::class, 'warehouseUpdate']
+)->name('magazijn.materials.update');
+
+
+});
 /*
 |--------------------------------------------------------------------------
 | ZONE: Admin (STRIKT ALLEEN VOOR ADMINS - Technieker en Magazijn worden geweigerd)

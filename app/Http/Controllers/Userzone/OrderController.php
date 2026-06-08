@@ -102,4 +102,51 @@ public function show($id)
         compact('order')
     );
 }
+
+public function warehouseIndex(Request $request)
+{
+    $query = Order::with('user');
+
+    if ($request->search) {
+
+        $query->where('id', 'like', '%' . $request->search . '%')
+              ->orWhereHas('user', function ($q) use ($request) {
+
+                  $q->where(
+                      'name',
+                      'like',
+                      '%' . $request->search . '%'
+                  );
+
+              });
+
+    }
+
+    $orders = $query
+        ->latest()
+        ->get();
+
+    return view(
+        'magazijn.orders.index',
+        compact('orders')
+    );
+}
+
+public function warehouseUpdate(Request $request, Order $order)
+{
+    $request->validate([
+        'status' => 'required',
+    ]);
+
+    $order->update([
+        'status' => $request->status,
+    ]);
+
+    return redirect()
+        ->back()
+        ->with(
+            'success',
+            'Status succesvol gewijzigd.'
+        );
+}
 }

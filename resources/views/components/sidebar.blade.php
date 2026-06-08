@@ -81,14 +81,14 @@
                 @if($role == 'magazijn')
 
                     <li>
-                        <a href="#"
+                        <a href="{{ route('magazijn.orders.index') }}"
                            class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
                          Bestellingen
                         </a>
                     </li>
 
                     <li>
-                        <a href="#"
+                        <a href="{{ route('magazijn.materials.index') }}"
                            class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
                              Voorraad
                         </a>

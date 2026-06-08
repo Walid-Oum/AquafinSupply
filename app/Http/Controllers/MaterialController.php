@@ -94,6 +94,7 @@ class MaterialController extends Controller
 
         $material = Material::findOrFail($id);
 
+<<<<<<< HEAD
         if ($request->hasFile('image')) {
             // Verwijder oude afbeelding als die bestaat
             if ($material->image) {
@@ -129,3 +130,86 @@ class MaterialController extends Controller
         return redirect()->route('materials.index')->with('success', 'Materiaal verwijderd!');
     }
 }
+=======
+return redirect()->route('materials.index')->with('success', 'Materiaal verwijderd!');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public function warehouseIndex(Request $request)
+{
+    $query = Material::query();
+
+    if ($request->search) {
+
+        $query->where(
+            'name',
+            'like',
+            '%' . $request->search . '%'
+        );
+
+    }
+
+    $materials = $query
+        ->orderBy('name')
+        ->get();
+
+    return view(
+        'magazijn.materials.index',
+        compact('materials')
+    );
+}
+
+public function warehouseUpdate(Request $request, $id)
+{
+    $request->validate([
+
+        'stock' => 'required|integer|min:0'
+
+    ]);
+
+    $material = Material::findOrFail($id);
+
+    $material->update([
+
+        'stock' => $request->stock
+
+    ]);
+
+    return redirect()
+        ->back()
+        ->with(
+            'success',
+            'Voorraad bijgewerkt.'
+        );
+}
+}
+>>>>>>> 727c7c982f766fd4ef4014356e0fa3f68f3538ac
