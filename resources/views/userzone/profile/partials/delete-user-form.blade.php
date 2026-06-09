@@ -48,7 +48,7 @@
 
                 <x-breeze.danger-button class="ms-3">
                     {{ __('Delete Account') }}
-                </x-breedanger-button>
+                </x-breeze.danger-button>
             </div>
         </form>
     </x-breeze.modal>
