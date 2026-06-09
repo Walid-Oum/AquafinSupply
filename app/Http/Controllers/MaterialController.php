@@ -81,7 +81,6 @@ class MaterialController extends Controller
     public function show($id)
     {
         $material = Material::findOrFail($id);
-
         if (auth()->user()->role == 'magazijn') {
 
             return view(
