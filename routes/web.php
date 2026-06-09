@@ -112,6 +112,11 @@ Route::get(
     [App\Http\Controllers\Userzone\OrderController::class, 'warehouseShow']
 )->name('magazijn.orders.show');
 
+Route::get(
+    '/magazijn/bestellingen/{id}/edit',
+    [App\Http\Controllers\Userzone\OrderController::class, 'warehouseEdit']
+)->name('magazijn.orders.edit');
+
 
 });
 /*

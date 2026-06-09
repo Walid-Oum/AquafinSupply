@@ -41,52 +41,95 @@
 
             <table class="w-full">
 
-                <thead>
+               <thead>
 
-                    <tr>
-                        <th class="text-left">Materiaal</th>
-                        <th class="text-left">Aantal</th>
-                    </tr>
+    <tr>
+        <th class="text-left">Foto</th>
+        <th class="text-left">Materiaal</th>
+        <th class="text-left">Aantal</th>
+    </tr>
 
-                </thead>
+</thead>
 
-                <tbody>
+<tbody>
 
-                    @foreach($order->items as $item)
+    @forelse($order->items as $item)
 
-                        <tr>
+        <tr>
 
-                            <td class="py-2">
-                                {{ $item->material->name }}
-                            </td>
+            <td class="py-2">
 
-                            <td>
-                                {{ $item->quantity }}
-                            </td>
+                @if($item->material->image)
 
-                        </tr>
+                    <img
+                        src="{{ asset('storage/' . $item->material->image) }}"
+                        class="w-16 h-16 object-cover rounded-lg">
 
-                    @endforeach
+                @else
 
-                </tbody>
+                    <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-500">
+
+                        Geen afbeelding
+
+                    </div>
+
+                @endif
+
+            </td>
+
+            <td>
+                {{ $item->material->name }}
+            </td>
+
+            <td>
+                {{ $item->quantity }}
+            </td>
+
+        </tr>
+
+    @empty
+
+        <tr>
+
+            <td colspan="3" class="text-center py-4 text-gray-500">
+
+                Geen materialen gevonden.
+
+            </td>
+
+        </tr>
+
+    @endforelse
+
+</tbody>
 
             </table>
 
         </div>
 
-        <div class="mt-6">
+       <div class="mt-6 flex gap-3">
 
-            <a href="{{ route('magazijn.orders.index') }}">
+    <a href="{{ route('magazijn.orders.edit', $order->id) }}">
 
-                <x-button>
+        <x-button>
 
-                    Terug
+            Bewerk
 
-                </x-button>
+        </x-button>
 
-            </a>
+    </a>
 
-        </div>
+    <a href="{{ route('magazijn.orders.index') }}">
+
+        <x-button>
+
+            Terug
+
+        </x-button>
+
+    </a>
+
+</div>
 
     </x-card>
 
