@@ -15,7 +15,7 @@ Route::redirect('/', '/login');
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified'])->group(function () {
-    
+
     Route::get('/dashboard', function () {
         return view('userzone.dashboard');
     })->name('dashboard');
@@ -137,6 +137,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', \App\Http\Controllers\UserController::class);
     });
+});
+
+Route::middleware(['auth', 'role:technieker,magazijn'])
+    ->get('/overstromingsrisico', [\App\Http\Controllers\FloodRiskController::class, 'index'])
+    ->name('flood-risk.index');
+
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/overstromingsrisico', [\App\Http\Controllers\Admin\FloodRiskController::class, 'index'])
+        ->name('admin.flood-risk.index');
 });
 
 require __DIR__.'/auth.php';
