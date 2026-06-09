@@ -32,10 +32,11 @@
             <x-button>
     Filter & Sorteer
 </x-button>
-          <a href="{{ route('technician.materials.index') }}">
-    <x-button type="button">
+          <a href="{{ route('technician.materials.index') }}"
+          class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg">
+    
         Reset
-    </x-button>
+    
 </a>
         </form>
     </div>
