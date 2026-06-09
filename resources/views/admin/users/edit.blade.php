@@ -1,7 +1,7 @@
 
 <x-app-layout>
 <div class="container mx-auto px-6 py-8">
-    
+
     <div class="mb-6">
         <a href="{{ route('admin.users.index') }}" class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
@@ -37,6 +37,31 @@
                     @endforeach
                 </select>
                 @error('role') <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label for="location_id" class="block text-gray-700 text-sm font-semibold mb-2">
+                    Locatie
+                </label>
+
+                <select
+                    id="location_id"
+                    name="location_id"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                >
+                    <option value="">Geen locatie</option>
+
+                    @foreach ($locations as $location)
+                        <option value="{{ $location->id }}"
+                            @selected(old('location_id', $user->location_id) == $location->id)>
+                            {{ $location->name }} - {{ $location->city }}
+                        </option>
+                    @endforeach
+                </select>
+
+                @error('location_id')
+                <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="mb-4 border-t border-gray-100 pt-4">

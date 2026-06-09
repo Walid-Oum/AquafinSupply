@@ -13,6 +13,7 @@ class Material extends Model
         'stock',
         'minimum_stock',
         'is_active',
+        'image',
     ];
 
     protected $casts = [

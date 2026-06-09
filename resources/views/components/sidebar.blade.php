@@ -1,163 +1,155 @@
 @php
-
-
-$role = Auth::user()->role;
-
+    $role = Auth::user()->role;
 @endphp
 
-<div class="w-72 bg-gradient-to-b from-[#0F4C81] via-[#1E6BA8] to-[#2D7FC1] text-white flex flex-col shadow-xl">
+<div class="w-72 h-screen sticky top-0 text-white flex flex-col shadow-2xl relative overflow-hidden">
 
-    <div class="p-8 border-b border-blue-400">
+    {{-- Background --}}
+    <div class="absolute inset-0">
+        <img
+            src="{{ asset('images/sidebar-bg.jpg') }}"
+            alt="Aquafin"
+            class="w-full h-full object-cover">
+    </div>
 
-        <div class="flex items-center gap-3">
+    {{-- Overlay léger --}}
+    <div
+        class="absolute inset-0
+               bg-gradient-to-b
+               from-[#0F4C81]/70
+               via-[#1E6BA8]/50
+               to-[#0F4C81]/80">
+    </div>
 
-            <div
-                class="bg-white text-[#0F4C81]
-                       w-12 h-12 rounded-xl
-                       flex items-center justify-center
-                       font-bold text-xl">
+    <div class="relative z-10 flex flex-col h-full">
 
-                A
+       {{-- Logo --}}
+<div class="p-6 border-b border-white/20 backdrop-blur-sm">
 
-            </div>
+    <div class="flex justify-center">
 
-            <div>
-
-                <h1 class="text-3xl font-bold">
-
-                    Aquafin
-
-                </h1>
-
-                <p class="text-blue-100 text-sm">
-
-                    Supply App
-
-                </p>
-
-            </div>
-
-        </div>
+        <img
+            src="{{ asset('images/aquafin-logo.png') }}"
+            alt="Aquafin"
+            class="w-44 object-contain">
 
     </div>
 
-    <nav class="flex-1 p-5">
+</div>
 
-        <ul class="space-y-2">
+        {{-- Menu --}}
+        <nav class="flex-1 px-4 py-6">
 
-            {{-- TECHNIEKER --}}
+            <ul class="space-y-3">
 
-            @if($role == 'technieker')
+                @if($role == 'technieker')
 
-                <li>
-                    <a href="{{ route('technician.materials.index') }}"
-                       class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
-                        Materialen
-                    </a>
-                </li>
+                    <li>
+                        <a href="{{ route('technician.materials.index') }}"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                            
+                            <span>Materialen</span>
+                        </a>
+                    </li>
 
-                <li>
-                    <a href="{{ route('cart.index') }}"
-                       class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
-                        Winkelmandje
-                    </a>
-                </li>
+                    <li>
+                        <a href="{{ route('cart.index') }}"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                            
+                            <span>Winkelmandje</span>
+                        </a>
+                    </li>
 
-                <li>
-                    <a href="{{ route('orders.index') }}"
-                       class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
-                        Bestellingen
-                    </a>
-                </li>
+                    <li>
+                        <a href="{{ route('orders.index') }}"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                            
+                            <span>Bestellingen</span>
+                        </a>
+                    </li>
 
-                <li>
-                    <a href="{{route('tickets.index')}}"
-                       class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
-                        Tickets
-                    </a>
-                </li>
+                    <li>
+                        <a href="{{ route('tickets.index') }}"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                            
+                            <span>Tickets</span>
+                        </a>
+                    </li>
+                     <li>
+                        <a href="#"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                            Overstromingsrisico
+                        </a>
+                    </li>
 
-            @endif
+                @endif
 
-            {{-- MAGAZIJN --}}
+                @if($role == 'magazijn')
 
-            @if($role == 'magazijn')
-
-                <li>
-                    <a href="#"
-                       class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
-                        Bestellingen
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#"
-                       class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
-                        Voorraad
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{route('tickets.warehouse.index')}}"
-                       class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
-                        Tickets
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#"
-                       class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
-                        Overstromingsrisico
-                    </a>
-                </li>
-
-            @endif
-
-            {{-- ADMIN --}}
-
-            @if($role == 'admin')
-
-                <li>
-                    <a href="{{ route('admin.users.index') }}"
-                       class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
-                        Gebruikers
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('materials.index') }}"
-                       class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
-                        Materialen
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{route('admin.orders.index')}}"
-                       class="block px-4 py-3 rounded-lg hover:bg-blue-500 transition">
+                    <li>
+                        <a href="{{ route('magazijn.orders.index') }}"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
                          Bestellingen
-                    </a>
-                </li>
+                        </a>
+                    </li>
 
-            @endif
+                    <li>
+                        <a href="{{ route('magazijn.materials.index') }}"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                             Voorraad
+                        </a>
+                    </li>
 
-        </ul>
+                    <li>
+                        <a href="{{ route('tickets.warehouse.index') }}"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                             Tickets
+                        </a>
+                    </li>
 
-    </nav>
+                    <li>
+                        <a href="#"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                            Overstromingsrisico
+                        </a>
+                    </li>
 
-    <div class="p-5 border-t border-blue-400">
+                @endif
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
+                @if($role == 'admin')
 
-            <button
-                type="submit"
-                class="w-full bg-red-500 hover:bg-red-600 transition py-3 rounded-lg font-medium">
+                    <li>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                            Gebruikers
+                        </a>
+                    </li>
 
-                Uitloggen
+                    <li>
+                        <a href="{{ route('materials.index') }}"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                            Materialen
+                        </a>
+                    </li>
 
-            </button>
+                    <li>
+                        <a href="{{ route('admin.orders.index') }}"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                            Bestellingen
+                        </a>
+                    </li>
+                     <li>
+                        <a href="#"
+                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                            Overstromingsrisico
+                        </a>
+                    </li>
 
-        </form>
+                @endif
+
+            </ul>
+
+        </nav>
 
     </div>
 

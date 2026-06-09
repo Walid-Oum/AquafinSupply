@@ -56,43 +56,79 @@ US17 - Inhoud bestelling bekijken
 
             <table class="w-full">
 
-                <thead>
+               <thead>
 
-                    <tr class="border-b">
+    <tr class="border-b">
 
-                        <th class="text-left p-3">
-                            Materiaal
-                        </th>
+        <th class="text-left p-3">
+            Afbeelding
+        </th>
 
-                        <th class="text-left p-3">
-                            Hoeveelheid
-                        </th>
+        <th class="text-left p-3">
+            Materiaal
+        </th>
 
-                    </tr>
+        <th class="text-left p-3">
+            Hoeveelheid
+        </th>
 
-                </thead>
+    </tr>
 
-               <tbody>
+</thead>
 
-@foreach($order->items as $item)
+<tbody>
 
-<tr>
+    @forelse($order->items as $item)
 
-    <td class="p-3">
+        <tr>
 
-        {{ $item->material->name }}
+            <td class="p-3">
 
-    </td>
+                @if($item->material->image)
 
-    <td class="p-3">
+                    <img
+                        src="{{ asset('storage/' . $item->material->image) }}"
+                        class="w-16 h-16 object-cover rounded-lg border">
 
-        {{ $item->quantity }}
+                @else
 
-    </td>
+                    <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-500">
 
-</tr>
+                        Geen afbeelding
 
-@endforeach
+                    </div>
+
+                @endif
+
+            </td>
+
+            <td class="p-3">
+
+                {{ $item->material->name }}
+
+            </td>
+
+            <td class="p-3">
+
+                {{ $item->quantity }}
+
+            </td>
+
+        </tr>
+
+    @empty
+
+        <tr>
+
+            <td colspan="3" class="text-center p-4 text-gray-500">
+
+                Geen materialen gevonden.
+
+            </td>
+
+        </tr>
+
+    @endforelse
 
 </tbody>
 

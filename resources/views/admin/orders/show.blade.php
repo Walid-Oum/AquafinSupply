@@ -53,33 +53,34 @@
             <table class="w-full">
 
                 <thead>
+    <tr class="border-b">
+        <th class="text-left p-3">Afbeelding</th>
+        <th class="text-left p-3">Materiaal</th>
+        <th class="text-left p-3">Hoeveelheid</th>
+    </tr>
+</thead>
 
-                    <tr class="border-b">
-                        <th class="text-left p-3">Materiaal</th>
-                        <th class="text-left p-3">Hoeveelheid</th>
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    @foreach($order->items as $item)
-
-                        <tr class="border-b">
-
-                            <td class="p-3">
-                                {{ $item->material->name }}
-                            </td>
-
-                            <td class="p-3">
-                                {{ $item->quantity }}
-                            </td>
-
-                        </tr>
-
-                    @endforeach
-
-                </tbody>
+<tbody>
+    @foreach($order->items as $item)
+        <tr class="border-b">
+            <td class="p-3">
+                @if($item->material->image)
+                    <img src="{{ asset('storage/' . $item->material->image) }}" class="w-16 h-16 object-cover rounded-lg">
+                @else
+                    <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-500">
+                        Geen afbeelding
+                    </div>
+                @endif
+            </td>
+            <td class="p-3">
+                {{ $item->material->name }}
+            </td>
+            <td class="p-3">
+                {{ $item->quantity }}
+            </td>
+        </tr>
+    @endforeach
+</tbody>
 
             </table>
 

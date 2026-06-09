@@ -41,79 +41,46 @@
                         <td>{{ $material->name }}</td>
                         <td>{{ $material->category }}</td>
                         <td>
-
                             @if($material->stock <= $material->minimum_stock)
-
                                 <span class="text-red-600 font-bold">
-            {{ $material->stock }}
-        </span>
-
+                                    {{ $material->stock }}
+                                </span>
                             @else
-
                                 {{ $material->stock }}
-
                             @endif
-
                         </td>
                         <td>
                             {{ $material->minimum_stock }}
                         </td>
 
                         <td>
-
                             @if($material->stock <= $material->minimum_stock)
-
                                 <span class="text-red-600 font-bold">
             Lage voorraad
         </span>
-
                             @else
-
                                 <span class="text-green-600">
             OK
         </span>
-
                             @endif
-
                         </td>
 
                         <td>
-
                             @if($material->is_active)
-
-                                <span class="text-green-600">
-            Actief
-        </span>
-
+                                <span class="text-green-600">Actief</span>
                             @else
-
-                                <span class="text-red-600">
-            Inactief
-        </span>
-
+                                <span class="text-red-600">Inactief</span>
                             @endif
-
                         </td>
                         <td class="space-x-3">
-
-
-
-    <a href="{{ route('materials.show', $material->id) }}"
-       class="text-blue-500">
-        Bekijk
-    </a>
-
-    <a href="{{ route('materials.edit', $material->id) }}"
-       class="text-yellow-500">
-        Bewerk
-    </a>
-
-</td>
-
+                            <a href="{{ route('materials.show', $material->id) }}" class="text-blue-500">Bekijk</a>
+                            <a href="{{ route('materials.edit', $material->id) }}" class="text-yellow-500">Bewerk</a>
+                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center">Geen materialen gevonden.</td>
+                        <td colspan="6" class="text-center">Geen materialen gevonden.
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>
