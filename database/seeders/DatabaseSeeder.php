@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Location;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -17,12 +18,38 @@ class DatabaseSeeder extends Seeder
 
 public function run(): void
 {
+
+    $antwerpen = Location::create([
+        'name' => 'Aquafin Antwerpen',
+        'city' => 'Antwerpen',
+        'postal_code' => '2000',
+        'latitude' => 51.2205000,
+        'longitude' => 4.4003000,
+    ]);
+
+    $gent = Location::create([
+        'name' => 'Aquafin Gent',
+        'city' => 'Gent',
+        'postal_code' => '9000',
+        'latitude' => 51.0543000,
+        'longitude' => 3.7174000,
+    ]);
+
+    $brussel = Location::create([
+        'name' => 'Aquafin Brussel',
+        'city' => 'Brussel',
+        'postal_code' => '1000',
+        'latitude' => 50.8503000,
+        'longitude' => 4.3517000,
+    ]);
+
     // 1. De vaste Admin
     \App\Models\User::factory()->create([
         'name' => 'Aquafin Admin',
         'email' => 'admin@aquafinsupply.be',
         'password' => bcrypt('Aquafin2026!'),
         'role' => 'admin',
+        'location_id' => $antwerpen->id,
     ]);
 
     // 2. De vaste Magazijn
@@ -31,6 +58,7 @@ public function run(): void
         'email' => 'magazijn@aquafinsupply.be',
         'password' => bcrypt('Magazijn2026!'),
         'role' => 'magazijn',
+        'location_id' => $brussel->id,
     ]);
 
     // 3. De vaste Technieker
@@ -39,10 +67,11 @@ public function run(): void
         'email' => 'technieker@aquafinsupply.be',
         'password' => bcrypt('Technieker2026!'),
         'role' => 'technieker',
+        'location_id' => $gent->id,
     ]);
 
 
-   
+
 
 
 
