@@ -5,7 +5,9 @@
     <div class="mb-4">
         <form method="GET" action="{{ route('technician.materials.index') }}" class="flex gap-2">
             <input type="text" name="search" placeholder="Zoeken op naam..." value="{{ request('search') }}" class="border rounded px-3 py-2 w-64">
-            <button type="submit" class="bg-gray-500 text-white px-4 py-2 rounded">Zoek</button>
+            <x-button>
+    Zoek
+</x-button>
         </form>
     </div>
 
@@ -27,8 +29,14 @@
                 <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Z-A</option>
             </select>
             
-            <button type="submit" class="bg-gray-500 text-white px-4 py-2 rounded">Filter & Sorteer</button>
-            <a href="{{ route('technician.materials.index') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Reset</a>
+            <x-button>
+    Filter & Sorteer
+</x-button>
+          <a href="{{ route('technician.materials.index') }}">
+    <x-button type="button">
+        Reset
+    </x-button>
+</a>
         </form>
     </div>
 
@@ -58,11 +66,11 @@
                             @endif
                         </td>
                <td class="text-center p-3">
-    <a
-        href="{{ route('technician.materials.show', $material->id) }}"
-        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg inline-block">
+   <a href="{{ route('technician.materials.show', $material->id) }}">
+    <x-button type="button">
         Bekijk
-    </a>
+    </x-button>
+</a>
 </td>
                     </tr>
                     @empty

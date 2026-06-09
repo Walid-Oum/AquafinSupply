@@ -111,7 +111,7 @@
                                     name="status"
                                     class="border rounded px-3 py-2">
 
-                                    <<option value="Nieuw">Nieuw</option>
+                                    <option value="Nieuw">Nieuw</option>
 
 <option value="In voorbereiding">In voorbereiding</option>
 

@@ -35,16 +35,9 @@
         <div class="flex justify-end gap-2">
             <form action="{{ route('cart.add', $material->id) }}" method="POST">
                 @csrf
-                <button
-                    type="submit"
-                    class="inline-flex items-center gap-3
-                           bg-gradient-to-r from-blue-600 to-blue-700
-                           hover:from-blue-700 hover:to-blue-800
-                           text-white font-bold
-                           px-8 py-4 rounded-xl
-                           shadow-lg transition">
-                    🛒 Toevoegen aan winkelmandje
-                </button>
+                <x-button>
+    🛒 Toevoegen aan winkelmandje
+</x-button>
             </form>
             <a href="{{ route('technician.materials.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded">Terug</a>
         </div>

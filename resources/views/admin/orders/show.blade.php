@@ -26,10 +26,13 @@
                 {{ $order->delivery_date }}
             </div>
 
-            <div>
-                <strong>Status:</strong>
-                {{ $order->status }}
-            </div>
+           <div>
+    <strong>Status:</strong>
+
+    <x-status-badge
+        :status="$order->status" />
+
+</div>
 
             <div>
                 <strong>Opmerking:</strong>
@@ -87,12 +90,11 @@
         </x-card>
 <div class="mt-6">
 
-    <a href="{{ route('admin.orders.index') }}"
-       class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
-
+  <a href="{{ route('admin.orders.index') }}">
+    <x-button>
         ← Terug
-
-    </a>
+    </x-button>
+</a>
 
 </div>
     </div>
