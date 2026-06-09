@@ -2,8 +2,48 @@
 
     <x-page-header title="Alle Bestellingen" />
 
-    <x-card>
+    <form
+        method="GET"
+        action="{{ route('admin.orders.index') }}"
+        class="mb-4">
 
+        <select
+            name="status"
+            class="border rounded px-3 py-2">
+
+            <option value="all">
+                Alle statussen
+            </option>
+
+            <option value="Nieuw">
+                Nieuw
+            </option>
+
+            <option value="In voorbereiding">
+                In voorbereiding
+            </option>
+
+            <option value="Klaar voor levering">
+                Klaar voor levering
+            </option>
+
+            <option value="Geleverd">
+                Geleverd
+            </option>
+
+        </select>
+
+        <button
+            type="submit"
+            class="bg-blue-600 text-white px-4 py-2 rounded">
+
+            Filter
+
+        </button>
+
+    </form>
+
+    <x-card>
         <table class="w-full">
 
             <thead>
