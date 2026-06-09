@@ -68,8 +68,13 @@
                 </select>
             </div>
 
-            <div class="flex justify-end">
-                <a href="{{ route('materials.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Annuleren</a>
+            <div class="flex justify-end gap-2">
+                <form action="{{ route('materials.destroy', $material->id) }}" method="POST" onsubmit="return confirm('Weet je zeker dat je {{ $material->name }} wilt verwijderen?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Verwijderen</button>
+                </form>
+                <a href="{{ route('materials.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded">Annuleren</a>
                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Bijwerken</button>
             </div>
         </form>
