@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="p-8">
         <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900">Alle tickets</h1>
+            <x-page-header title="Alle tickets" />
             <p class="text-gray-600">Bekijk hier alle tickets van techniekers.</p>
         </div>
 

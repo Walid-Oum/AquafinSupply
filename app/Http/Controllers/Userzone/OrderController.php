@@ -109,16 +109,28 @@ public function warehouseIndex(Request $request)
 
     if ($request->search) {
 
-        $query->where('id', 'like', '%' . $request->search . '%')
-              ->orWhereHas('user', function ($q) use ($request) {
+       $query->where(function($q) use ($request){
 
-                  $q->where(
-                      'name',
-                      'like',
-                      '%' . $request->search . '%'
-                  );
+    $q->where(
+        'id',
+        'like',
+        '%' . $request->search . '%'
+    )
 
-              });
+    ->orWhereHas(
+        'user',
+        function($user) use ($request){
+
+            $user->where(
+                'name',
+                'like',
+                '%' . $request->search . '%'
+            );
+
+        }
+    );
+
+});
 
     }
 
@@ -138,15 +150,80 @@ public function warehouseUpdate(Request $request, Order $order)
         'status' => 'required',
     ]);
 
-    $order->update([
-        'status' => $request->status,
-    ]);
+    $order->status = $request->status;
+    $order->save();
+
+    if ($request->has('quantities')) {
+
+        foreach ($request->quantities as $itemId => $newQuantity) {
+
+            $item = OrderItem::find($itemId);
+
+            if (!$item) {
+                continue;
+            }
+
+            $material = $item->material;
+
+            $oldQuantity = $item->quantity;
+
+           
+            if ($newQuantity == 0) {
+
+                $material->increment(
+                    'stock',
+                    $oldQuantity
+                );
+
+                $item->delete();
+
+            } else {
+
+                $difference = $newQuantity - $oldQuantity;
+
+               
+                if ($difference > 0) {
+
+                    if ($material->stock < $difference) {
+
+                        return redirect()
+                            ->back()
+                            ->with(
+                                'error',
+                                'Onvoldoende voorraad voor '
+                                . $material->name
+                            );
+                    }
+
+                    $material->decrement(
+                        'stock',
+                        $difference
+                    );
+
+                }
+
+                
+                elseif ($difference < 0) {
+
+                    $material->increment(
+                        'stock',
+                        abs($difference)
+                    );
+
+                }
+
+                $item->update([
+                    'quantity' => $newQuantity
+                ]);
+            }
+        }
+    }
 
     return redirect()
         ->back()
         ->with(
             'success',
-            'Status succesvol gewijzigd.'
+            'Bestelling succesvol gewijzigd.'
         );
 }
 
