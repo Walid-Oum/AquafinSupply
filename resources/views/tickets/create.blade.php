@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="p-8">
         <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900">Nieuw ticket</h1>
+            <x-page-header title="Nieuw ticket" />
             <p class="mt-1 text-gray-600">
                 Meld een probleem over een bestelling zodat het magazijn dit kan opvolgen.
             </p>
@@ -73,12 +73,9 @@
                 </div>
 
                 <div class="flex items-center gap-3 pt-2">
-                    <button
-                        type="submit"
-                        class="rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white shadow-sm hover:bg-blue-700"
-                    >
-                        Ticket aanmaken
-                    </button>
+                   <x-button>
+    Ticket aanmaken
+</x-button>
 
                     <a
                         href="{{ route('tickets.index') }}"

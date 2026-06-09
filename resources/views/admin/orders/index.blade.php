@@ -24,22 +24,18 @@
             </option>
 
             <option value="Klaar voor levering">
-                Klaar voor levering
+               Klaar om af te halen
             </option>
 
             <option value="Geleverd">
-                Geleverd
+                Afgehaald
             </option>
 
         </select>
 
-        <button
-            type="submit"
-            class="bg-blue-600 text-white px-4 py-2 rounded">
-
-            Filter
-
-        </button>
+        <x-button>
+    Filter
+</x-button>
 
     </form>
 

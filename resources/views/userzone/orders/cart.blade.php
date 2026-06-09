@@ -149,17 +149,9 @@
 
             <div>
 
-                <button
-                    type="submit"
-                    class="inline-flex items-center gap-3
-                           bg-blue-600 hover:bg-blue-700
-                           text-white font-bold
-                           px-8 py-4 rounded-xl
-                           shadow-lg transition">
-
-                    🛒 Bestelling plaatsen
-
-                </button>
+              <x-button>
+    🛒 Bestelling plaatsen
+</x-button>
 
             </div>
 
