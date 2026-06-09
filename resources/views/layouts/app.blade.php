@@ -57,6 +57,55 @@
     </div>
 
 @endif
+@if(Auth::check() && Auth::user()->role == 'technieker')
+
+<div
+    id="gasReminder"
+    class="mx-6 mt-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-lg shadow">
+
+    <h2 class="font-bold text-lg mb-2">
+        🔔 Herinnering
+    </h2>
+
+    <p>
+        Vergeet uw gastoestel niet op te laden.
+    </p>
+
+    <p class="mb-4">
+        Vergeet uw gastoestel niet mee te nemen.
+    </p>
+
+    <button
+        id="closeReminder"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+
+        ✓ Ik heb dit gecontroleerd
+
+    </button>
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    if(sessionStorage.getItem("gasReminder") === "done"){
+        document.getElementById("gasReminder").style.display = "none";
+    }
+
+    document.getElementById("closeReminder").addEventListener("click", function(){
+
+       sessionStorage.setItem("gasReminder", "done");
+
+        document.getElementById("gasReminder").style.display = "none";
+
+    });
+
+});
+
+</script>
+
+@endif
         <main class="p-8">
  
 
