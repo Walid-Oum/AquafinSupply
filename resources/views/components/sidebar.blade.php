@@ -47,7 +47,7 @@
                     <li>
                         <a href="{{ route('technician.materials.index') }}"
                            class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                            
+
                             <span>Materialen</span>
                         </a>
                     </li>
@@ -55,7 +55,7 @@
                     <li>
                         <a href="{{ route('cart.index') }}"
                            class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                            
+
                             <span>Winkelmandje</span>
                         </a>
                     </li>
@@ -63,7 +63,7 @@
                     <li>
                         <a href="{{ route('orders.index') }}"
                            class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                            
+
                             <span>Bestellingen</span>
                         </a>
                     </li>
@@ -71,12 +71,12 @@
                     <li>
                         <a href="{{ route('tickets.index') }}"
                            class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                            
+
                             <span>Tickets</span>
                         </a>
                     </li>
                      <li>
-                        <a href="#"
+                        <a href="{{ route('flood-risk.index')}}"
                            class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
                             Overstromingsrisico
                         </a>
@@ -108,7 +108,7 @@
                     </li>
 
                     <li>
-                        <a href="#"
+                        <a href="{{route('flood-risk.index')}}"
                            class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
                             Overstromingsrisico
                         </a>
@@ -139,7 +139,7 @@
                         </a>
                     </li>
                      <li>
-                        <a href="#"
+                        <a href="{{route('admin.flood-risk.index')}}"
                            class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
                             Overstromingsrisico
                         </a>
