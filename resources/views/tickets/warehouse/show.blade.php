@@ -2,7 +2,7 @@
     <div class="p-8">
         <div class="mb-6 flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">Ticket detail</h1>
+                <x-page-header title="Ticket detail" />
                 <p class="text-gray-600">Bekijk hier de details van dit ticket.</p>
             </div>
 
@@ -72,12 +72,9 @@
                         <option value="Opgelost" @selected($ticket->status === 'Opgelost')>Opgelost</option>
                     </select>
 
-                    <button
-                        type="submit"
-                        class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                    >
-                        Status opslaan
-                    </button>
+                  <x-button>
+    Status opslaan
+</x-button>
                 </div>
                 @error('status')
                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

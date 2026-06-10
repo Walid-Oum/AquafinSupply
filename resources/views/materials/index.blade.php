@@ -2,9 +2,11 @@
     <x-page-header title="Materialen overzicht" />
 
     <div class="mb-4 flex justify-between items-center">
-        <a href="{{ route('materials.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded">
-            + Nieuw materiaal
-        </a>
+       <a href="{{ route('materials.create') }}">
+    <x-button>
+        + Nieuw materiaal
+    </x-button>
+</a>
 
         <!-- Filter op categorie -->
         <form method="GET" action="{{ route('materials.index') }}" class="flex gap-2">
@@ -16,7 +18,9 @@
                     </option>
                 @endforeach
             </select>
-            <button type="submit" class="bg-gray-500 text-white px-4 py-2 rounded">Filter</button>
+           <x-button>
+    Filter
+</x-button>
             <a href="{{ route('materials.index') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Reset</a>
         </form>
     </div>
@@ -30,6 +34,7 @@
                         <th class="text-left">Categorie</th>
                         <th class="text-left">Voorraad</th>
                         <th class="text-left">Minimum voorraad</th>
+                        <th class="text-left">Voorraadstatus</th>
                         <th class="text-left">Status</th>
                         <th class="text-left">Acties</th>
                     </tr>
@@ -48,7 +53,22 @@
                                 {{ $material->stock }}
                             @endif
                         </td>
-                        <td>{{ $material->minimum_stock }}</td>
+                        <td>
+                            {{ $material->minimum_stock }}
+                        </td>
+
+                        <td>
+                            @if($material->stock <= $material->minimum_stock)
+                                <span class="text-red-600 font-bold">
+            Lage voorraad
+        </span>
+                            @else
+                                <span class="text-green-600">
+            OK
+        </span>
+                            @endif
+                        </td>
+
                         <td>
                             @if($material->is_active)
                                 <span class="text-green-600">Actief</span>
@@ -63,7 +83,8 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center">Geen materialen gevonden.}]
+                        <td colspan="7" class="text-center">Geen materialen gevonden.
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>

@@ -50,7 +50,16 @@ class CartController extends Controller
     $cart = session()->get('cart', []);
 
     if (isset($cart[$id])) {
+ if($request->quantity > $cart[$id]['stock']){
 
+    return redirect()
+        ->back()
+        ->with(
+            'error',
+            'Onvoldoende voorraad.'
+        );
+
+}
         $cart[$id]['quantity'] = $request->quantity;
 
         session()->put('cart', $cart);
@@ -60,6 +69,9 @@ class CartController extends Controller
         ->route('cart.index')
         ->with('success', 'Aantal bijgewerkt.');
 }
+
+
+
     public function remove($id)
     {
         $cart = session()->get('cart', []);

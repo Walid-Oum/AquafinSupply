@@ -45,10 +45,26 @@
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
+<div class="mb-4">
 
+<label class="block font-bold mb-2">
+
+Minimum voorraad
+
+</label>
+
+<input
+type="number"
+name="minimum_stock"
+value="0"
+class="w-full border rounded px-3 py-2">
+
+</div>
             <div class="flex justify-end">
                 <a href="{{ route('materials.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Annuleren</a>
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Opslaan</button>
+                <x-button>
+    Opslaan
+</x-button>
             </div>
         </form>
     </x-card>
