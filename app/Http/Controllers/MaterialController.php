@@ -218,4 +218,19 @@ class MaterialController extends Controller
                 'Voorraad bijgewerkt.'
             );
     }
+  public function searchSuggestions(Request $request)
+    {
+        $search = $request->get('q');
+        
+        if (strlen($search) < 2) {
+            return response()->json([]);
+        }
+
+        $materials = Material::where('name', 'LIKE', "%{$search}%")
+            ->select('id', 'name', 'stock')
+            ->limit(5)
+            ->get();
+
+        return response()->json($materials);
+    }  
 }

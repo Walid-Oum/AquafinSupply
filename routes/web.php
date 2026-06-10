@@ -149,4 +149,5 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         ->name('admin.flood-risk.index');
 });
 
+Route::get('/api/search-materials', [App\Http\Controllers\MaterialController::class, 'searchSuggestions'])->middleware('auth')->name('api.materials.search');
 require __DIR__.'/auth.php';
