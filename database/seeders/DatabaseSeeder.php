@@ -25,6 +25,10 @@ public function run(): void
         'postal_code' => '2000',
         'latitude' => 51.2205000,
         'longitude' => 4.4003000,
+        'depot_address' => 'Aquafin depot Antwerpen',
+        'province' => 'Antwerpen',
+
+
     ]);
 
     $gent = Location::create([
@@ -33,6 +37,8 @@ public function run(): void
         'postal_code' => '9000',
         'latitude' => 51.0543000,
         'longitude' => 3.7174000,
+        'depot_address' => 'Aquafin depot Gent',
+        'province' => 'Oost-Vlaanderen',
     ]);
 
     $brussel = Location::create([
@@ -41,6 +47,8 @@ public function run(): void
         'postal_code' => '1000',
         'latitude' => 50.8503000,
         'longitude' => 4.3517000,
+        'depot_address' => 'Aquafin depot Brussel',
+        'province' => 'Brussel',
     ]);
 
     // 1. De vaste Admin

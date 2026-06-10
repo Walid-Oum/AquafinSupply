@@ -2,25 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
 class FloodRiskController extends Controller
 {
     public function index()
     {
-        // We halen eerst de locatie van de ingelogde user
-        $location = auth()->user()->location;
+        $user = auth()->user();
+        $location = $user->location;
 
         if (! $location) {
             return view('flood-risk.index', [
-                'error' => 'Er is geen locatie gekoppeld aan deze gebruiker.',
+                'error' => 'Er is geen depot gekoppeld aan deze gebruiker.',
                 'location' => null,
-                'currentWeekRain' => null,
-                'nextWeekRain' => null,
+                'weekRain' => null,
                 'riskLevel' => null,
-                'dates' => [],
-                'rain' => [],
+                'weekForecast' => [],
+                'periodLabel' => null,
+                'highestRainDay' => null,
+                'highestRainDayLabel' => null,
+                'role' => $user->role,
             ]);
         }
 
@@ -29,54 +31,78 @@ class FloodRiskController extends Controller
             'longitude' => $location->longitude,
             'daily' => 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,rain_sum,wind_gusts_10m_max',
             'timezone' => 'Europe/Brussels',
-            'forecast_days' => 16,
+            'forecast_days' => 7,
         ]);
 
         if ($response->failed()) {
             return view('flood-risk.index', [
                 'error' => 'De weersgegevens konden niet opgehaald worden.',
                 'location' => $location,
-                'currentWeekRain' => null,
-                'nextWeekRain' => null,
+                'weekRain' => null,
                 'riskLevel' => null,
-                'dates' => [],
-                'rain' => [],
+                'weekForecast' => [],
+                'periodLabel' => null,
+                'highestRainDay' => null,
+                'highestRainDayLabel' => null,
+                'role' => $user->role,
             ]);
         }
 
         $data = $response->json();
 
-        // Nodige data
         $dates = $data['daily']['time'];
         $rain = $data['daily']['precipitation_sum'];
-        $probabilities = $data['daily']['precipitation_probability_max'];
-        $weatherCodes = $data['daily']['weather_code'];
-        $maxTemperatures = $data['daily']['temperature_2m_max'];
-        $minTemperatures = $data['daily']['temperature_2m_min'];
-        $windGusts = $data['daily']['wind_gusts_10m_max'];
 
-        // Deze week = dagen 0 t.e.m. 6
-        $currentWeekRain = array_sum(array_slice($rain, 0, 7));
+        $weekRain = array_sum($rain);
+        $riskLevel = $this->determineRiskLevel($weekRain);
 
-        // Volgende week = dagen 7 t.e.m. 13
-        // Dit is belangrijk voor jullie aanbevelingen, omdat techniekers materiaal voor de week erna bestellen.
-        $nextWeekRain = array_sum(array_slice($rain, 7, 7));
+        $periodLabel = null;
 
-        $riskLevel = $this->determineRiskLevel($nextWeekRain);
+        if (count($dates) > 0) {
+            $periodLabel =
+                Carbon::parse($dates[0])->locale('nl')->translatedFormat('d/m')
+                . ' t.e.m. ' .
+                Carbon::parse($dates[count($dates) - 1])->locale('nl')->translatedFormat('d/m');
+        }
+
+        $highestRainDay = 0;
+        $highestRainDayLabel = null;
+
+        if (count($rain) > 0) {
+            $highestRainDay = max($rain);
+            $highestRainIndex = array_search($highestRainDay, $rain);
+            $highestRainDate = $dates[$highestRainIndex] ?? null;
+
+            if ($highestRainDate) {
+                $highestRainDayLabel = ucfirst(
+                    Carbon::parse($highestRainDate)->locale('nl')->translatedFormat('l d/m')
+                );
+            }
+        }
+
+        $weekForecast = [];
+
+        foreach ($dates as $index => $date) {
+            $dailyRain = $rain[$index] ?? 0;
+
+            $weekForecast[] = [
+                'date' => $date,
+                'dayLabel' => ucfirst(Carbon::parse($date)->locale('nl')->translatedFormat('l d/m')),
+                'rain' => round($dailyRain, 1),
+                'riskLevel' => $this->determineDailyRiskLevel($dailyRain),
+            ];
+        }
 
         return view('flood-risk.index', [
             'error' => null,
             'location' => $location,
-            'dates' => $dates,
-            'rain' => $rain,
-            'probabilities' => $probabilities,
-            'weatherCodes' => $weatherCodes,
-            'maxTemperatures' => $maxTemperatures,
-            'minTemperatures' => $minTemperatures,
-            'windGusts' => $windGusts,
-            'currentWeekRain' => round($currentWeekRain, 1),
-            'nextWeekRain' => round($nextWeekRain, 1),
+            'weekRain' => round($weekRain, 1),
             'riskLevel' => $riskLevel,
+            'weekForecast' => $weekForecast,
+            'periodLabel' => $periodLabel,
+            'highestRainDay' => round($highestRainDay, 1),
+            'highestRainDayLabel' => $highestRainDayLabel,
+            'role' => $user->role,
         ]);
     }
 
@@ -87,6 +113,19 @@ class FloodRiskController extends Controller
         }
 
         if ($rainfall < 50) {
+            return 'Gemiddeld';
+        }
+
+        return 'Hoog';
+    }
+
+    private function determineDailyRiskLevel(float $rainfall): string
+    {
+        if ($rainfall < 5) {
+            return 'Laag';
+        }
+
+        if ($rainfall < 15) {
             return 'Gemiddeld';
         }
 
