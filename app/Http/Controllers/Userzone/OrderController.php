@@ -53,6 +53,18 @@ public function store(Request $request)
     ->with('error', 'Materiaal bestaat niet meer.');
         }
 
+        if (!$material->is_active) {
+
+    return redirect()
+        ->back()
+        ->withInput()
+        ->with(
+            'error',
+            'Een materiaal in uw winkelmandje is niet meer beschikbaar.'
+        );
+
+}
+
         if ($item['quantity'] > $material->stock) {
 
            return redirect()
