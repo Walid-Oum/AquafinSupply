@@ -16,6 +16,16 @@ class CartController extends Controller
     public function add($id)
     {
         $material = Material::findOrFail($id);
+        if (!$material->is_active) {
+
+    return redirect()
+        ->back()
+        ->with(
+            'error',
+            'Dit materiaal is niet meer beschikbaar.'
+        );
+
+}
 
         $cart = session()->get('cart', []);
 
