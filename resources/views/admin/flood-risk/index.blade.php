@@ -1,138 +1,334 @@
 <x-app-layout>
     <div class="p-8">
         <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900">
-                Overstromingsrisico per regio
-            </h1>
+            <x-page-header title="Overstromingsrisico per provincie" />
 
-            <p class="text-gray-600">
-                Kies een locatie om het voorspelde overstromingsrisico te bekijken.
+            <p class="mt-2 text-gray-600">
+                Bekijk de algemene risicosituatie per provinciaal depot. Gebruik de detailknop om één provincie uitgebreider te analyseren.
             </p>
         </div>
 
-        <div class="mb-6 rounded-xl bg-white p-6 shadow">
-            <form method="GET" action="{{ route('admin.flood-risk.index') }}">
-                <label for="location_id" class="mb-2 block text-sm font-semibold text-gray-700">
-                    Kies een locatie
-                </label>
-
-                <div class="flex gap-3">
-                    <select
-                        id="location_id"
-                        name="location_id"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-                    >
-                        @foreach($locations as $location)
-                            <option value="{{ $location->id }}"
-                                @selected($selectedLocation && $selectedLocation->id === $location->id)>
-                                {{ $location->name }} - {{ $location->city }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <button
-                        type="submit"
-                        class="rounded-lg bg-[#0F4C81] px-4 py-2 font-semibold text-white hover:bg-[#1E6BA8]"
-                    >
-                        Tonen
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        @if ($error)
+        @if(session('error'))
             <div class="mb-6 rounded-lg bg-red-100 p-4 text-red-700">
-                {{ $error }}
+                {{ session('error') }}
             </div>
         @endif
 
-        @if ($selectedLocation)
+        @if(count($provinceStats) > 0)
             <div class="mb-6 rounded-xl bg-white p-6 shadow">
-                <h2 class="text-xl font-semibold text-gray-900">
-                    Geselecteerde locatie: {{ $selectedLocation->name }}
-                </h2>
+                <div class="mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">
+                        Algemeen overzicht per provincie
+                    </h2>
 
-                <p class="mt-1 text-gray-600">
-                    Stad: {{ $selectedLocation->city }}
-                </p>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Dit overzicht helpt admins om te bepalen waar extra materiaalvoorbereiding of voorraadcontrole nodig is.
+                    </p>
+                </div>
 
-                <p class="mt-1 text-gray-600">
-                    Coördinaten: {{ $selectedLocation->latitude }}, {{ $selectedLocation->longitude }}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Provincie</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Depot</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Neerslag volgende week</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Piekdag</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Risicodagen</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Prioriteit</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Aanbevolen actie</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Details</th>
+                        </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-gray-100 bg-white">
+                        @foreach($provinceStats as $stat)
+                            <tr>
+                                <td class="px-4 py-3 font-medium text-gray-900">
+                                    {{ $stat['province'] }}
+                                </td>
+
+                                <td class="px-4 py-3 text-gray-700">
+                                    {{ $stat['depot'] }}
+                                </td>
+
+                                <td class="px-4 py-3 text-gray-700">
+                                    {{ $stat['nextWeekRain'] }} mm
+                                </td>
+
+                                <td class="px-4 py-3 text-gray-700">
+                                    @if($stat['highestRainDate'])
+                                        {{ \Carbon\Carbon::parse($stat['highestRainDate'])->format('d/m') }}
+                                        -
+                                        {{ $stat['highestRainDay'] }} mm
+                                    @else
+                                        {{ $stat['highestRainDay'] }} mm
+                                    @endif
+                                </td>
+
+                                <td class="px-4 py-3 text-gray-700">
+                                    {{ $stat['riskDays'] }}
+                                </td>
+
+                                <td class="px-4 py-3">
+                                    @if($stat['riskLevel'] === 'Hoog')
+                                        <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                                                Hoog
+                                            </span>
+                                    @elseif($stat['riskLevel'] === 'Gemiddeld')
+                                        <span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
+                                                Gemiddeld
+                                            </span>
+                                    @else
+                                        <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                                                Laag
+                                            </span>
+                                    @endif
+                                </td>
+
+                                <td class="px-4 py-3 text-gray-700">
+                                    @if($stat['riskLevel'] === 'Hoog')
+                                        Controleer voorraad overstromingsmateriaal.
+                                    @elseif($stat['riskLevel'] === 'Gemiddeld')
+                                        Volg kritieke voorraad extra op.
+                                    @else
+                                        Geen extra actie nodig.
+                                    @endif
+                                </td>
+
+                                <td class="px-4 py-3">
+                                    <a href="{{ route('admin.flood-risk.show', $stat['location']) }}">
+                                        <x-button class="px-3 py-2 text-xs">
+                                            Details bekijken
+                                        </x-button>
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @else
+            <div class="mb-6 rounded-xl bg-white p-6 shadow">
+                <p class="text-gray-600">
+                    Er zijn momenteel geen weergegevens beschikbaar.
                 </p>
             </div>
         @endif
 
-        @if ($riskLevel)
-            <div class="mb-6 rounded-xl bg-white p-6 shadow">
-                <div class="flex items-center justify-between">
-                    <div>
+        @if(count($provinceStats) > 0)
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div class="rounded-xl bg-white p-6 shadow">
+                    <div class="mb-4">
                         <h2 class="text-xl font-semibold text-gray-900">
-                            Risico voor volgende week
+                            Neerslag per provincie
                         </h2>
 
-                        <p class="mt-2 text-gray-700">
-                            Verwachte neerslag volgende week:
-                            <strong>{{ $nextWeekRain }} mm</strong>
-                        </p>
-
-                        <p class="mt-1 text-gray-700">
-                            Verwachte neerslag deze week:
-                            <strong>{{ $currentWeekRain }} mm</strong>
+                        <p class="mt-1 text-sm text-gray-600">
+                            Verwachte totale neerslag voor volgende week per provinciaal depot.
                         </p>
                     </div>
 
-                    @if($riskLevel === 'Hoog')
-                        <span class="rounded-full bg-red-100 px-4 py-2 text-sm font-semibold text-red-700">
-                            Hoog risico
-                        </span>
-                    @elseif($riskLevel === 'Gemiddeld')
-                        <span class="rounded-full bg-yellow-100 px-4 py-2 text-sm font-semibold text-yellow-700">
-                            Gemiddeld risico
-                        </span>
-                    @else
-                        <span class="rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
-                            Laag risico
-                        </span>
-                    @endif
+                    <div class="h-72">
+                        <canvas id="rainfallChart"></canvas>
+                    </div>
                 </div>
-            </div>
 
-            <div class="mb-6 rounded-xl bg-white p-6 shadow">
-                <h2 class="text-xl font-semibold text-gray-900">
-                    Administratief advies
-                </h2>
+                <div class="rounded-xl bg-white p-6 shadow">
+                    <div class="mb-4">
+                        <h2 class="text-xl font-semibold text-gray-900">
+                            Hoogste dagneerslag per provincie
+                        </h2>
 
-                @if($riskLevel === 'Hoog')
-                    <p class="mt-2 text-gray-700">
-                        Deze regio heeft een hoog risico. Controleer of er voldoende overstromingsmateriaal beschikbaar is en volg bestellingen uit deze regio extra goed op.
-                    </p>
-                @elseif($riskLevel === 'Gemiddeld')
-                    <p class="mt-2 text-gray-700">
-                        Deze regio heeft een gemiddeld risico. Het is aangeraden om de voorraad van kritieke materialen te controleren.
-                    </p>
-                @else
-                    <p class="mt-2 text-gray-700">
-                        Deze regio heeft momenteel een laag risico. Er zijn geen extra maatregelen nodig.
-                    </p>
-                @endif
-            </div>
-        @endif
+                        <p class="mt-1 text-sm text-gray-600">
+                            Toont per provincie de natste voorspelde dag van volgende week.
+                        </p>
+                    </div>
 
-        @if (count($dates) > 0)
-            <div class="rounded-xl bg-white p-6 shadow">
-                <h2 class="mb-4 text-xl font-semibold text-gray-900">
-                    Dagelijkse voorspelling
-                </h2>
+                    <div class="h-72">
+                        <canvas id="peakRainChart"></canvas>
+                    </div>
+                </div>
 
-                <div class="space-y-2">
-                    @foreach ($dates as $index => $date)
-                        <div class="flex justify-between border-b py-2 text-sm">
-                            <span>{{ $date }}</span>
-                            <span>{{ $rain[$index] }} mm neerslag</span>
-                        </div>
-                    @endforeach
+                <div class="rounded-xl bg-white p-6 shadow">
+                    <div class="mb-4">
+                        <h2 class="text-xl font-semibold text-gray-900">
+                            Prioriteitenverdeling
+                        </h2>
+
+                        <p class="mt-1 text-sm text-gray-600">
+                            Aantal provincies met lage, gemiddelde of hoge prioriteit.
+                        </p>
+                    </div>
+
+                    <div class="h-72">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
                 </div>
             </div>
         @endif
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const provinceStats = @json($provinceStats);
+
+        const provinceLabels = provinceStats.map(stat => stat.province);
+        const nextWeekRain = provinceStats.map(stat => stat.nextWeekRain);
+        const highestRainDay = provinceStats.map(stat => stat.highestRainDay);
+        const highestRainDate = provinceStats.map(stat => stat.highestRainDate);
+
+        const riskCounts = {
+            Laag: provinceStats.filter(stat => stat.riskLevel === 'Laag').length,
+            Gemiddeld: provinceStats.filter(stat => stat.riskLevel === 'Gemiddeld').length,
+            Hoog: provinceStats.filter(stat => stat.riskLevel === 'Hoog').length,
+        };
+
+        const rainfallChart = document.getElementById('rainfallChart');
+
+        if (rainfallChart) {
+            new Chart(rainfallChart, {
+                type: 'bar',
+                data: {
+                    labels: provinceLabels,
+                    datasets: [{
+                        label: 'Neerslag volgende week (mm)',
+                        data: nextWeekRain,
+                        backgroundColor: '#0F4C81',
+                        borderColor: '#0F4C81',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw + ' mm';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Neerslag (mm)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Provincie'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        const peakRainChart = document.getElementById('peakRainChart');
+
+        if (peakRainChart) {
+            new Chart(peakRainChart, {
+                type: 'bar',
+                data: {
+                    labels: provinceLabels,
+                    datasets: [{
+                        label: 'Hoogste dagneerslag (mm)',
+                        data: highestRainDay,
+                        backgroundColor: '#1E6BA8',
+                        borderColor: '#1E6BA8',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const date = highestRainDate[context.dataIndex];
+
+                                    if (date) {
+                                        return date + ': ' + context.raw + ' mm';
+                                    }
+
+                                    return context.raw + ' mm';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Neerslag (mm)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Provincie'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        const priorityChart = document.getElementById('priorityChart');
+
+        if (priorityChart) {
+            new Chart(priorityChart, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Laag', 'Gemiddeld', 'Hoog'],
+                    datasets: [{
+                        label: 'Aantal provincies',
+                        data: [
+                            riskCounts.Laag,
+                            riskCounts.Gemiddeld,
+                            riskCounts.Hoog
+                        ],
+                        backgroundColor: [
+                            '#BBF7D0',
+                            '#FEF3C7',
+                            '#FECACA'
+                        ],
+                        borderColor: [
+                            '#22C55E',
+                            '#F59E0B',
+                            '#EF4444'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </x-app-layout>

@@ -4,12 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Location;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class FloodRiskController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $locations = Location::orderBy('province')->get();
 
@@ -23,56 +22,24 @@ class FloodRiskController extends Controller
             }
         }
 
-        $selectedLocation = null;
-
-        if ($locations->isNotEmpty()) {
-            if ($request->filled('location_id')) {
-                $selectedLocation = Location::findOrFail($request->location_id);
-            } else {
-                $selectedLocation = $locations->first();
-            }
-        }
-
-        if (! $selectedLocation) {
-            return view('admin.flood-risk.index', [
-                'locations' => $locations,
-                'selectedLocation' => null,
-                'error' => 'Er zijn nog geen locaties beschikbaar.',
-                'dates' => [],
-                'rain' => [],
-                'currentWeekRain' => null,
-                'nextWeekRain' => null,
-                'riskLevel' => null,
-                'provinceStats' => $provinceStats,
-            ]);
-        }
-
-        $selectedStats = $this->buildLocationWeatherStats($selectedLocation);
-
-        if ($selectedStats === null) {
-            return view('admin.flood-risk.index', [
-                'locations' => $locations,
-                'selectedLocation' => $selectedLocation,
-                'error' => 'De weersgegevens konden niet opgehaald worden.',
-                'dates' => [],
-                'rain' => [],
-                'currentWeekRain' => null,
-                'nextWeekRain' => null,
-                'riskLevel' => null,
-                'provinceStats' => $provinceStats,
-            ]);
-        }
-
         return view('admin.flood-risk.index', [
             'locations' => $locations,
-            'selectedLocation' => $selectedLocation,
-            'error' => null,
-            'dates' => $selectedStats['dates'],
-            'rain' => $selectedStats['rain'],
-            'currentWeekRain' => $selectedStats['currentWeekRain'],
-            'nextWeekRain' => $selectedStats['nextWeekRain'],
-            'riskLevel' => $selectedStats['riskLevel'],
             'provinceStats' => $provinceStats,
+        ]);
+    }
+
+    public function show(Location $location)
+    {
+        $selectedStats = $this->buildLocationWeatherStats($location);
+
+        if ($selectedStats === null) {
+            return redirect()
+                ->route('admin.flood-risk.index')
+                ->with('error', 'De weersgegevens konden niet opgehaald worden.');
+        }
+
+        return view('admin.flood-risk.show', [
+            'location' => $location,
             'selectedStats' => $selectedStats,
         ]);
     }
@@ -113,7 +80,14 @@ class FloodRiskController extends Controller
         $nextWeekRain = array_sum(array_slice($rain, 7, 7));
         $nextWeekDailyRain = array_slice($rain, 7, 7);
 
-        $highestRainDay = count($nextWeekDailyRain) > 0 ? max($nextWeekDailyRain) : 0;
+        $highestRainDay = 0;
+        $highestRainDate = null;
+
+        if (count($nextWeekDailyRain) > 0) {
+            $highestRainDay = max($nextWeekDailyRain);
+            $highestRainIndex = array_search($highestRainDay, $nextWeekDailyRain);
+            $highestRainDate = $dates[7 + $highestRainIndex] ?? null;
+        }
 
         $riskDays = collect($nextWeekDailyRain)
             ->filter(fn ($dailyRain) => $dailyRain >= 15)
@@ -131,6 +105,7 @@ class FloodRiskController extends Controller
             'currentWeekRain' => round($currentWeekRain, 1),
             'nextWeekRain' => round($nextWeekRain, 1),
             'highestRainDay' => round($highestRainDay, 1),
+            'highestRainDate' => $highestRainDate,
             'riskDays' => $riskDays,
             'riskLevel' => $riskLevel,
             'dates' => $dates,
