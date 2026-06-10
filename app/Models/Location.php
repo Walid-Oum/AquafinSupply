@@ -12,9 +12,11 @@ class Location extends Model
         'postal_code',
         'latitude',
         'longitude',
+        'depot_address',
+        'province',
     ];
 
-    public function user(){
+    public function users(){
         return $this->hasMany(User::class);
 
     }
