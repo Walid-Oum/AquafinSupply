@@ -200,7 +200,7 @@
             <div class="rounded-xl bg-white p-6 shadow">
                 <div class="mb-4">
                     <h2 class="text-xl font-semibold text-gray-900">
-                        Neerslagverloop deze week
+                        Neerslagverloop komende 7 dagen
                     </h2>
 
                     <p class="mt-1 text-sm text-gray-600">
