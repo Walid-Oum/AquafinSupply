@@ -11,7 +11,8 @@ class Order extends Model
         'user_id',
         'delivery_date',
         'comment',
-        'status'
+        'status',
+        'location_id'
 
     ];
     public function user()
@@ -22,5 +23,8 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+    public function location(){
+        return $this->belongsTo(Location::class);
     }
 }
