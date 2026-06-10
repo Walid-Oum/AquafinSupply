@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Location;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
 class FloodRiskController extends Controller
@@ -57,6 +58,19 @@ class FloodRiskController extends Controller
         return 'Hoog';
     }
 
+    private function determineDailyRiskLevel(float $rainfall): string
+    {
+        if ($rainfall < 5) {
+            return 'Laag';
+        }
+
+        if ($rainfall < 15) {
+            return 'Gemiddeld';
+        }
+
+        return 'Hoog';
+    }
+
     private function buildLocationWeatherStats(Location $location): ?array
     {
         $response = Http::get('https://api.open-meteo.com/v1/forecast', [
@@ -78,15 +92,36 @@ class FloodRiskController extends Controller
 
         $currentWeekRain = array_sum(array_slice($rain, 0, 7));
         $nextWeekRain = array_sum(array_slice($rain, 7, 7));
+
+        $nextWeekDates = array_slice($dates, 7, 7);
         $nextWeekDailyRain = array_slice($rain, 7, 7);
+
+        $nextWeekStartDate = $nextWeekDates[0] ?? null;
+        $nextWeekEndDate = end($nextWeekDates) ?: null;
+
+        $nextWeekPeriodLabel = null;
+
+        if ($nextWeekStartDate && $nextWeekEndDate) {
+            $nextWeekPeriodLabel =
+                Carbon::parse($nextWeekStartDate)->locale('nl')->translatedFormat('d/m')
+                . ' t.e.m. ' .
+                Carbon::parse($nextWeekEndDate)->locale('nl')->translatedFormat('d/m');
+        }
 
         $highestRainDay = 0;
         $highestRainDate = null;
+        $highestRainDayLabel = null;
 
         if (count($nextWeekDailyRain) > 0) {
             $highestRainDay = max($nextWeekDailyRain);
             $highestRainIndex = array_search($highestRainDay, $nextWeekDailyRain);
-            $highestRainDate = $dates[7 + $highestRainIndex] ?? null;
+            $highestRainDate = $nextWeekDates[$highestRainIndex] ?? null;
+
+            if ($highestRainDate) {
+                $highestRainDayLabel = ucfirst(
+                    Carbon::parse($highestRainDate)->locale('nl')->translatedFormat('l d/m')
+                );
+            }
         }
 
         $riskDays = collect($nextWeekDailyRain)
@@ -94,6 +129,19 @@ class FloodRiskController extends Controller
             ->count();
 
         $riskLevel = $this->determineRiskLevel($nextWeekRain);
+
+        $nextWeekForecast = [];
+
+        foreach ($nextWeekDates as $index => $date) {
+            $dailyRain = $nextWeekDailyRain[$index] ?? 0;
+
+            $nextWeekForecast[] = [
+                'date' => $date,
+                'dayLabel' => ucfirst(Carbon::parse($date)->locale('nl')->translatedFormat('l d/m')),
+                'rain' => round($dailyRain, 1),
+                'riskLevel' => $this->determineDailyRiskLevel($dailyRain),
+            ];
+        }
 
         return [
             'location' => $location,
@@ -104,12 +152,15 @@ class FloodRiskController extends Controller
             'longitude' => $location->longitude,
             'currentWeekRain' => round($currentWeekRain, 1),
             'nextWeekRain' => round($nextWeekRain, 1),
+            'nextWeekPeriodLabel' => $nextWeekPeriodLabel,
             'highestRainDay' => round($highestRainDay, 1),
             'highestRainDate' => $highestRainDate,
+            'highestRainDayLabel' => $highestRainDayLabel,
             'riskDays' => $riskDays,
             'riskLevel' => $riskLevel,
             'dates' => $dates,
             'rain' => $rain,
+            'nextWeekForecast' => $nextWeekForecast,
         ];
     }
 }

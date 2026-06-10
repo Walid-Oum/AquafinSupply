@@ -57,10 +57,8 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-gray-700">
-                                    @if($stat['highestRainDate'])
-                                        {{ \Carbon\Carbon::parse($stat['highestRainDate'])->format('d/m') }}
-                                        -
-                                        {{ $stat['highestRainDay'] }} mm
+                                    @if($stat['highestRainDayLabel'])
+                                        {{ $stat['highestRainDayLabel'] }} - {{ $stat['highestRainDay'] }} mm
                                     @else
                                         {{ $stat['highestRainDay'] }} mm
                                     @endif
@@ -73,16 +71,16 @@
                                 <td class="px-4 py-3">
                                     @if($stat['riskLevel'] === 'Hoog')
                                         <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
-                                                Hoog
-                                            </span>
+                                            Hoog
+                                        </span>
                                     @elseif($stat['riskLevel'] === 'Gemiddeld')
                                         <span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
-                                                Gemiddeld
-                                            </span>
+                                            Gemiddeld
+                                        </span>
                                     @else
                                         <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-                                                Laag
-                                            </span>
+                                            Laag
+                                        </span>
                                     @endif
                                 </td>
 
@@ -118,6 +116,10 @@
         @endif
 
         @if(count($provinceStats) > 0)
+            @php
+                $periodLabel = $provinceStats[0]['nextWeekPeriodLabel'] ?? null;
+            @endphp
+
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <div class="rounded-xl bg-white p-6 shadow">
                     <div class="mb-4">
@@ -126,7 +128,12 @@
                         </h2>
 
                         <p class="mt-1 text-sm text-gray-600">
-                            Verwachte totale neerslag voor volgende week per provinciaal depot.
+                            Verwachte totale neerslag per provinciaal depot
+                            @if($periodLabel)
+                                voor de periode {{ $periodLabel }}.
+                            @else
+                                voor volgende week.
+                            @endif
                         </p>
                     </div>
 
@@ -142,7 +149,12 @@
                         </h2>
 
                         <p class="mt-1 text-sm text-gray-600">
-                            Toont per provincie de natste voorspelde dag van volgende week.
+                            Toont per provincie de natste voorspelde dag
+                            @if($periodLabel)
+                                binnen de periode {{ $periodLabel }}.
+                            @else
+                                van volgende week.
+                            @endif
                         </p>
                     </div>
 
@@ -162,7 +174,7 @@
                         </p>
                     </div>
 
-                    <div class="h-72">
+                    <div class="mx-auto h-64 max-w-xs">
                         <canvas id="priorityChart"></canvas>
                     </div>
                 </div>
@@ -178,7 +190,7 @@
         const provinceLabels = provinceStats.map(stat => stat.province);
         const nextWeekRain = provinceStats.map(stat => stat.nextWeekRain);
         const highestRainDay = provinceStats.map(stat => stat.highestRainDay);
-        const highestRainDate = provinceStats.map(stat => stat.highestRainDate);
+        const highestRainDayLabel = provinceStats.map(stat => stat.highestRainDayLabel);
 
         const riskCounts = {
             Laag: provinceStats.filter(stat => stat.riskLevel === 'Laag').length,
@@ -262,10 +274,10 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    const date = highestRainDate[context.dataIndex];
+                                    const day = highestRainDayLabel[context.dataIndex];
 
-                                    if (date) {
-                                        return date + ': ' + context.raw + ' mm';
+                                    if (day) {
+                                        return day + ': ' + context.raw + ' mm';
                                     }
 
                                     return context.raw + ' mm';
@@ -324,7 +336,20 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 16,
+                                padding: 16,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + ' provincie(s)';
+                                }
+                            }
                         }
                     }
                 }
