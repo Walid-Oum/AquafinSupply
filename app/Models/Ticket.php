@@ -16,6 +16,7 @@ class Ticket extends Model
         'subject',
         'description',
         'status',
+        'location_id'
     ];
 
     public function user(){
@@ -25,6 +26,10 @@ class Ticket extends Model
 
     public function order(){
         return $this->belongsTo(Order::class, 'order_id', 'id');
+    }
+
+    public function location(){
+        return $this->belongsTo(Location::class, 'location_id', 'id');
     }
 
     //wanneer order bestaan
