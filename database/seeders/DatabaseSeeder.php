@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,76 +17,218 @@ class DatabaseSeeder extends Seeder
      * Seed the application's database.
      */
 
-public function run(): void
-{
-
-    $antwerpen = Location::create([
-        'name' => 'Aquafin Antwerpen',
-        'city' => 'Antwerpen',
-        'postal_code' => '2000',
-        'latitude' => 51.2205000,
-        'longitude' => 4.4003000,
-        'depot_address' => 'Aquafin depot Antwerpen',
-        'province' => 'Antwerpen',
-
-
-    ]);
-
-    $gent = Location::create([
-        'name' => 'Aquafin Gent',
-        'city' => 'Gent',
-        'postal_code' => '9000',
-        'latitude' => 51.0543000,
-        'longitude' => 3.7174000,
-        'depot_address' => 'Aquafin depot Gent',
-        'province' => 'Oost-Vlaanderen',
-    ]);
-
-    $brussel = Location::create([
-        'name' => 'Aquafin Brussel',
-        'city' => 'Brussel',
-        'postal_code' => '1000',
-        'latitude' => 50.8503000,
-        'longitude' => 4.3517000,
-        'depot_address' => 'Aquafin depot Brussel',
-        'province' => 'Brussel',
-    ]);
-
-    // 1. De vaste Admin
-    \App\Models\User::factory()->create([
-        'name' => 'Aquafin Admin',
-        'email' => 'admin@aquafinsupply.be',
-        'password' => bcrypt('Aquafin2026!'),
-        'role' => 'admin',
-        'location_id' => $antwerpen->id,
-    ]);
-
-    // 2. De vaste Magazijn
-    \App\Models\User::factory()->create([
-        'name' => 'Magazijn Medewerker',
-        'email' => 'magazijn@aquafinsupply.be',
-        'password' => bcrypt('Magazijn2026!'),
-        'role' => 'magazijn',
-        'location_id' => $brussel->id,
-    ]);
-
-    // 3. De vaste Technieker
-    \App\Models\User::factory()->create([
-        'name' => 'Technieker App',
-        'email' => 'technieker@aquafinsupply.be',
-        'password' => bcrypt('Technieker2026!'),
-        'role' => 'technieker',
-        'location_id' => $gent->id,
-    ]);
+//
+//    $antwerpen = Location::create([
+//        'name' => 'Aquafin Antwerpen',
+//        'city' => 'Antwerpen',
+//        'postal_code' => '2000',
+//        'latitude' => 51.2205000,
+//        'longitude' => 4.4003000,
+//        'depot_address' => 'Aquafin depot Antwerpen',
+//        'province' => 'Antwerpen',
+//
+//
+//    ]);
+//
+//    $gent = Location::create([
+//        'name' => 'Aquafin Gent',
+//        'city' => 'Gent',
+//        'postal_code' => '9000',
+//        'latitude' => 51.0543000,
+//        'longitude' => 3.7174000,
+//        'depot_address' => 'Aquafin depot Gent',
+//        'province' => 'Oost-Vlaanderen',
+//    ]);
+//
+//    $brussel = Location::create([
+//        'name' => 'Aquafin Brussel',
+//        'city' => 'Brussel',
+//        'postal_code' => '1000',
+//        'latitude' => 50.8503000,
+//        'longitude' => 4.3517000,
+//        'depot_address' => 'Aquafin depot Brussel',
+//        'province' => 'Brussel',
+//    ]);
+//
+//    // 1. De vaste Admin
+//    \App\Models\User::factory()->create([
+//        'name' => 'Aquafin Admin',
+//        'email' => 'admin@aquafinsupply.be',
+//        'password' => bcrypt('Aquafin2026!'),
+//        'role' => 'admin',
+//        'location_id' => $antwerpen->id,
+//    ]);
+//
+//    // 2. De vaste Magazijn
+//    \App\Models\User::factory()->create([
+//        'name' => 'Magazijn Medewerker',
+//        'email' => 'magazijn@aquafinsupply.be',
+//        'password' => bcrypt('Magazijn2026!'),
+//        'role' => 'magazijn',
+//        'location_id' => $brussel->id,
+//    ]);
+//
+//    // 3. De vaste Technieker
+//    \App\Models\User::factory()->create([
+//        'name' => 'Technieker App',
+//        'email' => 'technieker@aquafinsupply.be',
+//        'password' => bcrypt('Technieker2026!'),
+//        'role' => 'technieker',
+//        'location_id' => $gent->id,
+//    ]);
 
 
+    public function run(): void
+    {
+        $locations = [
+            [
+                'name' => 'Aquafin Antwerpen',
+                'province' => 'Antwerpen',
+                'city' => 'Antwerpen',
+                'postal_code' => '2000',
+                'latitude' => 51.2194,
+                'longitude' => 4.4025,
+            ],
+            [
+                'name' => 'Aquafin Limburg',
+                'province' => 'Limburg',
+                'city' => 'Hasselt',
+                'postal_code' => '3500',
+                'latitude' => 50.9307,
+                'longitude' => 5.3325,
+            ],
+            [
+                'name' => 'Aquafin Oost-Vlaanderen',
+                'province' => 'Oost-Vlaanderen',
+                'city' => 'Gent',
+                'postal_code' => '9000',
+                'latitude' => 51.0538,
+                'longitude' => 3.7250,
+            ],
+            [
+                'name' => 'Aquafin Vlaams-Brabant',
+                'province' => 'Vlaams-Brabant',
+                'city' => 'Leuven',
+                'postal_code' => '3000',
+                'latitude' => 50.8798,
+                'longitude' => 4.7005,
+            ],
+            [
+                'name' => 'Aquafin West-Vlaanderen',
+                'province' => 'West-Vlaanderen',
+                'city' => 'Brugge',
+                'postal_code' => '8000',
+                'latitude' => 51.2093,
+                'longitude' => 3.2247,
+            ],
+        ];
+
+        foreach ($locations as $locationData) {
+            Location::updateOrCreate(
+                ['province' => $locationData['province']],
+                $locationData
+            );
+        }
+
+        $antwerpen = Location::where('province', 'Antwerpen')->first();
+        $limburg = Location::where('province', 'Limburg')->first();
+        $oostVlaanderen = Location::where('province', 'Oost-Vlaanderen')->first();
+        $vlaamsBrabant = Location::where('province', 'Vlaams-Brabant')->first();
+        $westVlaanderen = Location::where('province', 'West-Vlaanderen')->first();
+
+        User::updateOrCreate(
+            ['email' => 'admin@aquafin.be'],
+            [
+                'name' => 'Admin Aquafin',
+                'email' => 'admin@aquafin.be',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'location_id' => $antwerpen->id,
+            ]
+        );
+
+        $users = [
+            [
+                'name' => 'Technieker Antwerpen',
+                'email' => 'technieker.antwerpen@aquafin.be',
+                'role' => 'technieker',
+                'location_id' => $antwerpen->id,
+            ],
+            [
+                'name' => 'Magazijn Antwerpen',
+                'email' => 'magazijn.antwerpen@aquafin.be',
+                'role' => 'magazijn',
+                'location_id' => $antwerpen->id,
+            ],
+
+            [
+                'name' => 'Technieker Limburg',
+                'email' => 'technieker.limburg@aquafin.be',
+                'role' => 'technieker',
+                'location_id' => $limburg->id,
+            ],
+            [
+                'name' => 'Magazijn Limburg',
+                'email' => 'magazijn.limburg@aquafin.be',
+                'role' => 'magazijn',
+                'location_id' => $limburg->id,
+            ],
+
+            [
+                'name' => 'Technieker Oost-Vlaanderen',
+                'email' => 'technieker.oostvlaanderen@aquafin.be',
+                'role' => 'technieker',
+                'location_id' => $oostVlaanderen->id,
+            ],
+            [
+                'name' => 'Magazijn Oost-Vlaanderen',
+                'email' => 'magazijn.oostvlaanderen@aquafin.be',
+                'role' => 'magazijn',
+                'location_id' => $oostVlaanderen->id,
+            ],
+
+            [
+                'name' => 'Technieker Vlaams-Brabant',
+                'email' => 'technieker.vlaamsbrabant@aquafin.be',
+                'role' => 'technieker',
+                'location_id' => $vlaamsBrabant->id,
+            ],
+            [
+                'name' => 'Magazijn Vlaams-Brabant',
+                'email' => 'magazijn.vlaamsbrabant@aquafin.be',
+                'role' => 'magazijn',
+                'location_id' => $vlaamsBrabant->id,
+            ],
+
+            [
+                'name' => 'Technieker West-Vlaanderen',
+                'email' => 'technieker.westvlaanderen@aquafin.be',
+                'role' => 'technieker',
+                'location_id' => $westVlaanderen->id,
+            ],
+            [
+                'name' => 'Magazijn West-Vlaanderen',
+                'email' => 'magazijn.westvlaanderen@aquafin.be',
+                'role' => 'magazijn',
+                'location_id' => $westVlaanderen->id,
+            ],
+        ];
+
+        foreach ($users as $userData) {
+            User::updateOrCreate(
+                ['email' => $userData['email']],
+                [
+                    'name' => $userData['name'],
+                    'email' => $userData['email'],
+                    'password' => Hash::make('password'),
+                    'role' => $userData['role'],
+                    'location_id' => $userData['location_id'],
+                ]
+            );
+        }
 
 
-
-
-
-
-    $materials = [
+        $materials = [
             // ==================== BEVESTIGINGSMATERIAAL ====================
             ['name' => 'Bout M6', 'category' => 'Bevestigingsmateriaal', 'description' => 'Inox A2', 'stock' => 200, 'is_active' => true],
             ['name' => 'Bout M8', 'category' => 'Bevestigingsmateriaal', 'description' => 'Inox A2/A4, verzinkt', 'stock' => 150, 'is_active' => true],
@@ -232,8 +375,7 @@ public function run(): void
             $material['updated_at'] = now();
             DB::table('materials')->insert($material);
         }
-}
-
+    }
 
 
 }
