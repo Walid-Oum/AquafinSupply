@@ -56,7 +56,7 @@
 
                     @foreach ($locations as $location)
                         <option value="{{ $location->id }}" @selected(old('location_id') == $location->id)>
-                            {{ $location->name }} - {{ $location->city }}
+                            {{ $location->province }} - {{ $location->name }} ({{$location->city}})
                         </option>
                     @endforeach
                 </select>

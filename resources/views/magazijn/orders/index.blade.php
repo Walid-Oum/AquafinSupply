@@ -42,39 +42,43 @@
 
                 <thead>
 
-                    <tr>
+                <tr>
 
-                        <th class="text-left p-3">
-                            Nummer
-                        </th>
+                    <th class="text-left p-3">
+                        Nummer
+                    </th>
 
-                        <th class="text-left p-3">
-                            Technieker
-                        </th>
+                    <th class="text-left p-3">
+                        Technieker
+                    </th>
 
-                        <th class="text-left p-3">
-                            Leverdatum
-                        </th>
+                    <th class="text-left p-3">
+                        Depot/provincie
+                    </th>
 
-                        <th class="text-left p-3">
-                            Status
-                        </th>
+                    <th class="text-left p-3">
+                        Leverdatum
+                    </th>
 
-                        <th class="text-left p-3">
-                            Actie
-                        </th>
+                    <th class="text-left p-3">
+                        Status
+                    </th>
 
-                        <th class="text-center">
-    Bekijk
-</th>
+                    <th class="text-left p-3">
+                        Actie
+                    </th>
 
-                    </tr>
+                    <th class="text-center p-3">
+                        Bekijk
+                    </th>
+
+                </tr>
 
                 </thead>
 
                 <tbody>
 
-                    @forelse($orders as $order)
+                @forelse($orders as $order)
 
                     <tr class="border-b">
 
@@ -84,6 +88,18 @@
 
                         <td class="p-3">
                             {{ $order->user->name }}
+                        </td>
+
+                        <td class="p-3">
+                            <div>
+                                <p class="font-semibold">
+                                    {{ $order->location->province ?? 'Geen provincie ingesteld' }}
+                                </p>
+
+                                <p class="text-sm text-gray-500">
+                                    {{ $order->location->name ?? 'Geen depot gekoppeld' }}
+                                </p>
+                            </div>
                         </td>
 
                         <td class="p-3">
@@ -111,17 +127,21 @@
                                     name="status"
                                     class="border rounded px-3 py-2">
 
-                                    <option value="Nieuw">Nieuw</option>
+                                    <option value="Nieuw" @selected($order->status === 'Nieuw')>
+                                        Nieuw
+                                    </option>
 
-<option value="In voorbereiding">In voorbereiding</option>
+                                    <option value="In voorbereiding" @selected($order->status === 'In voorbereiding')>
+                                        In voorbereiding
+                                    </option>
 
-<option value="Klaar om af te halen">
-    Klaar om af te halen
-</option>
+                                    <option value="Klaar om af te halen" @selected($order->status === 'Klaar om af te halen')>
+                                        Klaar om af te halen
+                                    </option>
 
-<option value="Afgehaald">
-    Afgehaald
-</option>
+                                    <option value="Afgehaald" @selected($order->status === 'Afgehaald')>
+                                        Afgehaald
+                                    </option>
 
                                 </select>
 
@@ -134,26 +154,27 @@
                             </form>
 
                         </td>
-                        <td class="text-center">
 
-    <a
-        href="{{ route('magazijn.orders.show', $order->id) }}"
-        class="font-semibold text-[#0F4C81] hover:underline">
+                        <td class="text-center p-3">
 
-        Bekijk
+                            <a
+                                href="{{ route('magazijn.orders.show', $order->id) }}"
+                                class="font-semibold text-[#0F4C81] hover:underline">
 
-    </a>
+                                Bekijk
 
-</td>
+                            </a>
+
+                        </td>
 
                     </tr>
 
-                    @empty
+                @empty
 
                     <tr>
 
                         <td
-                            colspan="5"
+                            colspan="7"
                             class="text-center p-5">
 
                             Geen bestellingen gevonden.
@@ -162,7 +183,7 @@
 
                     </tr>
 
-                    @endforelse
+                @endforelse
 
                 </tbody>
 
