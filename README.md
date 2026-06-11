@@ -89,7 +89,6 @@ Het systeem ondersteunt drie verschillende gebruikersrollen:
 - Blade
 - Tailwind CSS
 - JavaScript
-- Alpine.js
 - HTML5
 - CSS3
 
