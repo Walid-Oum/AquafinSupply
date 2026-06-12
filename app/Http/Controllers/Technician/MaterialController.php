@@ -39,13 +39,12 @@ class MaterialController extends Controller
             ->distinct()
             ->pluck('category');
 
-        $recommendedMaterials = Material::where('is_active', true)
-            ->whereIn('category', [
-                'Technisch onderhoud',
-                'Aquafin tools'
-            ])
-            ->take(4)
-            ->get();
+        $recommendedMaterials = Material::whereIn('name', [
+            'Dompelpomp',
+            'Rioolstop',
+            'Slangenwagen',
+            'Werklaarzen PVC'
+        ])->get();
 
         return view(
             'technician.materials.index',
