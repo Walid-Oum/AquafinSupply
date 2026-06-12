@@ -4,14 +4,17 @@
 
 <a
     href="{{ route('cart.index') }}"
-    class="relative text-3xl hover:scale-110 transition">
+    class="relative hover:scale-110 transition">
 
-    🛒
+    <img
+        src="{{ asset('images/cart.png') }}"
+        alt="Winkelmandje"
+        class="w-10 h-10">
 
     @if(session()->has('cart') && count(session('cart')) > 0)
 
         <span
-            class="absolute -top-2 -right-2
+            class="absolute -top-1 -right-1
                    bg-red-500 text-white
                    text-xs font-bold
                    rounded-full
@@ -27,56 +30,51 @@
 </a>
 
 @endif
-    <a href="{{ route('profile.edit') }}"
-       class="flex items-center gap-4 p-2 rounded-xl hover:bg-gray-50 transition">
 
-        <div
-            class="w-12 h-12 rounded-full
-                   bg-gradient-to-r
-                   from-[#0F4C81]
-                   to-[#2D7FC1]
-                   text-white
-                   flex items-center
-                   justify-center
-                   font-bold
-                   uppercase">
+<a href="{{ route('profile.edit') }}"
+   class="flex items-center gap-3 hover:opacity-80 transition">
 
-            {{ substr(Auth::user()->name, 0, 1) }}
+    <div
+        class="w-10 h-10 rounded-full
+               bg-[#0F4C81]
+               text-white
+               flex items-center
+               justify-center
+               font-bold
+               uppercase">
 
-        </div>
+        {{ substr(Auth::user()->name, 0, 1) }}
 
-        <div>
+    </div>
 
-            <p class="font-semibold text-gray-700">
-                {{ Auth::user()->name }}
-            </p>
+    <span class="font-medium text-gray-700">
 
-            <p class="text-xs text-gray-400 capitalize">
-                {{ Auth::user()->role }}
-            </p>
+        {{ explode(' ', Auth::user()->name)[0] }}
 
-        </div>
+    </span>
 
-    </a>
+</a>
+<div class="h-10 w-px bg-gray-300"></div>
+<form
+    method="POST"
+    action="{{ route('logout') }}"
+    class="flex items-center">
 
-    <form method="POST" action="{{ route('logout') }}">
-        @csrf
+    @csrf
 
-        <button
-            type="submit"
-            class="bg-[#0F4C81]
-                   hover:bg-[#1E6BA8]
-                   text-white
-                   font-medium
-                   px-5 py-2
-                   rounded-xl
-                   shadow-md
-                   transition">
+    <button
+        type="submit"
+        class="flex items-center justify-center
+               w-10 h-10
+               hover:scale-110 transition">
 
-            Uitloggen
+        <img
+            src="{{ asset('images/logout.png') }}"
+            alt="Logout"
+            class="w-10 h-10">
 
-        </button>
+    </button>
 
-    </form>
+</form>
 
 </div>
