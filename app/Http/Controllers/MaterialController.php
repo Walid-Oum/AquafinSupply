@@ -118,9 +118,21 @@ class MaterialController extends Controller
 
         $material = Material::findOrFail($id);
 
+        if ($request->remove_image) {
+
+            if ($material->image) {
+
+                Storage::disk('public')
+                    ->delete($material->image);
+
+                $material->image = null;
+            }
+        }
+
         if ($request->hasFile('image')) {
 
             if ($material->image) {
+
                 Storage::disk('public')
                     ->delete($material->image);
             }
@@ -221,7 +233,7 @@ class MaterialController extends Controller
   public function searchSuggestions(Request $request)
     {
         $search = $request->get('q');
-        
+
         if (strlen($search) < 2) {
             return response()->json([]);
         }
@@ -232,5 +244,5 @@ class MaterialController extends Controller
             ->get();
 
         return response()->json($materials);
-    }  
+    }
 }
