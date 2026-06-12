@@ -74,7 +74,7 @@
 
                 <div class="flex items-center gap-3 pt-2">
                    <x-button>
-    Ticket aanmaken
+    Supportaanvraag aanmaken
 </x-button>
 
                     <a

@@ -2,13 +2,13 @@
     <div class="p-8">
         <div class="mb-6 flex items-center justify-between">
             <div>
-                <x-page-header title="Mijn tickets" />
-                <p class="text-gray-600">Bekijk hier de status van je aangemaakte tickets.</p>
+                <x-page-header title="Mijn supportaanvragen" />
+                <p class="text-gray-600">Bekijk hier de status van je supportaanvragen</p>
             </div>
 
            <a href="{{ route('tickets.create') }}">
     <x-button>
-        Nieuw ticket
+        Nieuwe supportaanvraag
     </x-button>
 </a>
         </div>
@@ -26,7 +26,7 @@
             </div>
         @empty
             <div class="rounded-lg bg-white p-6 shadow">
-                <p class="text-gray-600">Je hebt nog geen tickets.</p>
+                <p class="text-gray-600">Je hebt nog geen supportaanvraag aangemaakt.</p>
             </div>
         @endforelse
     </div>

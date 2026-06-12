@@ -56,6 +56,8 @@ class UserController extends Controller
             'password' => bcrypt($validated['password']),
             'role' => $validated['role'],
             'location_id' => $validated['location_id'],
+            // de admin moet het niet per se doen
+            'must_change_password' => $validated['role'] !== 'admin',
         ]);
 
         return redirect()
@@ -99,6 +101,9 @@ class UserController extends Controller
                 Rule::exists('locations', 'id'),
             ],
         ]);
+        if (auth()->id() == $user->id) {
+    unset($validated['role']);
+}
 
         $user->update([
             'name' => $validated['name'],
@@ -115,6 +120,7 @@ class UserController extends Controller
 
             $user->update([
                 'password' => bcrypt($request->password),
+                'must_change_password' => $validated['role'] !== 'admin',
             ]);
         }
 
