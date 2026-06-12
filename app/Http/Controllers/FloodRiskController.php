@@ -26,15 +26,19 @@ class FloodRiskController extends Controller
             ]);
         }
 
-        $response = Http::get('https://api.open-meteo.com/v1/forecast', [
-            'latitude' => $location->latitude,
-            'longitude' => $location->longitude,
-            'daily' => 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,rain_sum,wind_gusts_10m_max',
-            'timezone' => 'Europe/Brussels',
-            'forecast_days' => 7,
-        ]);
+        try {
+            $response = Http::timeout(10)->get('https://api.open-meteo.com/v1/forecast', [
+                'latitude' => $location->latitude,
+                'longitude' => $location->longitude,
+                'daily' => 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,rain_sum,wind_gusts_10m_max',
+                'timezone' => 'Europe/Brussels',
+                'forecast_days' => 7,
+            ]);
 
-        if ($response->failed()) {
+            if ($response->failed()) {
+                throw new \Exception('Weather API request failed.');
+            }
+        } catch (\Exception $e) {
             return view('flood-risk.index', [
                 'error' => 'De weersgegevens konden niet opgehaald worden.',
                 'location' => $location,
@@ -50,8 +54,8 @@ class FloodRiskController extends Controller
 
         $data = $response->json();
 
-        $dates = $data['daily']['time'];
-        $rain = $data['daily']['precipitation_sum'];
+        $dates = $data['daily']['time'] ?? [];
+        $rain = $data['daily']['precipitation_sum'] ?? [];
 
         $weekRain = array_sum($rain);
         $riskLevel = $this->determineRiskLevel($weekRain);
