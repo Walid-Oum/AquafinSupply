@@ -143,10 +143,16 @@ Route::middleware(['auth', 'role:technieker,magazijn'])
     ->get('/overstromingsrisico', [\App\Http\Controllers\FloodRiskController::class, 'index'])
     ->name('flood-risk.index');
 
+Route::get('/admin/overstromingsrisico/{location}', [\App\Http\Controllers\Admin\FloodRiskController::class, 'show'])
+    ->name('admin.flood-risk.show');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/overstromingsrisico', [\App\Http\Controllers\Admin\FloodRiskController::class, 'index'])
         ->name('admin.flood-risk.index');
+
+    Route::get('/admin/overstromingsrisico/{location}', [\App\Http\Controllers\Admin\FloodRiskController::class, 'show'])
+        ->name('admin.flood-risk.show');
 });
 
+Route::get('/api/search-materials', [App\Http\Controllers\MaterialController::class, 'searchSuggestions'])->middleware('auth')->name('api.materials.search');
 require __DIR__.'/auth.php';

@@ -1,10 +1,10 @@
-{{-- 
+{{--
     Pagina: Detail bestelling
 
     User Stories:
     US17 - Inhoud bestelling bekijken
 --}}
-{{-- 
+{{--
 US17 - Inhoud bestelling bekijken
 --}}
 
@@ -25,6 +25,23 @@ US17 - Inhoud bestelling bekijken
             </div>
 
             <div>
+                <strong>Depot/provincie:</strong>
+                {{ $order->location->province ?? 'Geen locatie gekoppeld' }}
+            </div>
+
+            <div>
+                <strong>Depot:</strong>
+                {{ $order->location->name ?? 'Geen depot gekoppeld' }}
+            </div>
+
+            @if($order->location?->depot_address)
+                <div>
+                    <strong>Depotadres:</strong>
+                    {{ $order->location->depot_address }}
+                </div>
+            @endif
+
+            <div>
                 <strong>Leverdatum:</strong> {{ $order->delivery_date }}
             </div>
 
@@ -37,7 +54,7 @@ US17 - Inhoud bestelling bekijken
             <div>
                 <strong>Opmerking:</strong>
 
-{{ $order->comment ?? 'Geen opmerking' }}
+                {{ $order->comment ?? 'Geen opmerking' }}
             </div>
 
         </div>

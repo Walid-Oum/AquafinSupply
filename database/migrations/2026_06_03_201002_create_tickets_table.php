@@ -13,15 +13,27 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            //Als user verwijdert wordt, ticket blijft bestaan en id = null
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            //zal nog komen orders moeten eerst nog aangemaakt worden
-//            $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
-            $table->unsignedBigInteger('order_id')->nullable();
+
+            // Als user verwijderd wordt, ticket blijft bestaan en user_id wordt null
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
+
+            $table->foreignId('order_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
+
+            $table->foreignId('location_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
 
             $table->string('subject');
             $table->text('description');
             $table->string('status')->default('Open');
+
             $table->timestamps();
         });
     }

@@ -17,6 +17,21 @@
             </p>
 
             <p>
+                <strong>Depot/provincie:</strong>
+                {{ $order->location->province ?? 'Geen provincie ingesteld' }}
+            </p>
+
+            <p>
+                <strong>Depot:</strong>
+                {{ $order->location->name ?? 'Geen depot gekoppeld' }}
+            </p>
+
+            <p>
+                <strong>Stad:</strong>
+                {{ $order->location->city ?? 'Geen stad gekoppeld' }}
+            </p>
+
+            <p>
                 <strong>Leverdatum:</strong>
                 {{ $order->delivery_date }}
             </p>
@@ -41,95 +56,95 @@
 
             <table class="w-full">
 
-               <thead>
+                <thead>
 
-    <tr>
-        <th class="text-left">Foto</th>
-        <th class="text-left">Materiaal</th>
-        <th class="text-left">Aantal</th>
-    </tr>
+                <tr>
+                    <th class="text-left">Foto</th>
+                    <th class="text-left">Materiaal</th>
+                    <th class="text-left">Aantal</th>
+                </tr>
 
-</thead>
+                </thead>
 
-<tbody>
+                <tbody>
 
-    @forelse($order->items as $item)
+                @forelse($order->items as $item)
 
-        <tr>
+                    <tr>
 
-            <td class="py-2">
+                        <td class="py-2">
 
-                @if($item->material->image)
+                            @if($item->material->image)
 
-                    <img
-                        src="{{ asset('storage/' . $item->material->image) }}"
-                        class="w-16 h-16 object-cover rounded-lg">
+                                <img
+                                    src="{{ asset('storage/' . $item->material->image) }}"
+                                    class="w-16 h-16 object-cover rounded-lg">
 
-                @else
+                            @else
 
-                    <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-500">
+                                <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-500">
 
-                        Geen afbeelding
+                                    Geen afbeelding
 
-                    </div>
+                                </div>
 
-                @endif
+                            @endif
 
-            </td>
+                        </td>
 
-            <td>
-                {{ $item->material->name }}
-            </td>
+                        <td>
+                            {{ $item->material->name }}
+                        </td>
 
-            <td>
-                {{ $item->quantity }}
-            </td>
+                        <td>
+                            {{ $item->quantity }}
+                        </td>
 
-        </tr>
+                    </tr>
 
-    @empty
+                @empty
 
-        <tr>
+                    <tr>
 
-            <td colspan="3" class="text-center py-4 text-gray-500">
+                        <td colspan="3" class="text-center py-4 text-gray-500">
 
-                Geen materialen gevonden.
+                            Geen materialen gevonden.
 
-            </td>
+                        </td>
 
-        </tr>
+                    </tr>
 
-    @endforelse
+                @endforelse
 
-</tbody>
+                </tbody>
 
             </table>
 
         </div>
 
-       <div class="mt-6 flex gap-3">
+        <div class="mt-6 flex gap-3">
 
-    <a href="{{ route('magazijn.orders.edit', $order->id) }}">
+            <a href="{{ route('magazijn.orders.edit', $order->id) }}">
 
-        <x-button>
+                <x-button>
 
-            Bewerk
+                    Bewerk
 
-        </x-button>
+                </x-button>
 
-    </a>
+            </a>
 
-    <a href="{{ route('magazijn.orders.index') }}">
+            <a href="{{ route('magazijn.orders.index') }}">
 
-        <x-button>
+                <x-button>
 
-            Terug
+                    Terug
 
-        </x-button>
+                </x-button>
 
-    </a>
+            </a>
 
-</div>
+        </div>
 
     </x-card>
 
