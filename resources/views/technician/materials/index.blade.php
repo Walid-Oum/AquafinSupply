@@ -108,7 +108,7 @@
             'sort' => request('sort')
         ]) }}"
         class="px-5 py-2 rounded-full
-        {{ request('category') == null ? 'bg-blue-600 text-white' : 'bg-gray-100' }}">
+        {{ request('category') == null ? 'bg-[#0F4C81] text-white' : 'bg-gray-100 hover:bg-gray-200' }}">
 
         Alles
 
@@ -122,7 +122,7 @@
                 'sort' => request('sort')
             ]) }}"
             class="px-5 py-2 rounded-full
-            {{ request('category') == $category ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200' }}">
+           {{ request('category') == $category ? 'bg-[#0F4C81] text-white' : 'bg-gray-100 hover:bg-gray-200' }}">
 
             {{ $category }}
 
