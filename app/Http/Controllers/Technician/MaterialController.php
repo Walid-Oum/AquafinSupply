@@ -40,6 +40,10 @@ class MaterialController extends Controller
             ->pluck('category');
 
         $recommendedMaterials = Material::where('is_active', true)
+            ->whereIn('category', [
+                'Technisch onderhoud',
+                'Aquafin tools'
+            ])
             ->take(4)
             ->get();
 
