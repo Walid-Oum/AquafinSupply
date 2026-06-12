@@ -11,17 +11,17 @@ class MaterialController extends Controller
     public function index(Request $request)
     {
         $query = Material::where('is_active', true);
-        
+
         // Zoeken
         if ($request->has('search') && $request->search != '') {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
-        
+
         // Filter op categorie
         if ($request->has('category') && $request->category != '') {
             $query->where('category', $request->category);
         }
-        
+
         // Sorteren
         if ($request->has('sort')) {
             if ($request->sort == 'asc') {
@@ -32,11 +32,25 @@ class MaterialController extends Controller
         } else {
             $query->orderBy('name', 'asc');
         }
-        
+
         $materials = $query->get();
-        $categories = Material::select('category')->distinct()->pluck('category');
-        
-        return view('technician.materials.index', compact('materials', 'categories'));
+
+        $categories = Material::select('category')
+            ->distinct()
+            ->pluck('category');
+
+        $recommendedMaterials = Material::where('is_active', true)
+            ->take(4)
+            ->get();
+
+        return view(
+            'technician.materials.index',
+            compact(
+                'materials',
+                'categories',
+                'recommendedMaterials'
+            )
+        );
     }
 
     public function show($id)

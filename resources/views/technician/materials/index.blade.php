@@ -1,18 +1,57 @@
 <x-app-layout>
     <x-page-header title="Materialen overzicht" />
+    @if($recommendedMaterials->count() > 0)
+
+        <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+
+            <h2 class="text-lg font-bold text-green-700 mb-4">
+                Aanbevolen materialen
+                (op basis van overstromingsrisico)
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+                @foreach($recommendedMaterials as $material)
+
+                    <a
+                        href="{{ route('technician.materials.show', $material->id) }}"
+                        class="border rounded-lg p-4 bg-white hover:shadow">
+
+                        <h3 class="font-semibold">
+                            {{ $material->name }}
+                        </h3>
+
+                        <p class="text-sm text-gray-500">
+                            {{ $material->category }}
+                        </p>
+
+                        <p class="text-sm mt-2">
+                            Voorraad:
+                            {{ $material->stock }}
+                        </p>
+
+                    </a>
+
+                @endforeach
+
+            </div>
+
+        </div>
+
+    @endif
 
     <div class="mb-4">
         <div class="relative w-full max-w-xs">
             <div class="relative">
-                <input 
-                    type="text" 
-                    id="global-material-search" 
-                    autocomplete="off" 
-                    placeholder="Zoeken op naam..." 
-                    value="{{ request('search') }}" 
+                <input
+                    type="text"
+                    id="global-material-search"
+                    autocomplete="off"
+                    placeholder="Zoeken op naam..."
+                    value="{{ request('search') }}"
                     class="border rounded px-3 py-2 w-64">
             </div>
-            
+
             <ul id="global-search-results" class="absolute z-50 w-64 bg-white border border-gray-200 rounded mt-1 shadow-xl hidden max-h-60 overflow-y-auto divide-y divide-gray-100">
             </ul>
         </div>
@@ -28,13 +67,13 @@
                     </option>
                 @endforeach
             </select>
-            
+
             <select name="sort" class="border rounded px-3 py-2">
                 <option value="">Sorteer op naam</option>
                 <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>A-Z</option>
                 <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Z-A</option>
             </select>
-            
+
             <x-button>
                 Filter & Sorteer
             </x-button>
@@ -110,16 +149,16 @@
 
                 if (data.length > 0) {
                     resultsList.classList.remove('hidden');
-                    
+
                     data.forEach(item => {
                         const li = document.createElement('li');
                         li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center text-sm';
-                        
+
                         li.innerHTML = `
                             <span class="font-medium text-gray-700">${item.name}</span>
                             <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">Stock: ${item.stock}</span>
                         `;
-                        
+
                         // Technieker klikt -> gaat naar de specifieke technieker detailpagina
                         li.addEventListener('click', function() {
                             searchInput.value = item.name;
