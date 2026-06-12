@@ -1,55 +1,80 @@
 <div class="bg-white h-20 border-b flex justify-end items-center px-8 gap-6 shadow-md">
+ 
+@if(Auth::user()->role == 'technieker')
 
-    <a href="{{ route('profile.edit') }}"
-       class="flex items-center gap-4 p-2 rounded-xl hover:bg-gray-50 transition">
+<a
+    href="{{ route('cart.index') }}"
+    class="relative hover:scale-110 transition">
 
-        <div
-            class="w-12 h-12 rounded-full
-                   bg-gradient-to-r
-                   from-[#0F4C81]
-                   to-[#2D7FC1]
-                   text-white
-                   flex items-center
-                   justify-center
-                   font-bold
-                   uppercase">
+    <img
+        src="{{ asset('images/cart.png') }}"
+        alt="Winkelmandje"
+        class="w-10 h-10">
 
-            {{ substr(Auth::user()->name, 0, 1) }}
+    @if(session()->has('cart') && count(session('cart')) > 0)
 
-        </div>
+        <span
+            class="absolute -top-1 -right-1
+                   bg-red-500 text-white
+                   text-xs font-bold
+                   rounded-full
+                   w-5 h-5
+                   flex items-center justify-center">
 
-        <div>
+            {{ count(session('cart')) }}
 
-            <p class="font-semibold text-gray-700">
-                {{ Auth::user()->name }}
-            </p>
+        </span>
 
-            <p class="text-xs text-gray-400 capitalize">
-                {{ Auth::user()->role }}
-            </p>
+    @endif
 
-        </div>
+</a>
 
-    </a>
+@endif
 
-    <form method="POST" action="{{ route('logout') }}">
-        @csrf
+<a href="{{ route('profile.edit') }}"
+   class="flex items-center gap-3 hover:opacity-80 transition">
 
-        <button
-            type="submit"
-            class="bg-[#0F4C81]
-                   hover:bg-[#1E6BA8]
-                   text-white
-                   font-medium
-                   px-5 py-2
-                   rounded-xl
-                   shadow-md
-                   transition">
+    <div
+        class="w-10 h-10 rounded-full
+               bg-[#0F4C81]
+               text-white
+               flex items-center
+               justify-center
+               font-bold
+               uppercase">
 
-            Uitloggen
+        {{ substr(Auth::user()->name, 0, 1) }}
 
-        </button>
+    </div>
 
-    </form>
+    <span class="font-medium text-gray-700">
+
+        {{ explode(' ', Auth::user()->name)[0] }}
+
+    </span>
+
+</a>
+<div class="h-10 w-px bg-gray-300"></div>
+<form
+    method="POST"
+    action="{{ route('logout') }}"
+    class="flex items-center">
+
+    @csrf
+
+    <button
+        type="submit"
+        class="flex items-center justify-center
+               w-10 h-10
+               hover:scale-110 transition">
+
+        <img
+            src="{{ asset('images/logout.png') }}"
+            alt="Logout"
+            class="w-10 h-10">
+
+    </button>
+
+</form>
 
 </div>

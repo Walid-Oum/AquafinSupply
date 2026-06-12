@@ -99,6 +99,9 @@ class UserController extends Controller
                 Rule::exists('locations', 'id'),
             ],
         ]);
+        if (auth()->id() == $user->id) {
+    unset($validated['role']);
+}
 
         $user->update([
             'name' => $validated['name'],

@@ -40,51 +40,87 @@
 
     @endif
 
-    <div class="mb-4">
-        <div class="relative w-full max-w-xs">
-            <div class="relative">
-                <input
-                    type="text"
-                    id="global-material-search"
-                    autocomplete="off"
-                    placeholder="Zoeken op naam..."
-                    value="{{ request('search') }}"
-                    class="border rounded px-3 py-2 w-64">
-            </div>
+   <div class="flex items-center gap-4 mb-6">
 
-            <ul id="global-search-results" class="absolute z-50 w-64 bg-white border border-gray-200 rounded mt-1 shadow-xl hidden max-h-60 overflow-y-auto divide-y divide-gray-100">
-            </ul>
-        </div>
+    <form method="GET"
+          action="{{ route('technician.materials.index') }}">
+
+        <input
+            type="hidden"
+            name="category"
+            value="{{ request('category') }}">
+
+        <select
+            name="sort"
+            onchange="this.form.submit()"
+            class="border rounded px-3 py-2">
+
+            <option value="">Sorteer op naam</option>
+
+            <option value="asc"
+                {{ request('sort') == 'asc' ? 'selected' : '' }}>
+                A-Z
+            </option>
+
+            <option value="desc"
+                {{ request('sort') == 'desc' ? 'selected' : '' }}>
+                Z-A
+            </option>
+
+        </select>
+
+    </form>
+
+    <div class="relative w-full max-w-xs">
+
+        <input
+            type="text"
+            id="global-material-search"
+            autocomplete="off"
+            placeholder="Zoeken op naam..."
+            value="{{ request('search') }}"
+            class="border rounded px-3 py-2 w-64">
+
+        <ul id="global-search-results"
+            class="absolute z-50 w-64 bg-white border border-gray-200 rounded mt-1 shadow-xl hidden max-h-60 overflow-y-auto divide-y divide-gray-100">
+        </ul>
+
     </div>
 
-    <div class="mb-4">
-        <form method="GET" action="{{ route('technician.materials.index') }}" class="flex gap-2">
-            <select name="category" class="border rounded px-3 py-2">
-                <option value="">Alle categorieën</option>
-                @foreach($categories as $category)
-                    <option value="{{ $category }}" {{ request('category') == $category ? 'selected' : '' }}>
-                        {{ $category }}
-                    </option>
-                @endforeach
-            </select>
+</div>
 
-            <select name="sort" class="border rounded px-3 py-2">
-                <option value="">Sorteer op naam</option>
-                <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>A-Z</option>
-                <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Z-A</option>
-            </select>
+<div class="mb-6 flex gap-3 flex-wrap">
 
-            <x-button>
-                Filter & Sorteer
-            </x-button>
-            <a href="{{ route('technician.materials.index') }}"
-               class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg">
-                Reset
-            </a>
-        </form>
-    </div>
+    <a
+        href="{{ route('technician.materials.index', [
+            'sort' => request('sort')
+        ]) }}"
+        class="px-5 py-2 rounded-full
+        {{ request('category') == null ? 'bg-blue-600 text-white' : 'bg-gray-100' }}">
 
+        Alles
+
+    </a>
+
+    @foreach($categories as $category)
+
+        <a
+            href="{{ route('technician.materials.index', [
+                'category' => $category,
+                'sort' => request('sort')
+            ]) }}"
+            class="px-5 py-2 rounded-full
+            {{ request('category') == $category ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200' }}">
+
+            {{ $category }}
+
+        </a>
+
+    @endforeach
+
+</div>
     <x-card>
+
         <div class="overflow-x-auto">
             <table class="min-w-full">
                 <thead>

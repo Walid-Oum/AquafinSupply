@@ -17,14 +17,25 @@ Route::redirect('/', '/login');
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {
-        return view('userzone.dashboard');
+
+        if (auth()->user()->role == 'technieker') {
+            return redirect()->route('technician.materials.index');
+        }
+
+        if (auth()->user()->role == 'magazijn') {
+            return redirect()->route('magazijn.materials.index');
+        }
+
+        if (auth()->user()->role == 'admin') {
+            return redirect()->route('materials.index');
+        }
+
     })->name('dashboard');
 
     Route::get('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
 /*
 |--------------------------------------------------------------------------
 | ZONE: Technieker (Alleen Techniekers en Admins mogen hierbij)
