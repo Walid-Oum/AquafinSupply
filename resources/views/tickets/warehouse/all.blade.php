@@ -1,10 +1,10 @@
 <x-app-layout>
     <div class="p-8">
         <div class="mb-6">
-            <x-page-header title="Alle tickets" />
+            <x-page-header title="Supportaanvragen" />
 
             <p class="text-gray-600">
-                Bekijk hier alle tickets van techniekers binnen jouw depot/provincie.
+                Bekijk hier alle supportaanvragen van techniekers binnen jouw depot/provincie.
             </p>
         </div>
 
@@ -52,7 +52,7 @@
         @empty
             <div class="rounded-lg bg-white p-6 shadow">
                 <p class="text-gray-600">
-                    Er zijn nog geen tickets voor jouw depot/provincie.
+                    Er zijn nog geen supportaanvraag voor jouw depot/provincie.
                 </p>
             </div>
         @endforelse

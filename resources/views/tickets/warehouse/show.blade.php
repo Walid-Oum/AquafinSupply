@@ -2,10 +2,10 @@
     <div class="p-8">
         <div class="mb-6 flex items-center justify-between">
             <div>
-                <x-page-header title="Ticket detail" />
+                <x-page-header title="Support detail" />
 
                 <p class="text-gray-600">
-                    Bekijk hier de details van dit ticket.
+                    Bekijk hier de details van deze supportaanvraag.
                 </p>
             </div>
 
