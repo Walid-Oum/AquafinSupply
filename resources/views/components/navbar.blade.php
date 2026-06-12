@@ -1,5 +1,32 @@
 <div class="bg-white h-20 border-b flex justify-end items-center px-8 gap-6 shadow-md">
+ 
+@if(Auth::user()->role == 'technieker')
 
+<a
+    href="{{ route('cart.index') }}"
+    class="relative text-3xl hover:scale-110 transition">
+
+    🛒
+
+    @if(session()->has('cart') && count(session('cart')) > 0)
+
+        <span
+            class="absolute -top-2 -right-2
+                   bg-red-500 text-white
+                   text-xs font-bold
+                   rounded-full
+                   w-5 h-5
+                   flex items-center justify-center">
+
+            {{ count(session('cart')) }}
+
+        </span>
+
+    @endif
+
+</a>
+
+@endif
     <a href="{{ route('profile.edit') }}"
        class="flex items-center gap-4 p-2 rounded-xl hover:bg-gray-50 transition">
 
