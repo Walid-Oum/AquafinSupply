@@ -131,49 +131,87 @@
     @endforeach
 
 </div>
-    <x-card>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-        <div class="overflow-x-auto">
-            <table class="min-w-full">
-                <thead>
-                    <tr>
-                        <th class="text-left">Naam</th>
-                        <th class="text-left">Categorie</th>
-                        <th class="text-left">Voorraad</th>
-                        <th class="text-left">Status</th>
-                        <th class="text-center">Actie</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($materials as $material)
-                    <tr>
-                        <td>{{ $material->name }}</td>
-                        <td>{{ $material->category }}</td>
-                        <td>{{ $material->stock }}</td>
-                        <td>
-                            @if($material->is_active)
-                                <span class="text-green-600">Actief</span>
-                            @else
-                                <span class="text-red-600">Inactief</span>
-                            @endif
-                        </td>
-                        <td class="text-center p-3">
-                            <a href="{{ route('technician.materials.show', $material->id) }}">
-                                <x-button type="button">
-                                    Bekijk
-                                </x-button>
-                            </a>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" class="text-center">Geen materialen gevonden.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+    @forelse($materials as $material)
+
+        <a
+            href="{{ route('technician.materials.show', $material->id) }}"
+            class="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden">
+
+            @if($material->image)
+
+                <img
+                    src="{{ Storage::url($material->image) }}"
+                    class="w-full h-48 object-cover">
+
+            @else
+
+                <div class="w-full h-48 bg-gray-100 flex items-center justify-center">
+
+                    <span class="text-gray-400">
+                        Geen afbeelding
+                    </span>
+
+                </div>
+
+            @endif
+
+            <div class="p-5">
+
+                <p class="text-xs text-gray-400 uppercase mb-1">
+                    {{ $material->category }}
+                </p>
+
+                <h3 class="text-xl font-bold text-gray-800 mb-3">
+                    {{ $material->name }}
+                </h3>
+
+                <div class="flex justify-between items-center mb-4">
+
+                    <span class="text-sm text-gray-500">
+                        Voorraad
+                    </span>
+
+                    <span class="font-bold text-green-600">
+                        {{ $material->stock }}
+                    </span>
+
+                </div>
+
+                @if($material->is_active)
+
+                    <span class="inline-block bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
+
+                        Actief
+
+                    </span>
+
+                @else
+
+                    <span class="inline-block bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full">
+
+                        Inactief
+
+                    </span>
+
+                @endif
+
+            </div>
+
+        </a>
+
+    @empty
+
+        <div class="col-span-4 text-center text-gray-500">
+
+            Geen materialen gevonden.
+
         </div>
-    </x-card>
+
+    @endforelse
+
+</div>
 
     <script>
     document.addEventListener('DOMContentLoaded', function () {
