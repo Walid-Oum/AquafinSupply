@@ -17,6 +17,18 @@
                         href="{{ route('technician.materials.show', $material->id) }}"
                         class="border rounded-lg p-4 bg-white hover:shadow">
 
+                        @if($material->image)
+
+                            <img
+                                src="{{ Storage::url($material->image) }}"
+                                class="w-32 h-32 object-cover rounded mb-3 mx-auto">
+
+                        @else
+
+                            <div class="w-32 h-32 bg-gray-100 rounded mb-3 mx-auto"></div>
+
+                        @endif
+
                         <h3 class="font-semibold">
                             {{ $material->name }}
                         </h3>
@@ -96,7 +108,7 @@
             'sort' => request('sort')
         ]) }}"
         class="px-5 py-2 rounded-full
-        {{ request('category') == null ? 'bg-blue-600 text-white' : 'bg-gray-100' }}">
+        {{ request('category') == null ? 'bg-[#0F4C81] text-white' : 'bg-gray-100 hover:bg-gray-200' }}">
 
         Alles
 
@@ -110,7 +122,7 @@
                 'sort' => request('sort')
             ]) }}"
             class="px-5 py-2 rounded-full
-            {{ request('category') == $category ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200' }}">
+           {{ request('category') == $category ? 'bg-[#0F4C81] text-white' : 'bg-gray-100 hover:bg-gray-200' }}">
 
             {{ $category }}
 
