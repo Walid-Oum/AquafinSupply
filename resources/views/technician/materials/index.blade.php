@@ -17,6 +17,18 @@
                         href="{{ route('technician.materials.show', $material->id) }}"
                         class="border rounded-lg p-4 bg-white hover:shadow">
 
+                        @if($material->image)
+
+                            <img
+                                src="{{ Storage::url($material->image) }}"
+                                class="w-32 h-32 object-cover rounded mb-3 mx-auto">
+
+                        @else
+
+                            <div class="w-32 h-32 bg-gray-100 rounded mb-3 mx-auto"></div>
+
+                        @endif
+
                         <h3 class="font-semibold">
                             {{ $material->name }}
                         </h3>
