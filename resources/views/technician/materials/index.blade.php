@@ -38,11 +38,34 @@
                         </p>
 
                         <p class="text-sm mt-2">
-                            Voorraad:
-                            {{ $material->stock }}
-                        </p>
+    Voorraad:
+    {{ $material->stock }}
+</p>
 
-                    </a>
+<form
+    action="{{ route('cart.add', $material->id) }}"
+    method="POST"
+    class="mt-4">
+
+    @csrf
+
+    <button
+        type="submit"
+        onclick="event.stopPropagation();"
+        class="w-full
+               bg-[#0F4C81]
+               hover:bg-[#1E6BA8]
+               text-white
+               py-2
+               rounded-lg">
+
+        + Toevoegen
+
+    </button>
+
+</form>
+
+</a>
 
                 @endforeach
 
@@ -179,27 +202,51 @@
 
                 </div>
 
-                @if($material->is_active)
+              @if($material->is_active)
 
-                    <span class="inline-block bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
+    <span class="inline-block bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
 
-                        Actief
+        Actief
 
-                    </span>
+    </span>
 
-                @else
+@else
 
-                    <span class="inline-block bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full">
+    <span class="inline-block bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full">
 
-                        Inactief
+        Inactief
 
-                    </span>
+    </span>
 
-                @endif
+@endif
 
-            </div>
+<form
+    action="{{ route('cart.add', $material->id) }}"
+    method="POST"
+    class="mt-5">
 
-        </a>
+    @csrf
+
+    <button
+        type="submit"
+        onclick="event.stopPropagation();"
+        class="w-full
+               bg-[#0F4C81]
+               hover:bg-[#1E6BA8]
+               text-white
+               font-semibold
+               py-3
+               rounded-xl">
+
+        + Toevoegen 
+
+    </button>
+
+</form>
+
+</div>
+
+</a>
 
     @empty
 
