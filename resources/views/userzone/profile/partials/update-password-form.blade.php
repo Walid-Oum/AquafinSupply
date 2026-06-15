@@ -1,13 +1,15 @@
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Update Password') }}
-        </h2>
+    <header class="mb-6">
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Ensure your account is using a long, random password to stay secure.') }}
-        </p>
-    </header>
+    <h2 class="text-2xl font-bold text-[#0F4C81]">
+        Wachtwoord wijzigen
+    </h2>
+
+    <p class="text-gray-500 mt-2">
+        Kies een sterk wachtwoord om uw account te beveiligen.
+    </p>
+
+</header>
 
     <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
         @csrf
@@ -32,7 +34,9 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-breeze.primary-button>{{ __('Save') }}</x-breeze.primary-button>
+            <x-button>
+    Opslaan
+</x-button>
 
             @if (session('status') === 'password-updated')
                 <p
