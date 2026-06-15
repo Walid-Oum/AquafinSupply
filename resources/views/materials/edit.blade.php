@@ -87,14 +87,27 @@
 
                 @endif
                 @if($material->image)
-                    <div class="mt-3">
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" name="remove_image" value="1">
-                            Afbeelding verwijderen
-                        </label>
-                    </div>
-                @endif
 
+                    <div class="mt-3">
+
+                        <button
+                            type="button"
+                            onclick="removeImage()"
+                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+
+                            Afbeelding verwijderen
+
+                        </button>
+
+                        <input
+                            type="hidden"
+                            name="remove_image"
+                            id="remove_image"
+                            value="0">
+
+                    </div>
+
+                @endif
             </div>
 
             <div class="mb-4">
@@ -209,5 +222,24 @@
         </div>
 
     </x-card>
+    <script>
+
+        function removeImage()
+        {
+            if (
+                confirm(
+                    'Ben je zeker dat je deze afbeelding wilt verwijderen?'
+                )
+            ) {
+
+                document.getElementById('remove_image').value = 1;
+
+                alert(
+                    'Afbeelding wordt verwijderd zodra je op Bijwerken klikt.'
+                );
+            }
+        }
+
+    </script>
 
 </x-app-layout>
