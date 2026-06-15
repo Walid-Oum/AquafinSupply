@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Location;
+use App\Models\Material;
+use App\Models\MaterialStock;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -374,6 +376,25 @@ class DatabaseSeeder extends Seeder
             $material['created_at'] = now();
             $material['updated_at'] = now();
             DB::table('materials')->insert($material);
+        }
+
+
+        $materials = Material::all();
+        $locations = Location::all();
+
+        foreach ($materials as $material) {
+            foreach ($locations as $location) {
+                MaterialStock::updateOrCreate(
+                    [
+                        'material_id' => $material->id,
+                        'location_id' => $location->id,
+                    ],
+                    [
+                        'stock' => $material->stock,
+                        'minimum_stock' => max(1, (int) ceil($material->stock * 0.25)),
+                    ]
+                );
+            }
         }
     }
 

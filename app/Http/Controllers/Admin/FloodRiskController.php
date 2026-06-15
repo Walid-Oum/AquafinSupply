@@ -36,7 +36,7 @@ class FloodRiskController extends Controller
         if ($selectedStats === null) {
             return redirect()
                 ->route('admin.flood-risk.index')
-                ->with('error', 'De weersgegevens konden niet opgehaald worden.');
+                ->with('error', 'De weersgegevens konden tijdelijk niet opgehaald worden. Probeer later opnieuw.');
         }
 
         return view('admin.flood-risk.show', [
@@ -73,19 +73,27 @@ class FloodRiskController extends Controller
 
     private function buildLocationWeatherStats(Location $location): ?array
     {
-        $response = Http::get('https://api.open-meteo.com/v1/forecast', [
-            'latitude' => $location->latitude,
-            'longitude' => $location->longitude,
-            'daily' => 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,rain_sum,wind_gusts_10m_max',
-            'timezone' => 'Europe/Brussels',
-            'forecast_days' => 16,
-        ]);
+        try {
+            $response = Http::timeout(5)->get('https://api.open-meteo.com/v1/forecast', [
+                'latitude' => $location->latitude,
+                'longitude' => $location->longitude,
+                'daily' => 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,rain_sum,wind_gusts_10m_max',
+                'timezone' => 'Europe/Brussels',
+                'forecast_days' => 16,
+            ]);
+        } catch (\Exception $exception) {
+            return null;
+        }
 
         if ($response->failed()) {
             return null;
         }
 
         $data = $response->json();
+
+        if (! isset($data['daily']['time'], $data['daily']['precipitation_sum'])) {
+            return null;
+        }
 
         $dates = $data['daily']['time'];
         $rain = $data['daily']['precipitation_sum'];
@@ -97,7 +105,7 @@ class FloodRiskController extends Controller
         $nextWeekDailyRain = array_slice($rain, 7, 7);
 
         $nextWeekStartDate = $nextWeekDates[0] ?? null;
-        $nextWeekEndDate = end($nextWeekDates) ?: null;
+        $nextWeekEndDate = $nextWeekDates[count($nextWeekDates) - 1] ?? null;
 
         $nextWeekPeriodLabel = null;
 

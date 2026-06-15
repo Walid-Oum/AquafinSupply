@@ -86,7 +86,15 @@
                     </p>
  
                 @endif
- 
+                @if($material->image)
+                    <div class="mt-3">
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" name="remove_image" value="1">
+                            Afbeelding verwijderen
+                        </label>
+                    </div>
+                @endif
+
             </div>
  
             <div class="mb-4">
@@ -203,4 +211,3 @@
     </x-card>
  
 </x-app-layout>
- 

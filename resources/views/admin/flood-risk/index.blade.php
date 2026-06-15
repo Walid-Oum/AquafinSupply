@@ -4,7 +4,7 @@
             <x-page-header title="Overstromingsrisico per provincie" />
 
             <p class="mt-2 text-gray-600">
-                Bekijk de algemene risicosituatie per provinciaal depot. Gebruik de detailknop om één provincie uitgebreider te analyseren.
+                Bekijk de algemene risicosituatie per provinciaal depot.
             </p>
         </div>
 
@@ -37,7 +37,7 @@
                             <th class="px-4 py-3 text-left font-semibold text-gray-700">Risicodagen</th>
                             <th class="px-4 py-3 text-left font-semibold text-gray-700">Prioriteit</th>
                             <th class="px-4 py-3 text-left font-semibold text-gray-700">Aanbevolen actie</th>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Details</th>
+
                         </tr>
                         </thead>
 
@@ -84,23 +84,33 @@
                                     @endif
                                 </td>
 
-                                <td class="px-4 py-3 text-gray-700">
+                                <td class="px-4 py-3">
+
                                     @if($stat['riskLevel'] === 'Hoog')
-                                        Controleer voorraad overstromingsmateriaal.
+
+                                        <div class="text-red-700">
+                                            ⚠ Controleer voorraad overstromingsmateriaal.<br>
+                                            ⚠ Plan preventiev-e interventies.<br>
+                                            ⚠ Controleer pompen en noodmateriaal.
+                                        </div>
+
                                     @elseif($stat['riskLevel'] === 'Gemiddeld')
-                                        Volg kritieke voorraad extra op.
+
+                                        <div class="text-yellow-700">
+                                            ⚠ Volg kritieke voorraad extra op.<br>
+                                            ⚠ Controleer voorspellingen dagelijks.
+                                        </div>
+
                                     @else
-                                        Geen extra actie nodig.
+
+                                        <div class="text-green-700">
+                                            ✓ Geen extra actie nodig.
+                                        </div>
+
                                     @endif
+
                                 </td>
 
-                                <td class="px-4 py-3">
-                                    <a href="{{ route('admin.flood-risk.show', $stat['location']) }}">
-                                        <x-button class="px-3 py-2 text-xs">
-                                            Details bekijken
-                                        </x-button>
-                                    </a>
-                                </td>
                             </tr>
                         @endforeach
                         </tbody>

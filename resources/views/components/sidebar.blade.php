@@ -52,13 +52,7 @@
                         </a>
                     </li>
 
-                    <li>
-                        <a href="{{ route('cart.index') }}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-
-                            <span>Winkelmandje</span>
-                        </a>
-                    </li>
+                   
 
                     <li>
                         <a href="{{ route('orders.index') }}"
@@ -72,7 +66,7 @@
                         <a href="{{ route('tickets.index') }}"
                            class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
 
-                            <span>Tickets</span>
+                            <span>Support</span>
                         </a>
                     </li>
                      <li>
@@ -103,7 +97,7 @@
                     <li>
                         <a href="{{ route('tickets.warehouse.index') }}"
                            class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                             Tickets
+                             Support aanvragen
                         </a>
                     </li>
 
