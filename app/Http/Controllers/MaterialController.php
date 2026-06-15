@@ -161,6 +161,7 @@ class MaterialController extends Controller
 
         $material = Material::findOrFail($id);
 
+
         if ($request->remove_image) {
             if ($material->image) {
                 Storage::disk('public')
