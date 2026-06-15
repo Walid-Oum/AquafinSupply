@@ -8,6 +8,12 @@
             </p>
         </div>
 
+        @if(collect($provinceStats)->contains(fn($stats) => $stats['fromCache'] ?? false))
+            <div class="mb-6 rounded-lg bg-yellow-100 border-l-4 border-yellow-500 p-4 text-yellow-800">
+                Live weersgegevens zijn tijdelijk niet beschikbaar. We tonen voor sommige provincies de laatst opgeslagen gegevens.
+            </div>
+        @endif
+
         @if(session('error'))
             <div class="mb-6 rounded-lg bg-red-100 p-4 text-red-700">
                 {{ session('error') }}

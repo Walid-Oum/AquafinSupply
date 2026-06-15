@@ -91,9 +91,9 @@
 
     <div class="mb-6 flex flex-wrap gap-3">
         <a
-            href="{{ route('technician.materials.index', [
-                'sort' => request('sort')
-            ]) }}"
+           href="{{ route('technician.materials.index', [
+    'sort' => request('sort')
+]) }}#materials"
             class="rounded-full px-5 py-2
             {{ request('category') == null ? 'bg-[#0F4C81] text-white' : 'bg-gray-100 hover:bg-gray-200' }}"
         >
@@ -102,10 +102,10 @@
 
         @foreach($categories as $category)
             <a
-                href="{{ route('technician.materials.index', [
-                    'category' => $category,
-                    'sort' => request('sort')
-                ]) }}"
+               href="{{ route('technician.materials.index', [
+    'category' => $category,
+    'sort' => request('sort')
+]) }}#materials"
                 class="rounded-full px-5 py-2
                 {{ request('category') == $category ? 'bg-[#0F4C81] text-white' : 'bg-gray-100 hover:bg-gray-200' }}"
             >
@@ -114,7 +114,9 @@
         @endforeach
     </div>
 
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div
+    id="materials"
+    class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
         @forelse($materials as $material)
             <x-material-card :material="$material" />
         @empty

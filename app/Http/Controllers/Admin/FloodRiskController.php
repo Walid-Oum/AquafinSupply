@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class FloodRiskController extends Controller
 {
@@ -73,6 +74,9 @@ class FloodRiskController extends Controller
 
     private function buildLocationWeatherStats(Location $location): ?array
     {
+        $cacheKey = 'admin_flood_risk_weather_' . $location->id;
+        $fromCache = false;
+
         try {
             $response = Http::timeout(5)->get('https://api.open-meteo.com/v1/forecast', [
                 'latitude' => $location->latitude,
@@ -81,18 +85,26 @@ class FloodRiskController extends Controller
                 'timezone' => 'Europe/Brussels',
                 'forecast_days' => 16,
             ]);
+
+            if ($response->failed()) {
+                throw new \Exception('Weather API request failed');
+            }
+
+            $data = $response->json();
+
+            if (! isset($data['daily']['time'], $data['daily']['precipitation_sum'])) {
+                throw new \Exception('Weather API data incomplete');
+            }
+
+            Cache::put($cacheKey, $data, now()->addHours(6));
         } catch (\Exception $exception) {
-            return null;
-        }
+            $data = Cache::get($cacheKey);
 
-        if ($response->failed()) {
-            return null;
-        }
+            if (! $data) {
+                return null;
+            }
 
-        $data = $response->json();
-
-        if (! isset($data['daily']['time'], $data['daily']['precipitation_sum'])) {
-            return null;
+            $fromCache = true;
         }
 
         $dates = $data['daily']['time'];
@@ -169,6 +181,7 @@ class FloodRiskController extends Controller
             'dates' => $dates,
             'rain' => $rain,
             'nextWeekForecast' => $nextWeekForecast,
+            'fromCache' => $fromCache,
         ];
     }
 }
