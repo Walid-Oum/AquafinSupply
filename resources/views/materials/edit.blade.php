@@ -89,6 +89,12 @@
                 @endif
                 @if($material->image)
 
+                    <input
+                        type="hidden"
+                        name="remove_image"
+                        id="remove_image"
+                        value="0">
+
                     <div
                         id="deleteButtonContainer"
                         class="mt-3">
@@ -100,13 +106,9 @@
                             Afbeelding verwijderen
                         </button>
 
-                        <input
-                            type="hidden"
-                            name="remove_image"
-                            id="remove_image"
-                            value="0">
-
                     </div>
+
+
 
                 @endif
             </div>
@@ -251,6 +253,7 @@
             document
                 .getElementById('remove_image')
                 .value = 1;
+            console.log(document.getElementById('remove_image').value);
 
             closeDeleteModal();
 
