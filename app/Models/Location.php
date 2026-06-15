@@ -21,4 +21,9 @@ class Location extends Model
 
     }
 
+    public function materialStocks()
+    {
+        return $this->hasMany(MaterialStock::class);
+    }
+
 }
