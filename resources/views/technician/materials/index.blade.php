@@ -2,18 +2,48 @@
     <x-page-header title="Materialen overzicht" />
 
     @if($recommendedMaterials->count() > 0)
-        <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
-            <h2 class="mb-4 text-lg font-bold text-green-700">
-                Aanbevolen materialen
-                (op basis van overstromingsrisico)
-            </h2>
 
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                @foreach($recommendedMaterials as $material)
-                    <x-material-card :material="$material" :compact="true" />
-                @endforeach
+        <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
+
+            <div class="flex items-center justify-between mb-3">
+
+                <h2 class="text-lg font-bold text-green-700">
+                    Aanbevolen materialen
+                    (op basis van overstromingsrisico)
+                </h2>
+
+                <button
+                    type="button"
+                    onclick="toggleRecommendations()"
+                    id="recommendationIcon"
+                    class="text-sm font-medium text-green-700 hover:text-green-900 hover:underline">
+
+                    ▲ Verberg
+
+                </button>
+
             </div>
+
+            <div
+                id="recommendationsContainer"
+                class="mt-4">
+
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+
+                    @foreach($recommendedMaterials as $material)
+
+                        <x-material-card
+                            :material="$material"
+                            :compact="true" />
+
+                    @endforeach
+
+                </div>
+
+            </div>
+
         </div>
+
     @endif
 
     <div class="mb-6 flex items-center gap-4">
@@ -150,5 +180,24 @@
                 }
             });
         });
+        function toggleRecommendations()
+        {
+            const container =
+                document.getElementById('recommendationsContainer');
+
+            const icon =
+                document.getElementById('recommendationIcon');
+
+            if (container.classList.contains('hidden'))
+            {
+                container.classList.remove('hidden');
+                icon.textContent = '▲ Verberg';
+            }
+            else
+            {
+                container.classList.add('hidden');
+                icon.textContent = '▼ Toon aanbevelingen';
+            }
+        }
     </script>
 </x-app-layout>
