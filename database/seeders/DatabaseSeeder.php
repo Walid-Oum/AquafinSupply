@@ -391,7 +391,7 @@ class DatabaseSeeder extends Seeder
                     ],
                     [
                         'stock' => $material->stock,
-                        'minimum_stock' => $material->minimum_stock,
+                        'minimum_stock' => max(1, (int) ceil($material->stock * 0.25)),
                     ]
                 );
             }
