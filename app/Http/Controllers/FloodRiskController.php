@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class FloodRiskController extends Controller
 {
@@ -11,6 +12,7 @@ class FloodRiskController extends Controller
     {
         $user = auth()->user();
         $location = $user->location;
+
 
         if (! $location) {
             return view('flood-risk.index', [
@@ -25,6 +27,8 @@ class FloodRiskController extends Controller
                 'role' => $user->role,
             ]);
         }
+        $cacheKey = 'flood_risk_weather_' . $location->id;
+        $fromCache = false;
 
         try {
             $response = Http::timeout(10)->get('https://api.open-meteo.com/v1/forecast', [
@@ -39,20 +43,28 @@ class FloodRiskController extends Controller
                 throw new \Exception('Weather API request failed.');
             }
         } catch (\Exception $e) {
-            return view('flood-risk.index', [
-                'error' => 'De weersgegevens konden niet opgehaald worden.',
-                'location' => $location,
-                'weekRain' => null,
-                'riskLevel' => null,
-                'weekForecast' => [],
-                'periodLabel' => null,
-                'highestRainDay' => null,
-                'highestRainDayLabel' => null,
-                'role' => $user->role,
-            ]);
+            $data = Cache::get($cacheKey);
+
+            if (! $data) {
+                return view('flood-risk.index', [
+                    'error' => 'De weersgegevens konden niet opgehaald worden.',
+                    'location' => $location,
+                    'weekRain' => null,
+                    'riskLevel' => null,
+                    'weekForecast' => [],
+                    'periodLabel' => null,
+                    'highestRainDay' => null,
+                    'highestRainDayLabel' => null,
+                    'role' => $user->role,
+                    'fromCache' => false,
+                ]);
+            }
+
+            $fromCache = true;
         }
 
         $data = $response->json();
+        Cache::put($cacheKey, $data, now()->addHours(6));
 
         $dates = $data['daily']['time'] ?? [];
         $rain = $data['daily']['precipitation_sum'] ?? [];
@@ -98,7 +110,7 @@ class FloodRiskController extends Controller
         }
 
         return view('flood-risk.index', [
-            'error' => null,
+            'error' => $fromCache ? 'Live weersgegevens zijn tijdelijk niet beschikbaar. We tonen de laatst opgeslagen gegevens.' : null,
             'location' => $location,
             'weekRain' => round($weekRain, 1),
             'riskLevel' => $riskLevel,
@@ -107,6 +119,7 @@ class FloodRiskController extends Controller
             'highestRainDay' => round($highestRainDay, 1),
             'highestRainDayLabel' => $highestRainDayLabel,
             'role' => $user->role,
+            'fromCache' => $fromCache,
         ]);
     }
 
