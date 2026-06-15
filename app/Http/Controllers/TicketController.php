@@ -8,12 +8,21 @@ use Illuminate\Http\Request;
 
 class TicketController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tickets = Ticket::with(['order', 'location'])
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->get();
+        // Start met de basisrelaties en filter op de eigen tickets van de gebruiker
+        $query = Ticket::with(['order', 'location'])
+            ->where('user_id', auth()->id());
+
+        // Pas onze slimme zoekfunctie toe als er gezocht wordt
+        if ($request->has('search')) {
+            $query->search($request->input('search'));
+        } else {
+            // Als er niet gezocht wordt, sorteren we standaard op nieuwste eerst
+            $query->latest();
+        }
+
+        $tickets = $query->get();
 
         return view('tickets.index', [
             'tickets' => $tickets
@@ -58,7 +67,7 @@ class TicketController extends Controller
             ->with('success', 'Ticket succesvol aangemaakt.');
     }
 
-    public function all()
+    public function all(Request $request)
     {
         $user = auth()->user();
 
@@ -68,10 +77,18 @@ class TicketController extends Controller
                 ->with('error', 'Er is geen depot gekoppeld aan je account. Contacteer een administrator.');
         }
 
-        $tickets = Ticket::with(['user', 'order', 'location'])
-            ->where('location_id', $user->location_id)
-            ->latest()
-            ->get();
+        // Start de query voor het magazijn (alleen tickets van hun eigen depot)
+        $query = Ticket::with(['user', 'order', 'location'])
+            ->where('location_id', $user->location_id);
+
+        // Pas onze slimme zoekfunctie toe als er gezocht wordt
+        if ($request->has('search')) {
+            $query->search($request->input('search'));
+        } else {
+            $query->latest();
+        }
+
+        $tickets = $query->get();
 
         return view('tickets.warehouse.all', [
             'tickets' => $tickets
