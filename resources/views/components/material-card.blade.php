@@ -1,3 +1,9 @@
+@php
+    $localStock = $material->stocks->first();
+    $stock = $localStock?->stock ?? 0;
+    $minimumStock = $localStock?->minimum_stock ?? 0;
+@endphp
+
 @if($compact)
     <a
         href="{{ route('technician.materials.show', $material->id) }}"
@@ -20,7 +26,7 @@
         </p>
 
         <p class="text-sm mt-2">
-            Voorraad: {{ $material->stock }}
+            Voorraad: {{ $stock }}
         </p>
 
         <form
@@ -70,18 +76,18 @@
                     Voorraad
                 </span>
 
-                <span class="font-bold text-green-600">
-                    {{ $material->stock }}
+                <span class="font-bold {{ $stock <= $minimumStock ? 'text-red-600' : 'text-green-600' }}">
+                    {{ $stock }}
                 </span>
             </div>
 
-            @if($material->is_active)
-                <span class="inline-block bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
-                    Actief
+            @if($stock <= $minimumStock)
+                <span class="inline-block bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full">
+                    Lage voorraad
                 </span>
             @else
-                <span class="inline-block bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full">
-                    Inactief
+                <span class="inline-block bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
+                    Beschikbaar
                 </span>
             @endif
 
