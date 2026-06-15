@@ -1,7 +1,6 @@
 <x-app-layout>
     <x-page-header title="Materialen overzicht"/>
 
-    ```
     <div class="mb-4 flex justify-between items-center">
         <a href="{{ route('materials.create') }}">
             <x-button>
@@ -217,6 +216,5 @@
             });
         });
     </script>
-    ```
 
 </x-app-layout>
