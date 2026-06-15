@@ -46,9 +46,9 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
-        return redirect()->back()
-            ->with('success', 'Materiaal toegevoegd aan winkelmandje');
-    }
+       return redirect()->back()
+    ->withFragment('materials')
+    ->with('success', 'Materiaal toegevoegd aan winkelmandje');
   
 
     public function update(Request $request, $id)
