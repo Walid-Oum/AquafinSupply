@@ -10,7 +10,7 @@ class MaterialController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Material::query();
+        $query = Material::search($request->input('search'));
 
         if ($request->has('category') && $request->category != '') {
             $query->where('category', $request->category);
@@ -177,21 +177,9 @@ class MaterialController extends Controller
 
     public function warehouseIndex(Request $request)
     {
-        $query = Material::query();
-
-        if ($request->search) {
-
-            $query->where(
-                'name',
-                'like',
-                '%' . $request->search . '%'
-            );
-
-        }
-
-        $materials = $query
-            ->orderBy('name')
-            ->get();
+        // Ook voor het magazijn gebruiken we nu de slimme scopeSearch!
+        // De orderBy('name') halen we hier weg, omdat scopeSearch zelf al prioriteit geeft aan de beste matches.
+        $materials = Material::search($request->input('search'))->get();
 
         return view(
             'magazijn.materials.index',
@@ -218,7 +206,9 @@ class MaterialController extends Controller
                 'Voorraad bijgewerkt.'
             );
     }
-  public function searchSuggestions(Request $request)
+
+    
+    public function searchSuggestions(Request $request)
     {
         $search = $request->get('q');
         
@@ -226,7 +216,8 @@ class MaterialController extends Controller
             return response()->json([]);
         }
 
-        $materials = Material::where('name', 'LIKE', "%{$search}%")
+        // We hergebruiken onze scopeSearch voor de API, zodat suggesties ook direct spatieloos zoeken
+        $materials = Material::search($search)
             ->select('id', 'name', 'stock')
             ->limit(5)
             ->get();
