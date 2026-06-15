@@ -1,3 +1,9 @@
+@php
+    $localStock = $material->stocks->first();
+    $stock = $localStock?->stock ?? 0;
+    $minimumStock = $localStock?->minimum_stock ?? 0;
+@endphp
+
 <x-app-layout>
 
     <x-page-header title="Materiaal details" />
@@ -39,12 +45,12 @@
 
             <p>
                 <strong>Voorraad:</strong>
-                {{ $material->stock }}
+                {{ $stock }}
             </p>
 
             <p>
                 <strong>Minimum voorraad:</strong>
-                {{ $material->minimum_stock }}
+                {{ $minimum_stock }}
             </p>
 
         </div>

@@ -1,13 +1,15 @@
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
-        </h2>
+   <header class="mb-6">
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
-        </p>
-    </header>
+    <h2 class="text-2xl font-bold text-[#0F4C81]">
+        Profielgegevens
+    </h2>
+
+    <p class="text-gray-500 mt-2">
+        Werk uw persoonlijke gegevens bij.
+    </p>
+
+</header>
 
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
@@ -48,7 +50,9 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-breeze.primary-button>{{ __('Save') }}</x-breeze.primary-button>
+            <x-button>
+    Opslaan
+</x-button>
 
             @if (session('status') === 'profile-updated')
                 <p

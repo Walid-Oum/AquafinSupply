@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OrderItem;
+use App\Models\Material;
+use App\Models\MaterialStock;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -42,7 +45,7 @@ class OrderController extends Controller
 
         $user = Auth::user();
 
-        if (! $user->location_id) {
+        if (!$user->location_id) {
             return redirect()
                 ->back()
                 ->withInput()
@@ -59,51 +62,79 @@ class OrderController extends Controller
         }
 
         foreach ($cart as $item) {
-            $material = \App\Models\Material::find($item['id']);
+            $material = Material::find($item['id']);
 
-            if (! $material) {
+            if (!$material) {
                 return redirect()
                     ->back()
                     ->withInput()
                     ->with('error', 'Materiaal bestaat niet meer.');
             }
 
-            if (! $material->is_active) {
+            if (!$material->is_active) {
                 return redirect()
                     ->back()
                     ->withInput()
-                    ->with(
-                        'error',
-                        'Een materiaal in uw winkelmandje is niet meer beschikbaar.'
-                    );
+                    ->with('error', 'Een materiaal in uw winkelmandje is niet meer beschikbaar.');
             }
 
-            if ($item['quantity'] > $material->stock) {
+            $materialStock = MaterialStock::where('material_id', $material->id)
+                ->where('location_id', $user->location_id)
+                ->first();
+
+            if (!$materialStock) {
                 return redirect()
                     ->back()
                     ->withInput()
-                    ->with('error', 'Onvoldoende voorraad');
+                    ->with('error', 'Dit materiaal is niet beschikbaar in jouw depot.');
+            }
+
+            if ($item['quantity'] > $materialStock->stock) {
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', 'Onvoldoende voorraad in jouw depot voor ' . $material->name . '.');
             }
         }
 
-        $order = Order::create([
-            'user_id' => $user->id,
-            'location_id' => $user->location_id,
-            'delivery_date' => $request->delivery_date,
-            'comment' => $request->comment,
-            'status' => 'Nieuw',
-        ]);
+        try {
+            $order = DB::transaction(function () use ($cart, $user, $request) {
+                $order = Order::create([
+                    'user_id' => $user->id,
+                    'location_id' => $user->location_id,
+                    'delivery_date' => $request->delivery_date,
+                    'comment' => $request->comment,
+                    'status' => 'Nieuw',
+                ]);
 
-        foreach ($cart as $item) {
-            $material = \App\Models\Material::find($item['id']);
+                foreach ($cart as $item) {
+                    $material = Material::findOrFail($item['id']);
 
-            OrderItem::create([
-                'order_id' => $order->id,
-                'material_id' => $material->id,
-                'quantity' => $item['quantity'],
-            ]);
+                    $materialStock = MaterialStock::where('material_id', $material->id)
+                        ->where('location_id', $user->location_id)
+                        ->lockForUpdate()
+                        ->firstOrFail();
 
-            $material->decrement('stock', $item['quantity']);
+                    if ($item['quantity'] > $materialStock->stock) {
+                        throw new \Exception('Onvoldoende voorraad in jouw depot voor ' . $material->name . '.');
+                    }
+
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'material_id' => $material->id,
+                        'quantity' => $item['quantity'],
+                    ]);
+
+                    $materialStock->decrement('stock', $item['quantity']);
+                }
+
+                return $order;
+            });
+        } catch (\Exception $exception) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', $exception->getMessage());
         }
 
         session()->forget('cart');
@@ -129,7 +160,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->location_id) {
+        if (!$user->location_id) {
             return redirect()
                 ->back()
                 ->with('error', 'Er is geen depot gekoppeld aan je account. Contacteer een administrator.');
@@ -162,64 +193,74 @@ class OrderController extends Controller
 
         $request->validate([
             'status' => 'required',
+            'quantities.*' => 'nullable|integer|min:0',
         ]);
 
-        $order->status = $request->status;
-        $order->save();
+        try {
+            DB::transaction(function () use ($request, $order) {
+                $order->status = $request->status;
+                $order->save();
 
-        if ($request->has('quantities')) {
-            foreach ($request->quantities as $itemId => $newQuantity) {
-                $item = OrderItem::find($itemId);
+                if ($request->has('quantities')) {
+                    foreach ($request->quantities as $itemId => $newQuantity) {
+                        $item = OrderItem::find($itemId);
 
-                if (! $item) {
-                    continue;
-                }
-
-                if ($item->order_id !== $order->id) {
-                    abort(403);
-                }
-
-                $material = $item->material;
-
-                $oldQuantity = $item->quantity;
-
-                if ($newQuantity == 0) {
-                    $material->increment(
-                        'stock',
-                        $oldQuantity
-                    );
-
-                    $item->delete();
-                } else {
-                    $difference = $newQuantity - $oldQuantity;
-
-                    if ($difference > 0) {
-                        if ($material->stock < $difference) {
-                            return redirect()
-                                ->back()
-                                ->with(
-                                    'error',
-                                    'Onvoldoende voorraad voor '
-                                    . $material->name
-                                );
+                        if (!$item) {
+                            continue;
                         }
 
-                        $material->decrement(
-                            'stock',
-                            $difference
-                        );
-                    } elseif ($difference < 0) {
-                        $material->increment(
-                            'stock',
-                            abs($difference)
-                        );
-                    }
+                        if ($item->order_id !== $order->id) {
+                            abort(403);
+                        }
 
-                    $item->update([
-                        'quantity' => $newQuantity
-                    ]);
+                        $material = $item->material;
+
+                        $materialStock = MaterialStock::where('material_id', $material->id)
+                            ->where('location_id', $order->location_id)
+                            ->lockForUpdate()
+                            ->firstOrFail();
+
+                        $oldQuantity = $item->quantity;
+
+                        if ($newQuantity == 0) {
+                            $materialStock->increment(
+                                'stock',
+                                $oldQuantity
+                            );
+
+                            $item->delete();
+                        } else {
+                            $difference = $newQuantity - $oldQuantity;
+
+                            if ($difference > 0) {
+                                if ($materialStock->stock < $difference) {
+                                    throw new \Exception(
+                                        'Onvoldoende voorraad in jouw depot voor ' . $material->name . '.'
+                                    );
+                                }
+
+                                $materialStock->decrement(
+                                    'stock',
+                                    $difference
+                                );
+                            } elseif ($difference < 0) {
+                                $materialStock->increment(
+                                    'stock',
+                                    abs($difference)
+                                );
+                            }
+
+                            $item->update([
+                                'quantity' => $newQuantity
+                            ]);
+                        }
+                    }
                 }
-            }
+            });
+        } catch (\Exception $exception) {
+            return redirect()
+                ->back()
+                ->with('error', $exception->getMessage());
         }
 
         return redirect()

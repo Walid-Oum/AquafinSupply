@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class FloodRiskController extends Controller
 {
@@ -39,7 +40,7 @@ class FloodRiskController extends Controller
         if ($selectedStats === null) {
             return redirect()
                 ->route('admin.flood-risk.index')
-                ->with('error', 'De weersgegevens konden niet opgehaald worden.');
+                ->with('error', 'De weersgegevens konden tijdelijk niet opgehaald worden. Probeer later opnieuw.');
         }
 // De show view wordt geretourneerd met de locatie en de bijbehorende statistieken
         return view('admin.flood-risk.show', [
@@ -79,20 +80,39 @@ class FloodRiskController extends Controller
     private function buildLocationWeatherStats(Location $location): ?array
     {
         // start een https verzoek naar de Open-Meteo API om de weersvoorspelling op te halen voor de opgegeven locatie
-        $response = Http::get('https://api.open-meteo.com/v1/forecast', [
-            'latitude' => $location->latitude,
-            'longitude' => $location->longitude,
-            'daily' => 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,rain_sum,wind_gusts_10m_max',
-            'timezone' => 'Europe/Brussels',
-            'forecast_days' => 16,
-        ]);
+        $cacheKey = 'admin_flood_risk_weather_' . $location->id;
+        $fromCache = false;
+
+        try {
+            $response = Http::timeout(5)->get('https://api.open-meteo.com/v1/forecast', [
+                'latitude' => $location->latitude,
+                'longitude' => $location->longitude,
+                'daily' => 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,rain_sum,wind_gusts_10m_max',
+                'timezone' => 'Europe/Brussels',
+                'forecast_days' => 16,
+            ]);
 // faalt de API-aanroep, retourneer dan null om aan te geven dat de gegevens niet kunnen worden opgehaald
-        if ($response->failed()) {
-            return null;
-        }
+            if ($response->failed()) {
+                throw new \Exception('Weather API request failed');
+            }
 // converteer de JSON-respons naar een array en haal de relevante gegevens op voor de komende week
-        $data = $response->json();
+            $data = $response->json();
 // Haal de datums en neerslaggegevens op uit de respons
+            if (! isset($data['daily']['time'], $data['daily']['precipitation_sum'])) {
+                throw new \Exception('Weather API data incomplete');
+            }
+
+            Cache::put($cacheKey, $data, now()->addHours(6));
+        } catch (\Exception $exception) {
+            $data = Cache::get($cacheKey);
+
+            if (! $data) {
+                return null;
+            }
+
+            $fromCache = true;
+        }
+
         $dates = $data['daily']['time'];
         $rain = $data['daily']['precipitation_sum'];
 // Bereken de totale neerslag voor de huidige week en de volgende week
@@ -103,7 +123,7 @@ class FloodRiskController extends Controller
         $nextWeekDailyRain = array_slice($rain, 7, 7);
 // pak de start- en einddatum van de komende week op basis van de opgehaalde datums
         $nextWeekStartDate = $nextWeekDates[0] ?? null;
-        $nextWeekEndDate = end($nextWeekDates) ?: null;
+        $nextWeekEndDate = $nextWeekDates[count($nextWeekDates) - 1] ?? null;
 
         $nextWeekPeriodLabel = null;
 // formateer de start- en einddatum van de komende week naar een leesbaar formaat in het Nederlands, bijvoorbeeld "01/01 t.e.m. 07/01"
@@ -168,6 +188,7 @@ class FloodRiskController extends Controller
             'dates' => $dates,
             'rain' => $rain,
             'nextWeekForecast' => $nextWeekForecast,
+            'fromCache' => $fromCache,
         ];
     }
 }

@@ -30,13 +30,42 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Rol</label>
-                <select name="role" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
-                    @foreach($roles as $role)
-                        <option value="{{ $role }}" {{ old('role', $user->role) == $role ? 'selected' : '' }}>{{ ucfirst($role) }}</option>
-                    @endforeach
-                </select>
-                @error('role') <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p> @enderror
+              
+
+@if(Auth::id() != $user->id)
+
+<label class="block text-gray-700 text-sm font-semibold mb-2">
+    Rol
+</label>
+
+<select
+    name="role"
+    class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+    required>
+
+    @foreach($roles as $role)
+        <option value="{{ $role }}"
+            {{ old('role', $user->role) == $role ? 'selected' : '' }}>
+            {{ ucfirst($role) }}
+        </option>
+    @endforeach
+
+</select>
+
+@error('role')
+<p class="text-rose-500 text-xs mt-1 font-medium">
+    {{ $message }}
+</p>
+@enderror
+
+@else
+
+<p class="text-gray-500 text-sm">
+    U kunt uw eigen rol niet wijzigen.
+</p>
+
+@endif
+
             </div>
 
             <div>

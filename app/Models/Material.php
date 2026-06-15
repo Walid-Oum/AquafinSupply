@@ -52,4 +52,10 @@ class Material extends Model
             END DESC
         ", ["{$searchTerm}", "%{$searchTerm}%"]);
     }
+
+
+    public function stocks()
+    {
+        return $this->hasMany(MaterialStock::class);
+    }
 }

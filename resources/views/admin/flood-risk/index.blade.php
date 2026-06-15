@@ -4,9 +4,15 @@
             <x-page-header title="Overstromingsrisico per provincie" />
 
             <p class="mt-2 text-gray-600">
-                Bekijk de algemene risicosituatie per provinciaal depot. Gebruik de detailknop om één provincie uitgebreider te analyseren.
+                Bekijk de algemene risicosituatie per provinciaal depot.
             </p>
         </div>
+
+        @if(collect($provinceStats)->contains(fn($stats) => $stats['fromCache'] ?? false))
+            <div class="mb-6 rounded-lg bg-yellow-100 border-l-4 border-yellow-500 p-4 text-yellow-800">
+                Live weersgegevens zijn tijdelijk niet beschikbaar. We tonen voor sommige provincies de laatst opgeslagen gegevens.
+            </div>
+        @endif
 
         @if(session('error'))
             <div class="mb-6 rounded-lg bg-red-100 p-4 text-red-700">
@@ -37,7 +43,7 @@
                             <th class="px-4 py-3 text-left font-semibold text-gray-700">Risicodagen</th>
                             <th class="px-4 py-3 text-left font-semibold text-gray-700">Prioriteit</th>
                             <th class="px-4 py-3 text-left font-semibold text-gray-700">Aanbevolen actie</th>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Details</th>
+
                         </tr>
                         </thead>
 
@@ -84,23 +90,33 @@
                                     @endif
                                 </td>
 
-                                <td class="px-4 py-3 text-gray-700">
+                                <td class="px-4 py-3">
+
                                     @if($stat['riskLevel'] === 'Hoog')
-                                        Controleer voorraad overstromingsmateriaal.
+
+                                        <div class="text-red-700">
+                                            ⚠ Controleer voorraad overstromingsmateriaal.<br>
+                                            ⚠ Plan preventiev-e interventies.<br>
+                                            ⚠ Controleer pompen en noodmateriaal.
+                                        </div>
+
                                     @elseif($stat['riskLevel'] === 'Gemiddeld')
-                                        Volg kritieke voorraad extra op.
+
+                                        <div class="text-yellow-700">
+                                            ⚠ Volg kritieke voorraad extra op.<br>
+                                            ⚠ Controleer voorspellingen dagelijks.
+                                        </div>
+
                                     @else
-                                        Geen extra actie nodig.
+
+                                        <div class="text-green-700">
+                                            ✓ Geen extra actie nodig.
+                                        </div>
+
                                     @endif
+
                                 </td>
 
-                                <td class="px-4 py-3">
-                                    <a href="{{ route('admin.flood-risk.show', $stat['location']) }}">
-                                        <x-button class="px-3 py-2 text-xs">
-                                            Details bekijken
-                                        </x-button>
-                                    </a>
-                                </td>
                             </tr>
                         @endforeach
                         </tbody>

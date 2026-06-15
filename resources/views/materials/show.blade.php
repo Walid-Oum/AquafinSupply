@@ -32,8 +32,13 @@
             @endif
         </div>
 
-        <div class="flex justify-end">
+      <div class="flex justify-end gap-4">
             <a href="{{ route('materials.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded">Terug</a>
+         <a href="{{ route('materials.edit', $material->id) }}">
+        <x-button>
+            Bewerk
+        </x-button>
+    </a>
         </div>
     </x-card>
 </x-app-layout>

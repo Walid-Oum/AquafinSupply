@@ -1,12 +1,12 @@
 <section>
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-2xl font-bold text-[#0F4C81]">
             {{ __('Locatie') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Deze locatie wordt gebruikt voor het overstromingsrisico.') }}
-        </p>
+        <p class="text-gray-500 mt-2">
+    Deze locatie wordt gebruikt voor uw materiaalbestellingen en overstromingsrisico.
+</p>
     </header>
 
     <div class="mt-6">
