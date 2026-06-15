@@ -76,6 +76,7 @@
                 @if($material->image)
 
                     <img
+                        id="materialImage"
                         src="{{ Storage::url($material->image) }}"
                         class="w-32 h-32 object-cover rounded">
 
@@ -88,15 +89,15 @@
                 @endif
                 @if($material->image)
 
-                    <div class="mt-3">
+                    <div
+                        id="deleteButtonContainer"
+                        class="mt-3">
 
                         <button
                             type="button"
-                            onclick="removeImage()"
-                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
-
+                            onclick="openDeleteModal()"
+                            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
                             Afbeelding verwijderen
-
                         </button>
 
                         <input
@@ -224,22 +225,98 @@
     </x-card>
     <script>
 
-        function removeImage()
+        function openDeleteModal()
         {
-            if (
-                confirm(
-                    'Ben je zeker dat je deze afbeelding wilt verwijderen?'
-                )
-            ) {
+            document
+                .getElementById('deleteImageModal')
+                .classList.remove('hidden');
 
-                document.getElementById('remove_image').value = 1;
-
-                alert(
-                    'Afbeelding wordt verwijderd zodra je op Bijwerken klikt.'
-                );
-            }
+            document
+                .getElementById('deleteImageModal')
+                .classList.add('flex');
         }
 
+        function closeDeleteModal()
+        {
+            document
+                .getElementById('deleteImageModal')
+                .classList.add('hidden');
+
+            document
+                .getElementById('deleteImageModal')
+                .classList.remove('flex');
+        }
+        function confirmDeleteImage()
+        {
+            document
+                .getElementById('remove_image')
+                .value = 1;
+
+            closeDeleteModal();
+
+            const image =
+                document.getElementById('materialImage');
+
+            if (image) {
+                image.remove();
+            }
+
+            const buttonContainer =
+                document.getElementById('deleteButtonContainer');
+
+            if (buttonContainer) {
+                buttonContainer.remove();
+            }
+
+            const label =
+                document.querySelector('label.block.font-bold.mb-2');
+
+            if (label &&
+                label.textContent.includes('Huidige afbeelding'))
+            {
+                label.nextElementSibling?.remove();
+            }
+        }
     </script>
+
+    <div
+        id="deleteImageModal"
+        class="fixed inset-0 bg-white bg-opacity-40 backdrop-blur-sm hidden items-center justify-center z-50">
+
+        <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+
+            <h2 class="text-xl font-bold mb-4">
+                Afbeelding verwijderen
+            </h2>
+
+            <p class="mb-6">
+                Ben je zeker dat je deze afbeelding wilt verwijderen?
+            </p>
+
+            <div class="flex justify-end gap-3">
+
+                <button
+                    type="button"
+                    onclick="closeDeleteModal()"
+                    class="bg-gray-500 text-white px-4 py-2 rounded">
+
+                    Annuleren
+
+                </button>
+
+                <button
+                    type="button"
+                    onclick="confirmDeleteImage()"
+                    class="bg-red-600 text-white px-4 py-2 rounded">
+
+                    Verwijderen
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </x-app-layout>
