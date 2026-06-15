@@ -159,17 +159,7 @@ class MaterialController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-<<<<<<< HEAD
         if ($request->hasFile('image')) {
-=======
-        $material = Material::findOrFail($id);
-
-
-        if ($request->remove_image) {
-            if ($material->image) {
-                Storage::disk('public')
-                    ->delete($material->image);
->>>>>>> main
 
                 $material->image = null;
             }
