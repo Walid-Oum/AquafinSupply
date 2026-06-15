@@ -17,9 +17,9 @@
             <div class="w-32 h-32 bg-gray-100 rounded mb-3 mx-auto"></div>
         @endif
 
-        <h3 class="font-semibold">
-            {{ $material->name }}
-        </h3>
+      <h3 class="text-xl font-bold min-h-[64px]">
+    {{ $material->name }}
+</h3>
 
         <p class="text-sm text-gray-500">
             {{ $material->category }}
@@ -62,14 +62,14 @@
             </div>
         @endif
 
-        <div class="p-5">
+        <div class="p-5 flex flex-col min-h-[260px]">
             <p class="text-xs text-gray-400 uppercase mb-1">
                 {{ $material->category }}
             </p>
 
-            <h3 class="text-xl font-bold text-gray-800 mb-3">
-                {{ $material->name }}
-            </h3>
+            <h3 class="text-xl font-bold text-gray-800 mb-3 min-h-[64px]">
+    {{ $material->name }}
+</h3>
 
             <div class="flex justify-between items-center mb-4">
                 <span class="text-sm text-gray-500">
@@ -90,7 +90,7 @@
                     Beschikbaar
                 </span>
             @endif
-
+<div class="mt-auto">
             <form
                 action="{{ route('cart.add', $material->id) }}"
                 method="POST"
@@ -106,6 +106,7 @@
                     + Toevoegen
                 </button>
             </form>
+            </div>
         </div>
     </a>
 @endif
