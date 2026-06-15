@@ -26,4 +26,10 @@ class Material extends Model
 {
     return $this->hasMany(OrderItem::class);
 }
+
+
+    public function stocks()
+    {
+        return $this->hasMany(MaterialStock::class);
+    }
 }

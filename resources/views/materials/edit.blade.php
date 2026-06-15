@@ -85,6 +85,17 @@
                         Geen afbeelding
                     </p>
  
+<<<<<<< HEAD
+=======
+                @endif
+                @if($material->image)
+                    <div class="mt-3">
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" name="remove_image" value="1">
+                            Afbeelding verwijderen
+                        </label>
+                    </div>
+>>>>>>> main
                 @endif
  
             </div>
@@ -203,4 +214,7 @@
     </x-card>
  
 </x-app-layout>
+<<<<<<< HEAD
  
+=======
+>>>>>>> main

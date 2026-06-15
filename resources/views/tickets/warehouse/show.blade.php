@@ -2,8 +2,11 @@
     <div class="p-8">
         <div class="mb-6 flex items-center justify-between">
             <div>
-                <x-page-header title="Ticket detail" />
-                <p class="text-gray-600">Bekijk hier de details van dit ticket.</p>
+                <x-page-header title="Support detail" />
+
+                <p class="text-gray-600">
+                    Bekijk hier de details van deze supportaanvraag.
+                </p>
             </div>
 
             <a href="{{ route('tickets.warehouse.index') }}"
@@ -31,22 +34,60 @@
 
             <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div class="rounded-lg bg-gray-50 p-4">
-                    <p class="text-sm font-medium text-gray-500">Technieker</p>
+                    <p class="text-sm font-medium text-gray-500">
+                        Technieker
+                    </p>
+
                     <p class="mt-1 text-gray-900">
                         {{ $ticket->user->name ?? 'Onbekend' }}
                     </p>
                 </div>
 
                 <div class="rounded-lg bg-gray-50 p-4">
-                    <p class="text-sm font-medium text-gray-500">Gekoppelde bestelling</p>
+                    <p class="text-sm font-medium text-gray-500">
+                        Gekoppelde bestelling
+                    </p>
+
                     <p class="mt-1 text-gray-900">
                         Bestelling #{{ $ticket->order_id }}
+                    </p>
+                </div>
+
+                <div class="rounded-lg bg-gray-50 p-4">
+                    <p class="text-sm font-medium text-gray-500">
+                        Depot/provincie
+                    </p>
+
+                    <p class="mt-1 text-gray-900">
+                        {{ $ticket->location->province ?? 'Geen provincie ingesteld' }}
+                    </p>
+                </div>
+
+                <div class="rounded-lg bg-gray-50 p-4">
+                    <p class="text-sm font-medium text-gray-500">
+                        Depot
+                    </p>
+
+                    <p class="mt-1 text-gray-900">
+                        {{ $ticket->location->name ?? 'Geen depot gekoppeld' }}
+                    </p>
+                </div>
+
+                <div class="rounded-lg bg-gray-50 p-4">
+                    <p class="text-sm font-medium text-gray-500">
+                        Stad
+                    </p>
+
+                    <p class="mt-1 text-gray-900">
+                        {{ $ticket->location->city ?? 'Geen stad gekoppeld' }}
                     </p>
                 </div>
             </div>
 
             <div>
-                <h3 class="mb-2 font-semibold text-gray-900">Beschrijving</h3>
+                <h3 class="mb-2 font-semibold text-gray-900">
+                    Beschrijving
+                </h3>
 
                 <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-gray-700">
                     {{ $ticket->description }}
@@ -67,22 +108,31 @@
                         name="status"
                         class="rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
                     >
-                        <option value="Open" @selected($ticket->status === 'Open')>Open</option>
-                        <option value="In behandeling" @selected($ticket->status === 'In behandeling')>In behandeling</option>
-                        <option value="Opgelost" @selected($ticket->status === 'Opgelost')>Opgelost</option>
+                        <option value="Open" @selected($ticket->status === 'Open')>
+                            Open
+                        </option>
+
+                        <option value="In behandeling" @selected($ticket->status === 'In behandeling')>
+                            In behandeling
+                        </option>
+
+                        <option value="Opgelost" @selected($ticket->status === 'Opgelost')>
+                            Opgelost
+                        </option>
                     </select>
 
-                  <x-button>
-    Status opslaan
-</x-button>
+                    <x-button>
+                        Status opslaan
+                    </x-button>
                 </div>
+
                 @error('status')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-2 text-sm text-red-600">
+                    {{ $message }}
+                </p>
                 @enderror
             </form>
 
         </div>
     </div>
-
-
 </x-app-layout>

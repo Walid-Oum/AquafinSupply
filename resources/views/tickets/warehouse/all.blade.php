@@ -1,8 +1,11 @@
 <x-app-layout>
     <div class="p-8">
         <div class="mb-6">
-            <x-page-header title="Alle tickets" />
-            <p class="text-gray-600">Bekijk hier alle tickets van techniekers.</p>
+            <x-page-header title="Supportaanvragen" />
+
+            <p class="text-gray-600">
+                Bekijk hier alle supportaanvragen van techniekers binnen jouw depot/provincie.
+            </p>
         </div>
 
         @forelse ($tickets as $ticket)
@@ -22,6 +25,16 @@
                         </p>
 
                         <p class="text-sm text-gray-600">
+                            Depot/provincie:
+                            {{ $ticket->location->province ?? 'Geen provincie ingesteld' }}
+                        </p>
+
+                        <p class="text-sm text-gray-600">
+                            Depot:
+                            {{ $ticket->location->name ?? 'Geen depot gekoppeld' }}
+                        </p>
+
+                        <p class="text-sm text-gray-600">
                             Status: {{ $ticket->status }}
                         </p>
 
@@ -38,7 +51,9 @@
             </div>
         @empty
             <div class="rounded-lg bg-white p-6 shadow">
-                <p class="text-gray-600">Er zijn nog geen tickets.</p>
+                <p class="text-gray-600">
+                    Er zijn nog geen supportaanvraag voor jouw depot/provincie.
+                </p>
             </div>
         @endforelse
     </div>

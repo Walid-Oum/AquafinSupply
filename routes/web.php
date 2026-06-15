@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PasswordChangeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Userzone\CartController;
 use App\Http\Controllers\Userzone\OrderController;
@@ -14,23 +15,34 @@ Route::redirect('/', '/login');
 | Dashboard & Profiel (Toegankelijk voor IEDEREEN die ingelogd is)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified'])->group(function () {
-    
+Route::middleware(['auth', 'password.changed', 'verified'])->group(function () {
+
     Route::get('/dashboard', function () {
-        return view('userzone.dashboard');
+
+        if (auth()->user()->role == 'technieker') {
+            return redirect()->route('technician.materials.index');
+        }
+
+        if (auth()->user()->role == 'magazijn') {
+            return redirect()->route('magazijn.materials.index');
+        }
+
+        if (auth()->user()->role == 'admin') {
+            return redirect()->route('materials.index');
+        }
+
     })->name('dashboard');
 
     Route::get('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
 /*
 |--------------------------------------------------------------------------
 | ZONE: Technieker (Alleen Techniekers en Admins mogen hierbij)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:technieker,admin'])->group(function () {
+Route::middleware(['auth', 'password.changed', 'role:technieker,admin'])->group(function () {
 
     // Technieker - Materialen bekijken
     Route::prefix('technician')->name('technician.')->group(function () {
@@ -62,7 +74,7 @@ Route::middleware(['auth', 'role:technieker,admin'])->group(function () {
 | ZONE: Magazijn (Alleen Magazijnmedewerkers en Admins mogen hierbij)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:magazijn,admin'])->group(function () {
+Route::middleware(['auth', 'password.changed', 'role:magazijn,admin'])->group(function () {
 
     // Tickets verwerken in het magazijn
     Route::prefix('magazijn/tickets')->group(function () {
@@ -73,49 +85,47 @@ Route::middleware(['auth', 'role:magazijn,admin'])->group(function () {
 });
 
 
-
-
 /*
 |--------------------------------------------------------------------------
 | ZONE: Magazijn (Alleen Magazijnmedewerkers )
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:magazijn'])->group(function () {
+Route::middleware(['auth', 'password.changed', 'role:magazijn'])->group(function () {
 
     Route::get(
-    '/magazijn/bestellingen',
-    [App\Http\Controllers\Userzone\OrderController::class, 'warehouseIndex']
-)->name('magazijn.orders.index');
+        '/magazijn/bestellingen',
+        [App\Http\Controllers\Userzone\OrderController::class, 'warehouseIndex']
+    )->name('magazijn.orders.index');
 
-Route::patch(
-    '/magazijn/bestellingen/{order}',
-    [App\Http\Controllers\Userzone\OrderController::class, 'warehouseUpdate']
-)->name('magazijn.orders.update');
+    Route::patch(
+        '/magazijn/bestellingen/{order}',
+        [App\Http\Controllers\Userzone\OrderController::class, 'warehouseUpdate']
+    )->name('magazijn.orders.update');
 
-Route::get(
-    '/magazijn/voorraad',
-    [MaterialController::class, 'warehouseIndex']
-)->name('magazijn.materials.index');
+    Route::get(
+        '/magazijn/voorraad',
+        [MaterialController::class, 'warehouseIndex']
+    )->name('magazijn.materials.index');
 
-Route::patch(
-    '/magazijn/voorraad/{id}',
-    [MaterialController::class, 'warehouseUpdate']
-)->name('magazijn.materials.update');
+    Route::patch(
+        '/magazijn/voorraad/{id}',
+        [MaterialController::class, 'warehouseUpdate']
+    )->name('magazijn.materials.update');
 
-Route::get(
-    '/magazijn/material/{id}',
-    [MaterialController::class, 'show']
-)->name('magazijn.materials.show');
+    Route::get(
+        '/magazijn/material/{id}',
+        [MaterialController::class, 'show']
+    )->name('magazijn.materials.show');
 
-Route::get(
-    '/magazijn/bestellingen/{id}',
-    [App\Http\Controllers\Userzone\OrderController::class, 'warehouseShow']
-)->name('magazijn.orders.show');
+    Route::get(
+        '/magazijn/bestellingen/{id}',
+        [App\Http\Controllers\Userzone\OrderController::class, 'warehouseShow']
+    )->name('magazijn.orders.show');
 
-Route::get(
-    '/magazijn/bestellingen/{id}/edit',
-    [App\Http\Controllers\Userzone\OrderController::class, 'warehouseEdit']
-)->name('magazijn.orders.edit');
+    Route::get(
+        '/magazijn/bestellingen/{id}/edit',
+        [App\Http\Controllers\Userzone\OrderController::class, 'warehouseEdit']
+    )->name('magazijn.orders.edit');
 
 
 });
@@ -124,7 +134,7 @@ Route::get(
 | ZONE: Admin (STRIKT ALLEEN VOOR ADMINS - Technieker en Magazijn worden geweigerd)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth',  'password.changed', 'role:admin'])->group(function () {
 
     // Admin Materialenbeheer (CRUD)
     Route::resource('materials', MaterialController::class);
@@ -139,4 +149,25 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     });
 });
 
-require __DIR__.'/auth.php';
+Route::middleware(['auth',  'password.changed',  'role:technieker,magazijn'])
+    ->get('/overstromingsrisico', [\App\Http\Controllers\FloodRiskController::class, 'index'])
+    ->name('flood-risk.index');
+
+
+
+Route::middleware(['auth', 'password.changed', 'role:admin'])->group(function () {
+    Route::get('/admin/overstromingsrisico', [\App\Http\Controllers\Admin\FloodRiskController::class, 'index'])
+        ->name('admin.flood-risk.index');
+});
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/wachtwoord-instellen', [PasswordChangeController::class, 'edit'])
+        ->name('password.change');
+
+    Route::patch('/wachtwoord-instellen', [PasswordChangeController::class, 'update'])
+        ->name('password.change.update');
+});
+
+Route::get('/api/search-materials', [App\Http\Controllers\MaterialController::class, 'searchSuggestions'])->middleware('auth', 'password.changed')->name('api.materials.search');
+require __DIR__ . '/auth.php';
