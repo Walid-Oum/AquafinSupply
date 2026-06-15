@@ -136,6 +136,21 @@ class MaterialController extends Controller
 
     public function update(Request $request, $id)
     {
+        $material = Material::findOrFail($id);
+
+        // Afbeelding verwijderen (alleen de afbeelding, niet het materiaal)
+        if ($request->has('delete_image')) {
+            if ($material->image) {
+                Storage::disk('public')->delete($material->image);
+                $material->image = null;
+                $material->save();
+            }
+            return redirect()
+                ->route('materials.edit', $material->id)
+                ->with('success', 'Afbeelding verwijderd!');
+        }
+
+        // Normale validatie
         $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
