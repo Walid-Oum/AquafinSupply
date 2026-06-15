@@ -1,7 +1,6 @@
 <x-app-layout>
     <x-page-header title="Materialen overzicht"/>
 
-    ```
     <div class="mb-4 flex justify-between items-center">
         <a href="{{ route('materials.create') }}">
             <x-button>
@@ -92,7 +91,9 @@
                         });
                     @endphp
 
-                    <tr class="hover:bg-gray-50">
+                    <tr
+    onclick="window.location='{{ route('materials.show', $material->id) }}'"
+    class="cursor-pointer hover:bg-gray-100 transition">
                         <td class="px-4 py-3 font-medium text-gray-800">
                             {{ $material->name }}
                         </td>
@@ -143,10 +144,14 @@
 
                         <td class="px-4 py-3">
                             <a
-                                href="{{ route('materials.show', $material->id) }}"
-                                class="font-semibold text-[#0F4C81] hover:underline">
-                                Bekijk
-                            </a>
+    href="{{ route('materials.show', $material->id) }}"
+    onclick="event.stopPropagation();">
+
+    <x-button>
+        Bekijk
+    </x-button>
+
+</a>
                         </td>
                     </tr>
                 @empty
@@ -217,6 +222,5 @@
             });
         });
     </script>
-    ```
 
 </x-app-layout>

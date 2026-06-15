@@ -8,7 +8,13 @@
             </p>
         </div>
 
-        @if ($error)
+        @if($fromCache ?? false)
+            <div class="mb-6 rounded-lg bg-yellow-100 border-l-4 border-yellow-500 p-4 text-yellow-800">
+                Live weersgegevens zijn tijdelijk niet beschikbaar. We tonen de laatst opgeslagen gegevens voor jouw depot.
+            </div>
+        @endif
+
+        @if ($error && !($fromCache ?? false))
             <div class="mb-6 rounded-lg bg-red-100 p-4 text-red-700">
                 {{ $error }}
             </div>

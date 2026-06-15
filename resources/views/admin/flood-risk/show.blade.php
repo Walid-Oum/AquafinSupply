@@ -14,6 +14,12 @@
             </div>
         </div>
 
+        @if($selectedStats['fromCache'] ?? false)
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded mb-6">
+                Live weersgegevens zijn tijdelijk niet beschikbaar. We tonen de laatst opgeslagen gegevens voor dit depot.
+            </div>
+        @endif
+
         <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-4">
             <div class="rounded-xl bg-white p-6 shadow">
                 <p class="text-sm text-gray-600">Neerslag volgende week</p>
