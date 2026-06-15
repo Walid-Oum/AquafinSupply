@@ -1,5 +1,11 @@
+@php
+    $localStock = $material->stocks->first();
+    $stock = $localStock?->stock ?? 0;
+    $minimumStock = $localStock?->minimum_stock ?? 0;
+@endphp
+
 <x-app-layout>
-    <x-page-header title="Materiaal detail" />
+    <x-page-header title="Materiaal detail"/>
 
     <x-card>
         <div class="mb-4">
@@ -21,7 +27,7 @@
             <strong>Beschrijving:</strong> {{ $material->description ?? 'Geen beschrijving' }}
         </div>
         <div class="mb-4">
-            <strong>Voorraad:</strong> {{ $material->stock }}
+            <strong>Voorraad:</strong> {{ $stock }}
         </div>
         <div class="mb-4">
             <strong>Status:</strong>
@@ -33,13 +39,23 @@
         </div>
 
         <div class="flex justify-end gap-2">
-            <form action="{{ route('cart.add', $material->id) }}" method="POST">
-                @csrf
-                <x-button>
-    🛒 Toevoegen aan winkelmandje
-</x-button>
-            </form>
-            <a href="{{ route('technician.materials.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded">Terug</a>
+            @if($stock > 0)
+                <form action="{{ route('cart.add', $material->id) }}" method="POST">
+                    @csrf
+                    <x-button>
+                        🛒 Toevoegen aan winkelmandje
+                    </x-button>
+                </form>
+            @else
+                <button
+                    type="button"
+                    disabled
+                    class="bg-gray-300 text-gray-500 px-4 py-2 rounded cursor-not-allowed">
+                    Niet beschikbaar
+                </button>
+            @endif
+            <a href="{{ route('technician.materials.index') }}"
+               class="bg-gray-500 text-white px-4 py-2 rounded">Terug</a>
         </div>
     </x-card>
 </x-app-layout>
