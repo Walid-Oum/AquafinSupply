@@ -226,23 +226,6 @@
 
         </form>
 
-        <div class="mt-6 border-t pt-6">
-
-            <form
-                action="{{ route('materials.destroy', $material->id) }}"
-                method="POST"
-                onsubmit="return confirm('Weet je zeker dat je dit materiaal wilt verwijderen?')">
-
-                @csrf
-                @method('DELETE')
-
-               <x-button>
-    Verwijderen
-</x-button>
-
-            </form>
-
-        </div>
 
     </x-card>
     <script>
