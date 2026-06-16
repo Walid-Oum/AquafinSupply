@@ -14,6 +14,22 @@ class MaterialController extends Controller
     {
         $query = Material::query()
             ->with('stocks');
+            if ($request->filled('stock_status')) {
+
+    if ($request->stock_status === 'low') {
+
+        $query->whereHas('stocks', function ($q) {
+            $q->whereColumn('stock', '<=', 'minimum_stock');
+        });
+
+    } elseif ($request->stock_status === 'ok') {
+
+        $query->whereDoesntHave('stocks', function ($q) {
+            $q->whereColumn('stock', '<=', 'minimum_stock');
+        });
+
+    }
+}
 
         if ($request->has('category') && $request->category != '') {
             $query->where('category', $request->category);

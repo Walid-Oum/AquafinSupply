@@ -32,6 +32,25 @@
                         </option>
                     @endforeach
                 </select>
+                <select name="stock_status" class="border rounded px-3 py-2 text-sm">
+
+    <option value="">
+        Alle voorraadstatussen
+    </option>
+
+    <option
+        value="low"
+        {{ request('stock_status') == 'low' ? 'selected' : '' }}>
+        Lage voorraad
+    </option>
+
+    <option
+        value="ok"
+        {{ request('stock_status') == 'ok' ? 'selected' : '' }}>
+        OK
+    </option>
+
+</select>
 
                 <x-button>
                     Filter
