@@ -35,9 +35,7 @@
         <div class="mb-4">
             <strong>Beschrijving:</strong> {{ $material->description ?? 'Geen beschrijving' }}
         </div>
-        <div class="mb-4">
-            <strong>Voorraad:</strong> {{ $material->stock }}
-        </div>
+        
         <div class="mb-4">
             <strong>Status:</strong>
             @if($material->is_active)
@@ -46,6 +44,41 @@
                 <span class="text-red-600">Inactief</span>
             @endif
         </div>
+
+<hr class="my-6">
+
+<h3 class="text-xl font-bold mb-4">
+    Voorraad per depot
+</h3>
+
+<div class="space-y-3 mb-6">
+
+    @foreach($material->stocks as $stock)
+
+        <div class="border rounded-lg p-4 bg-gray-50">
+
+            <div>
+                <strong>Depot:</strong>
+                {{ $stock->location->name }}
+            </div>
+
+            <div>
+                <strong>Voorraad:</strong>
+                {{ $stock->stock }}
+            </div>
+
+            <div>
+                <strong>Minimum voorraad:</strong>
+                {{ $stock->minimum_stock }}
+            </div>
+
+        </div>
+
+    @endforeach
+
+</div>
+
+
 
       <div class="flex justify-end gap-4">
             <a href="{{ route('materials.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded">Terug</a>
