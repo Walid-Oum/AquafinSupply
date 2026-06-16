@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class FloodRiskController extends Controller
 {
@@ -12,7 +12,6 @@ class FloodRiskController extends Controller
     {
         $user = auth()->user();
         $location = $user->location;
-
 
         if (! $location) {
             return view('flood-risk.index', [
@@ -25,8 +24,10 @@ class FloodRiskController extends Controller
                 'highestRainDay' => null,
                 'highestRainDayLabel' => null,
                 'role' => $user->role,
+                'fromCache' => false,
             ]);
         }
+
         $cacheKey = 'flood_risk_weather_' . $location->id;
         $fromCache = false;
 
@@ -42,12 +43,20 @@ class FloodRiskController extends Controller
             if ($response->failed()) {
                 throw new \Exception('Weather API request failed.');
             }
-        } catch (\Exception $e) {
+
+            $data = $response->json();
+
+            if (! isset($data['daily']['time'], $data['daily']['precipitation_sum'])) {
+                throw new \Exception('Weather API data incomplete.');
+            }
+
+            Cache::put($cacheKey, $data, now()->addDay());
+        } catch (\Exception $exception) {
             $data = Cache::get($cacheKey);
 
             if (! $data) {
                 return view('flood-risk.index', [
-                    'error' => 'De weersgegevens konden niet opgehaald worden.',
+                    'error' => 'De weersgegevens konden niet opgehaald worden en er zijn geen opgeslagen gegevens beschikbaar.',
                     'location' => $location,
                     'weekRain' => null,
                     'riskLevel' => null,
@@ -62,9 +71,6 @@ class FloodRiskController extends Controller
 
             $fromCache = true;
         }
-
-        $data = $response->json();
-        Cache::put($cacheKey, $data, now()->addHours(6));
 
         $dates = $data['daily']['time'] ?? [];
         $rain = $data['daily']['precipitation_sum'] ?? [];
