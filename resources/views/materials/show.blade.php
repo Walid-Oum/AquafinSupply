@@ -51,30 +51,73 @@
     Voorraad per depot
 </h3>
 
-<div class="space-y-3 mb-6">
+<div class="mb-6">
 
-    @foreach($material->stocks as $stock)
+    <x-table>
 
-        <div class="border rounded-lg p-4 bg-gray-50">
+    <thead class="bg-gray-100">
+        <tr>
+            <th class="px-4 py-3 text-left">
+                Depot
+            </th>
 
-            <div>
-                <strong>Depot:</strong>
-                {{ $stock->location->name }}
-            </div>
+            <th class="px-4 py-3 text-left">
+                Voorraad
+            </th>
 
-            <div>
-                <strong>Voorraad:</strong>
-                {{ $stock->stock }}
-            </div>
+            <th class="px-4 py-3 text-left">
+                Minimum voorraad
+            </th>
 
-            <div>
-                <strong>Minimum voorraad:</strong>
-                {{ $stock->minimum_stock }}
-            </div>
+            <th class="px-4 py-3 text-left">
+                Status
+            </th>
+        </tr>
+    </thead>
 
-        </div>
+    <tbody>
 
-    @endforeach
+        @foreach($material->stocks as $stock)
+
+            <tr class="border-t">
+
+                <td class="px-4 py-3">
+                    {{ $stock->location->name }}
+                </td>
+
+                <td class="px-4 py-3">
+                    {{ $stock->stock }}
+                </td>
+
+                <td class="px-4 py-3">
+                    {{ $stock->minimum_stock }}
+                </td>
+
+                <td class="px-4 py-3">
+
+                    @if($stock->stock <= $stock->minimum_stock)
+
+                        <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">
+                            Lage voorraad
+                        </span>
+
+                    @else
+
+                        <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                            OK
+                        </span>
+
+                    @endif
+
+                </td>
+
+            </tr>
+
+        @endforeach
+
+    </tbody>
+
+    </x-table>
 
 </div>
 
