@@ -7,6 +7,16 @@
 {{--
 US17 - Inhoud bestelling bekijken
 --}}
+@php
+    $categoryImages = [
+        'Aquafin tools' => 'aquafintools.png',
+        'Bevestigingsmateriaal' => 'bevestigingsmateriaal.png',
+        'Gereedschap' => 'gereedschap.png',
+        'PBM' => 'PBM.png',
+        'Technisch onderhoud' => 'technischeonderhoud.png',
+        'Verbruiksgoederen' => 'verbruiksgoederen.png',
+    ];
+@endphp
 
 <x-app-layout>
 
@@ -101,21 +111,20 @@ US17 - Inhoud bestelling bekijken
 
             <td class="p-3">
 
-                @if($item->material->image)
+            @if($item->material->image)
 
-                    <img
-                        src="{{ asset('storage/' . $item->material->image) }}"
-                        class="w-16 h-16 object-cover rounded-lg border">
+    <img
+        src="{{ asset('storage/' . $item->material->image) }}"
+        class="w-16 h-16 object-cover rounded-lg border">
 
-                @else
+@else
 
-                    <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-500">
+    <img
+        src="{{ asset('images/' . ($categoryImages[$item->material->category] ?? 'sidebar-bg.jpg')) }}"
+        class="w-16 h-16 object-cover rounded-lg border"
+        alt="{{ $item->material->category }}">
 
-                        Geen afbeelding
-
-                    </div>
-
-                @endif
+@endif
 
             </td>
 
