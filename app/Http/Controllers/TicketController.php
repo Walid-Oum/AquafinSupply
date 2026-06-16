@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Ticket;
+use App\Models\UserNotification;
 use App\Support\FuzzySearch;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -70,7 +71,7 @@ class TicketController extends Controller
     {
         $user = auth()->user();
 
-        if (! $user->location_id) {
+        if (!$user->location_id) {
             return redirect()
                 ->back()
                 ->with('error', 'Er is geen depot gekoppeld aan je account. Contacteer een administrator.');
@@ -97,13 +98,13 @@ class TicketController extends Controller
             ->latest()
             ->get();
 
-        if (! empty($validated['status'])) {
+        if (!empty($validated['status'])) {
             $tickets = $tickets
                 ->where('status', $validated['status'])
                 ->values();
         }
 
-        if (! empty($validated['search'])) {
+        if (!empty($validated['search'])) {
             $search = $validated['search'];
 
             $tickets = $tickets
@@ -162,10 +163,36 @@ class TicketController extends Controller
             ],
         ]);
 
+        $oldStatus = $ticket->status;
+        $oldWarehouseNote = $ticket->warehouse_note;
+
+        $newStatus = $validated['status'];
+        $newWarehouseNote = $validated['warehouse_note'] ?? null;
+
         $ticket->update([
-            'status' => $validated['status'],
-            'warehouse_note' => $validated['warehouse_note'] ?? null,
+            'status' => $newStatus,
+            'warehouse_note' => $newWarehouseNote,
         ]);
+
+        $statusChanged = $oldStatus !== $newStatus;
+        $noteChanged = $oldWarehouseNote !== $newWarehouseNote && !empty($newWarehouseNote);
+
+        if ($statusChanged || $noteChanged) {
+            if ($statusChanged && $noteChanged) {
+                $message = 'Je supportaanvraag "' . $ticket->subject . '" kreeg status "' . $newStatus . '" en een antwoord van het magazijn.';
+            } elseif ($statusChanged) {
+                $message = 'Je supportaanvraag "' . $ticket->subject . '" kreeg status "' . $newStatus . '".';
+            } else {
+                $message = 'Je supportaanvraag "' . $ticket->subject . '" kreeg een antwoord van het magazijn.';
+            }
+
+            UserNotification::create([
+                'user_id' => $ticket->user_id,
+                'title' => 'Supportaanvraag bijgewerkt',
+                'message' => $message,
+                'link' => route('tickets.index'),
+            ]);
+        }
 
         return redirect()
             ->route('tickets.warehouse.show', $ticket)

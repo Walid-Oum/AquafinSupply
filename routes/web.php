@@ -36,6 +36,9 @@ Route::middleware(['auth', 'password.changed', 'verified'])->group(function () {
     Route::get('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/notificaties', [\App\Http\Controllers\NotificationController::class, 'index'])
+        ->name('notifications.index');
 });
 /*
 |--------------------------------------------------------------------------
