@@ -89,6 +89,9 @@
                         $hasLowStock = $material->stocks->contains(function ($stock) {
                             return $stock->stock <= $stock->minimum_stock;
                         });
+                        $lowStockDepots = $material->stocks->filter(function ($stock) {
+    return $stock->stock <= $stock->minimum_stock;
+})->count();
                     @endphp
 
                     <tr
@@ -119,15 +122,21 @@
                         </td>
 
                         <td class="px-4 py-3">
-                            @if($hasLowStock)
-                                <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">
-                                    Lage voorraad in minstens één depot
-                                </span>
-                            @else
-                                <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
-                                    OK
-                                </span>
-                            @endif
+                          @if($hasLowStock)
+    <div class="space-y-1">
+        <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">
+            Lage voorraad
+        </span>
+
+        <p class="text-xs text-red-600 font-medium">
+            {{ $lowStockDepots }} depot(s) onder minimum
+        </p>
+    </div>
+@else
+    <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+        OK
+    </span>
+@endif
                         </td>
 
                         <td class="px-4 py-3">
