@@ -61,14 +61,24 @@ class MaterialController extends Controller
         );
     }
 
-   public function create()
-{
-    $categories = Material::select('category')
-        ->distinct()
-        ->pluck('category');
+    public function create()
+    {
+        $categories = Material::select('category')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category');
 
-    return view('materials.create', compact('categories'));
-}
+        $riskLevels = \App\Models\RiskLevel::all();
+
+
+        return view(
+            'materials.create',
+            compact(
+                'categories',
+                'riskLevels'
+            )
+        );
+    }
 
     public function store(Request $request)
     {
@@ -76,7 +86,10 @@ class MaterialController extends Controller
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'description' => 'nullable|string',
-            
+
+            'risk_levels' => 'nullable|array',
+            'risk_levels.*' => 'exists:risk_levels,id',
+
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -109,6 +122,13 @@ class MaterialController extends Controller
     'minimum_stock' => 0,
 ]
             );
+        }
+        if ($request->filled('risk_levels')) {
+
+            $material->riskLevels()->sync(
+                $request->risk_levels
+            );
+
         }
 
         return redirect()
@@ -144,19 +164,25 @@ class MaterialController extends Controller
     }
 
     public function edit($id)
-{
-    $material = Material::findOrFail($id);
+    {
+        $material = Material::with('riskLevels')
+            ->findOrFail($id);
 
-    $categories = Material::select('category')
-        ->distinct()
-        ->pluck('category');
+        $categories = Material::select('category')
+            ->distinct()
+            ->pluck('category');
 
-    return view(
-        'materials.edit',
-        compact('material', 'categories')
-    );
-}
+        $riskLevels = \App\Models\RiskLevel::all();
 
+        return view(
+            'materials.edit',
+            compact(
+                'material',
+                'categories',
+                'riskLevels'
+            )
+        );
+    }
     public function update(Request $request, $id)
     {
         $material = Material::findOrFail($id);
@@ -212,6 +238,9 @@ class MaterialController extends Controller
             'is_active' => $request->is_active,
             'image' => $material->image,
         ]);
+        $material->riskLevels()->sync(
+            $request->risk_levels ?? []
+        );
 
         return redirect()
             ->route('materials.index')

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Location;
 use App\Models\Material;
 use App\Models\MaterialStock;
+use App\Models\RiskLevel;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -396,6 +397,49 @@ class DatabaseSeeder extends Seeder
                 );
             }
         }
+        $laag = RiskLevel::where('name', 'Laag')->first();
+        $gemiddeld = RiskLevel::where('name', 'Gemiddeld')->first();
+        $hoog = RiskLevel::where('name', 'Hoog')->first();
+
+        Material::where('name', 'EHBO-kit')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $laag->id,
+                $gemiddeld->id,
+                $hoog->id,
+            ]);
+
+        Material::where('name', 'Fluovest')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $laag->id,
+                $gemiddeld->id,
+            ]);
+
+        Material::where('name', 'Gasdetectiemeter')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $gemiddeld->id,
+                $hoog->id,
+            ]);
+
+        Material::where('name', 'Dompelpomp')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $gemiddeld->id,
+                $hoog->id,
+            ]);
+
+        Material::where('name', 'Rioolstop')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $hoog->id,
+            ]);
     }
 
 

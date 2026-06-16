@@ -146,9 +146,33 @@
 
             </div>
 
-            
+            <div class="mb-4">
 
-           
+                <label class="block font-bold mb-2">
+                    Risiconiveaus
+                </label>
+
+                @foreach($riskLevels as $riskLevel)
+
+                    <label class="flex items-center gap-2 mb-2">
+
+                        <input
+                            type="checkbox"
+                            name="risk_levels[]"
+                            value="{{ $riskLevel->id }}"
+                            {{ $material->riskLevels->contains($riskLevel->id) ? 'checked' : '' }}>
+
+                        {{ $riskLevel->name }}
+
+                    </label>
+
+                @endforeach
+
+            </div>
+
+
+
+
 
             <div class="mb-6">
 
