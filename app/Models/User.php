@@ -13,7 +13,8 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    public function tickets(){
+    public function tickets()
+    {
         return $this->hasMany(Ticket::class, 'user_id', 'id');
     }
 
@@ -22,14 +23,14 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-   protected $fillable = [
-       'name',
-       'email',
-       'password',
-       'role',
-       'location_id',
-       'must_change_password',
-   ];
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+        'location_id',
+        'must_change_password',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -53,11 +54,20 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-public function orders()
-{
-    return $this->hasMany(Order::class);
-}
-public function location(){
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function location()
+    {
         return $this->belongsTo(Location::class);
-}
+    }
+
+
+    public function userNotifications()
+    {
+        return $this->hasMany(UserNotification::class);
+    }
 }

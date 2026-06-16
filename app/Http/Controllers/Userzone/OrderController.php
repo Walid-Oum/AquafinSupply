@@ -11,6 +11,7 @@ use App\Models\Material;
 use App\Models\MaterialStock;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Models\UserNotification;
 
 class OrderController extends Controller
 {
@@ -215,10 +216,16 @@ class OrderController extends Controller
             'quantities.*' => ['nullable', 'integer', 'min:0'],
         ]);
 
+        $oldStatus = $order->status;
+        $newStatus = $validated['status'];
+        $statusChanged = false;
+
         try {
-            DB::transaction(function () use ($validated, $order) {
-                $order->status = $validated['status'];
+            DB::transaction(function () use ($validated, $order, $oldStatus, $newStatus, &$statusChanged) {
+                $order->status = $newStatus;
                 $order->save();
+
+                $statusChanged = $oldStatus !== $newStatus;
 
                 if (! empty($validated['quantities'])) {
                     foreach ($validated['quantities'] as $itemId => $newQuantity) {
@@ -273,6 +280,15 @@ class OrderController extends Controller
             return redirect()
                 ->back()
                 ->with('error', $exception->getMessage());
+        }
+
+        if ($statusChanged) {
+            UserNotification::create([
+                'user_id' => $order->user_id,
+                'title' => 'Bestelling bijgewerkt',
+                'message' => 'Je bestelling #' . $order->id . ' kreeg status "' . $newStatus . '".',
+                'link' => route('orders.show', $order->id),
+            ]);
         }
 
         return redirect()

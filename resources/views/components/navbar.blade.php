@@ -1,10 +1,21 @@
 @php
+    $user = Auth::user();
+
     $cartCount = collect(session('cart', []))->sum('quantity');
+
+    $unreadNotificationCount = $user?->userNotifications()
+        ->whereNull('read_at')
+        ->count() ?? 0;
+
+    $latestNotifications = $user?->userNotifications()
+        ->latest()
+        ->take(5)
+        ->get() ?? collect();
 @endphp
 
 <div class="bg-white h-20 border-b flex justify-end items-center px-8 gap-6 shadow-md">
 
-    @if(Auth::user()->role == 'technieker')
+    @if($user->role == 'technieker')
         <a
             href="{{ route('cart.index') }}"
             class="relative hover:scale-110 transition"
@@ -34,6 +45,104 @@
                 {{ $cartCount }}
             </span>
         </a>
+
+        <div
+            x-data="{ open: false }"
+            class="relative"
+        >
+            <button
+                type="button"
+                @click="open = !open"
+                class="relative hover:scale-110 transition"
+                title="Notificaties"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke-width="1.8"
+                     stroke="#0F4C81"
+                     class="w-10 h-10">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M14.857 17.082a2.25 2.25 0 01-4.714 0m8.607-2.332A3.375 3.375 0 0117.25 12V9.75a5.25 5.25 0 00-10.5 0V12a3.375 3.375 0 01-1.5 2.75l-.33.22a.75.75 0 00.416 1.38h13.328a.75.75 0 00.416-1.38l-.33-.22z" />
+                </svg>
+
+                <span
+                    class="absolute -top-1 -right-1
+                           bg-red-500 text-white
+                           text-xs font-bold
+                           rounded-full
+                           min-w-5 h-5
+                           px-1
+                           flex items-center justify-center
+                           {{ $unreadNotificationCount > 0 ? '' : 'hidden' }}"
+                >
+                    {{ $unreadNotificationCount > 9 ? '9+' : $unreadNotificationCount }}
+                </span>
+            </button>
+
+            <div
+                x-show="open"
+                @click.outside="open = false"
+                x-cloak
+                class="absolute right-0 mt-3 w-96 rounded-xl bg-white shadow-xl border border-gray-200 z-50"
+            >
+                <div class="border-b px-4 py-3">
+                    <h3 class="font-bold text-gray-900">
+                        Notificaties
+                    </h3>
+
+                    <p class="text-sm text-gray-500">
+                        Laatste updates over je bestellingen en supportaanvragen.
+                    </p>
+                </div>
+
+                <div class="max-h-80 overflow-y-auto">
+                    @forelse($latestNotifications as $notification)
+                        <a
+                            href="{{ $notification->link ?? '#' }}"
+                            class="block border-b px-4 py-3 hover:bg-gray-50"
+                        >
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-semibold text-gray-900">
+                                        {{ $notification->title }}
+                                    </p>
+
+                                    <p class="mt-1 text-sm text-gray-600">
+                                        {{ $notification->message }}
+                                    </p>
+
+                                    <p class="mt-2 text-xs text-gray-400">
+                                        {{ $notification->created_at->format('d/m/Y H:i') }}
+                                    </p>
+                                </div>
+
+                                @if(! $notification->is_read)
+                                    <span class="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">
+                                        Nieuw
+                                    </span>
+                                @endif
+                            </div>
+                        </a>
+                    @empty
+                        <div class="px-4 py-6 text-sm text-gray-500">
+                            Je hebt nog geen notificaties.
+                        </div>
+                    @endforelse
+                </div>
+
+                <div class="px-4 py-3">
+                    <a
+                        href="{{ route('notifications.index') }}"
+                        class="block text-center text-sm font-semibold text-[#0F4C81] hover:underline"
+                    >
+                        Bekijk alle notificaties
+                    </a>
+                </div>
+            </div>
+        </div>
     @endif
 
     <a href="{{ route('profile.edit') }}"
@@ -48,11 +157,11 @@
                    font-bold
                    uppercase">
 
-            {{ substr(Auth::user()->name, 0, 1) }}
+            {{ substr($user->name, 0, 1) }}
         </div>
 
         <span class="font-medium text-gray-700">
-            {{ explode(' ', Auth::user()->name)[0] }}
+            {{ explode(' ', $user->name)[0] }}
         </span>
     </a>
 
