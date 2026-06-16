@@ -20,17 +20,10 @@ class MaterialController extends Controller
                 $query->where('location_id', $locationId);
             }]);
 
-        // Zoeken
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        // Filter op categorie
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
-        }
-
-        // Sorteren
         if ($request->sort === 'desc') {
             $query->orderBy('name', 'desc');
         } else {
