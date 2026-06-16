@@ -4,10 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Ticket;
+use App\Support\FuzzySearch;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TicketController extends Controller
 {
+    private const TICKET_STATUSES = [
+        'Open',
+        'In behandeling',
+        'Opgelost',
+    ];
+
     public function index()
     {
         $tickets = Ticket::with(['order', 'location'])
@@ -16,7 +24,7 @@ class TicketController extends Controller
             ->get();
 
         return view('tickets.index', [
-            'tickets' => $tickets
+            'tickets' => $tickets,
         ]);
     }
 
@@ -28,7 +36,7 @@ class TicketController extends Controller
             ->get();
 
         return view('tickets.create', [
-            'orders' => $orders
+            'orders' => $orders,
         ]);
     }
 
@@ -58,7 +66,7 @@ class TicketController extends Controller
             ->with('success', 'Ticket succesvol aangemaakt.');
     }
 
-    public function all()
+    public function all(Request $request)
     {
         $user = auth()->user();
 
@@ -68,13 +76,58 @@ class TicketController extends Controller
                 ->with('error', 'Er is geen depot gekoppeld aan je account. Contacteer een administrator.');
         }
 
+        $validated = $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
+            'status' => [
+                'nullable',
+                Rule::in(self::TICKET_STATUSES),
+            ],
+        ]);
+
         $tickets = Ticket::with(['user', 'order', 'location'])
             ->where('location_id', $user->location_id)
+            ->orderByRaw("
+                CASE status
+                    WHEN 'Open' THEN 1
+                    WHEN 'In behandeling' THEN 2
+                    WHEN 'Opgelost' THEN 3
+                    ELSE 4
+                END
+            ")
             ->latest()
             ->get();
 
+        if (! empty($validated['status'])) {
+            $tickets = $tickets
+                ->where('status', $validated['status'])
+                ->values();
+        }
+
+        if (! empty($validated['search'])) {
+            $search = $validated['search'];
+
+            $tickets = $tickets
+                ->filter(function (Ticket $ticket) use ($search) {
+                    $searchableText = collect([
+                        $ticket->subject,
+                        $ticket->description,
+                        $ticket->warehouse_note,
+                        $ticket->status,
+                        $ticket->user?->name,
+                        $ticket->order_id,
+                        $ticket->location?->province,
+                        $ticket->location?->name,
+                        $ticket->location?->city,
+                    ])->filter()->implode(' ');
+
+                    return FuzzySearch::matches($search, $searchableText);
+                })
+                ->values();
+        }
+
         return view('tickets.warehouse.all', [
-            'tickets' => $tickets
+            'tickets' => $tickets,
+            'ticketStatuses' => self::TICKET_STATUSES,
         ]);
     }
 
@@ -87,7 +140,7 @@ class TicketController extends Controller
         $ticket->load(['user', 'order', 'location']);
 
         return view('tickets.warehouse.show', [
-            'ticket' => $ticket
+            'ticket' => $ticket,
         ]);
     }
 
@@ -98,11 +151,20 @@ class TicketController extends Controller
         }
 
         $validated = $request->validate([
-            'status' => ['required', 'string'],
+            'status' => [
+                'required',
+                Rule::in(self::TICKET_STATUSES),
+            ],
+            'warehouse_note' => [
+                'nullable',
+                'string',
+                'max:2000',
+            ],
         ]);
 
         $ticket->update([
             'status' => $validated['status'],
+            'warehouse_note' => $validated['warehouse_note'] ?? null,
         ]);
 
         return redirect()
