@@ -12,8 +12,7 @@ class FloodRiskController extends Controller
     {
         $user = auth()->user();
         $location = $user->location;
-
-        if (! $location) {
+        if (!$location) {
             return view('flood-risk.index', [
                 'error' => 'Er is geen depot gekoppeld aan deze gebruiker.',
                 'location' => null,
@@ -46,7 +45,7 @@ class FloodRiskController extends Controller
 
             $data = $response->json();
 
-            if (! isset($data['daily']['time'], $data['daily']['precipitation_sum'])) {
+            if (!isset($data['daily']['time'], $data['daily']['precipitation_sum'])) {
                 throw new \Exception('Weather API data incomplete.');
             }
 
@@ -54,7 +53,7 @@ class FloodRiskController extends Controller
         } catch (\Exception $exception) {
             $data = Cache::get($cacheKey);
 
-            if (! $data) {
+            if (!$data) {
                 return view('flood-risk.index', [
                     'error' => 'De weersgegevens konden niet opgehaald worden en er zijn geen opgeslagen gegevens beschikbaar.',
                     'location' => $location,
