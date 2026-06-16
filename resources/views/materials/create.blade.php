@@ -15,7 +15,24 @@
 
             <div class="mb-4">
                 <label class="block font-bold mb-2">Categorie *</label>
-                <input type="text" name="category" value="{{ old('category') }}" class="w-full border rounded px-3 py-2" required>
+              <select
+    name="category"
+    class="w-full border rounded px-3 py-2"
+    required>
+
+    <option value="">
+        Kies een categorie
+    </option>
+
+    @foreach($categories as $category)
+        <option
+            value="{{ $category }}"
+            {{ old('category') == $category ? 'selected' : '' }}>
+            {{ $category }}
+        </option>
+    @endforeach
+
+</select>
                 @error('category')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -38,28 +55,8 @@
                 @enderror
             </div>
 
-            <div class="mb-4">
-                <label class="block font-bold mb-2">Voorraad *</label>
-                <input type="number" name="stock" value="{{ old('stock', 0) }}" class="w-full border rounded px-3 py-2" required>
-                @error('stock')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-<div class="mb-4">
+           
 
-<label class="block font-bold mb-2">
-
-Minimum voorraad
-
-</label>
-
-<input
-type="number"
-name="minimum_stock"
-value="0"
-class="w-full border rounded px-3 py-2">
-
-</div>
             <div class="flex justify-end">
                 <a href="{{ route('materials.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Annuleren</a>
                 <x-button>

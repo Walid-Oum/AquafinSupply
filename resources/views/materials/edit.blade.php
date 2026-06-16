@@ -36,12 +36,20 @@
                     Categorie *
                 </label>
 
-                <input
-                    type="text"
-                    name="category"
-                    value="{{ old('category', $material->category) }}"
-                    class="w-full border rounded px-3 py-2"
-                    required>
+               <select
+    name="category"
+    class="w-full border rounded px-3 py-2"
+    required>
+
+    @foreach($categories as $category)
+        <option
+            value="{{ $category }}"
+            {{ old('category', $material->category) == $category ? 'selected' : '' }}>
+            {{ $category }}
+        </option>
+    @endforeach
+
+</select>
 
                 @error('category')
                     <p class="text-red-500 text-sm mt-1">
@@ -73,20 +81,32 @@
                     Huidige afbeelding
                 </label>
 
-                @if($material->image)
+               @php
+    $categoryImages = [
+        'Aquafin tools' => 'aquafintools.png',
+        'Bevestigingsmateriaal' => 'bevestigingsmateriaal.png',
+        'Gereedschap' => 'gereedschap.png',
+        'PBM' => 'PBM.png',
+        'Technisch onderhoud' => 'technischeonderhoud.png',
+        'Verbruiksgoederen' => 'verbruiksgoederen.png',
+    ];
+@endphp
 
-                    <img
-                        id="materialImage"
-                        src="{{ Storage::url($material->image) }}"
-                        class="w-32 h-32 object-cover rounded">
+@if($material->image)
 
-                @else
+    <img
+        id="materialImage"
+        src="{{ Storage::url($material->image) }}"
+        class="w-32 h-32 object-cover rounded">
 
-                    <p class="text-gray-500">
-                        Geen afbeelding
-                    </p>
+@else
 
-                @endif
+    <img
+        src="{{ asset('images/' . ($categoryImages[$material->category] ?? 'sidebar-bg.jpg')) }}"
+        class="w-32 h-32 object-cover rounded"
+        alt="{{ $material->category }}">
+
+@endif
                 @if($material->image)
 
                     <input
@@ -126,37 +146,9 @@
 
             </div>
 
-            <div class="mb-4">
+            
 
-                <label class="block font-bold mb-2">
-                    Voorraad *
-                </label>
-
-                <input
-                    type="number"
-                    name="stock"
-                    min="0"
-                    value="{{ old('stock', $material->stock) }}"
-                    class="w-full border rounded px-3 py-2"
-                    required>
-
-            </div>
-
-            <div class="mb-4">
-
-                <label class="block font-bold mb-2">
-                    Minimum voorraad *
-                </label>
-
-                <input
-                    type="number"
-                    name="minimum_stock"
-                    min="0"
-                    value="{{ old('minimum_stock', $material->minimum_stock) }}"
-                    class="w-full border rounded px-3 py-2"
-                    required>
-
-            </div>
+           
 
             <div class="mb-6">
 
@@ -206,23 +198,6 @@
 
         </form>
 
-        <div class="mt-6 border-t pt-6">
-
-            <form
-                action="{{ route('materials.destroy', $material->id) }}"
-                method="POST"
-                onsubmit="return confirm('Weet je zeker dat je dit materiaal wilt verwijderen?')">
-
-                @csrf
-                @method('DELETE')
-
-               <x-button>
-    Verwijderen
-</x-button>
-
-            </form>
-
-        </div>
 
     </x-card>
     <script>

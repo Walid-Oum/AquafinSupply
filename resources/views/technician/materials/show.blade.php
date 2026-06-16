@@ -2,19 +2,32 @@
     $localStock = $material->stocks->first();
     $stock = $localStock?->stock ?? 0;
     $minimumStock = $localStock?->minimum_stock ?? 0;
-@endphp
 
+$categoryImages = [
+    'Aquafin tools' => 'aquafintools.png',
+    'Bevestigingsmateriaal' => 'bevestigingsmateriaal.png',
+    'Gereedschap' => 'gereedschap.png',
+    'PBM' => 'PBM.png',
+    'Technisch onderhoud' => 'technischeonderhoud.png',
+    'Verbruiksgoederen' => 'verbruiksgoederen.png',
+];
+@endphp
 <x-app-layout>
     <x-page-header title="Materiaal detail"/>
 
     <x-card>
         <div class="mb-4">
             <strong>Afbeelding:</strong><br>
-            @if($material->image)
-                <img src="{{ Storage::url($material->image) }}" class="w-48 h-48 object-cover rounded mt-2">
-            @else
-                <p class="text-gray-500 mt-1">Geen afbeelding</p>
-            @endif
+           @if($material->image)
+    <img
+        src="{{ Storage::url($material->image) }}"
+        class="w-full max-w-sm h-auto object-cover rounded mt-2">
+@else
+    <img
+        src="{{ asset('images/' . ($categoryImages[$material->category] ?? 'sidebar-bg.jpg')) }}"
+        class="w-full max-w-sm h-auto object-cover rounded mt-2"
+        alt="{{ $material->category }}">
+@endif
         </div>
 
         <div class="mb-4">

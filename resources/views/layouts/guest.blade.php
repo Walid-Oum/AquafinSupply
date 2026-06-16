@@ -14,11 +14,13 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.1/dist/cdn.min.js"></script>
 </head>
 
-<body class="bg-[#F5F8FC]">
+<body
+    class="min-h-screen bg-cover bg-center"
+    style="background-image: url('{{ asset('images/sidebar-bg.jpg') }}');">
 
-    <div class="min-h-screen flex items-center justify-center">
+    <div class="min-h-screen flex items-center justify-center bg-black/30">
 
-        <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
 
             {{ $slot }}
 
