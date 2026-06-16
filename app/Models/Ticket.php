@@ -15,8 +15,9 @@ class Ticket extends Model
         'order_id',
         'subject',
         'description',
+        'warehouse_note',
         'status',
-        'location_id'
+        'location_id',
     ];
 
     public function user(){

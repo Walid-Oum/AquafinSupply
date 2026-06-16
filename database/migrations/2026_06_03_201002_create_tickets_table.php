@@ -32,6 +32,7 @@ return new class extends Migration
 
             $table->string('subject');
             $table->text('description');
+            $table->text('warehouse_note')->nullable();
             $table->string('status')->default('Open');
 
             $table->timestamps();

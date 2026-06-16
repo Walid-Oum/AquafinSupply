@@ -5,9 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TicketController extends Controller
 {
+    private const TICKET_STATUSES = [
+        'Open',
+        'In behandeling',
+        'Opgelost',
+    ];
     public function index()
     {
         $tickets = Ticket::with(['order', 'location'])
@@ -98,11 +104,20 @@ class TicketController extends Controller
         }
 
         $validated = $request->validate([
-            'status' => ['required', 'string'],
+            'status' => [
+                'required',
+                Rule::in(self::TICKET_STATUSES),
+            ],
+            'warehouse_note' => [
+                'nullable',
+                'string',
+                'max:2000',
+            ],
         ]);
 
         $ticket->update([
             'status' => $validated['status'],
+            'warehouse_note' => $validated['warehouse_note'] ?? null,
         ]);
 
         return redirect()

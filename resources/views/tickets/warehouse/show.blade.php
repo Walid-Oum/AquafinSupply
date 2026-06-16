@@ -27,9 +27,7 @@
                     </p>
                 </div>
 
-                <span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
-                    {{ $ticket->status }}
-                </span>
+                <x-status-badge :status="$ticket->status" />
             </div>
 
             <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -94,43 +92,77 @@
                 </div>
             </div>
 
+            @if($ticket->warehouse_note)
+                <div class="mt-6">
+                    <h3 class="mb-2 font-semibold text-gray-900">
+                        Antwoord van magazijn
+                    </h3>
+
+                    <div class="rounded-lg border border-blue-200 bg-blue-50 p-4 text-gray-700">
+                        {{ $ticket->warehouse_note }}
+                    </div>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('tickets.warehouse.updateStatus', $ticket) }}" class="mt-6">
                 @csrf
                 @method('PATCH')
 
-                <label for="status" class="mb-1 block text-sm font-semibold text-gray-700">
-                    Status aanpassen
-                </label>
+                <div class="space-y-4">
+                    <div>
+                        <label for="status" class="mb-1 block text-sm font-semibold text-gray-700">
+                            Status aanpassen
+                        </label>
 
-                <div class="flex gap-3">
-                    <select
-                        id="status"
-                        name="status"
-                        class="rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-                    >
-                        <option value="Open" @selected($ticket->status === 'Open')>
-                            Open
-                        </option>
+                        <select
+                            id="status"
+                            name="status"
+                            class="rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+                        >
+                            <option value="Open" @selected($ticket->status === 'Open')>
+                                Open
+                            </option>
 
-                        <option value="In behandeling" @selected($ticket->status === 'In behandeling')>
-                            In behandeling
-                        </option>
+                            <option value="In behandeling" @selected($ticket->status === 'In behandeling')>
+                                In behandeling
+                            </option>
 
-                        <option value="Opgelost" @selected($ticket->status === 'Opgelost')>
-                            Opgelost
-                        </option>
-                    </select>
+                            <option value="Opgelost" @selected($ticket->status === 'Opgelost')>
+                                Opgelost
+                            </option>
+                        </select>
+
+                        @error('status')
+                        <p class="mt-2 text-sm text-red-600">
+                            {{ $message }}
+                        </p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="warehouse_note" class="mb-1 block text-sm font-semibold text-gray-700">
+                            Antwoord/opmerking voor technieker
+                        </label>
+
+                        <textarea
+                            id="warehouse_note"
+                            name="warehouse_note"
+                            rows="4"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+                            placeholder="Bijvoorbeeld: Het ontbrekende materiaal wordt morgen klaargelegd."
+                        >{{ old('warehouse_note', $ticket->warehouse_note) }}</textarea>
+
+                        @error('warehouse_note')
+                        <p class="mt-2 text-sm text-red-600">
+                            {{ $message }}
+                        </p>
+                        @enderror
+                    </div>
 
                     <x-button>
-                        Status opslaan
+                        Ticket opslaan
                     </x-button>
                 </div>
-
-                @error('status')
-                <p class="mt-2 text-sm text-red-600">
-                    {{ $message }}
-                </p>
-                @enderror
             </form>
 
         </div>

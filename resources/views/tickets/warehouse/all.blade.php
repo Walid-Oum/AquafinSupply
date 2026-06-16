@@ -34,9 +34,15 @@
                             {{ $ticket->location->name ?? 'Geen depot gekoppeld' }}
                         </p>
 
-                        <p class="text-sm text-gray-600">
-                            Status: {{ $ticket->status }}
-                        </p>
+                        <div class="mt-2">
+                            <x-status-badge :status="$ticket->status" />
+                        </div>
+
+                        @if($ticket->warehouse_note)
+                            <p class="mt-2 text-sm font-medium text-blue-700">
+                                Antwoord toegevoegd
+                            </p>
+                        @endif
 
                         <p class="text-sm text-gray-600">
                             Aangemaakt op: {{ $ticket->created_at->format('d/m/Y') }}
