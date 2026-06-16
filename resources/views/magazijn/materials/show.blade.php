@@ -3,7 +3,15 @@
 
     $stock = $localStock?->stock ?? 0;
     $minimumStock = $localStock?->minimum_stock ?? $material->minimum_stock ?? 0;
-@endphp
+  $categoryImages = [
+        'Aquafin tools' => 'aquafintools.png',
+        'Bevestigingsmateriaal' => 'bevestigingsmateriaal.png',
+        'Gereedschap' => 'gereedschap.png',
+        'PBM' => 'PBM.png',
+        'Technisch onderhoud' => 'technischeonderhoud.png',
+        'Verbruiksgoederen' => 'verbruiksgoederen.png',
+    ];
+    @endphp
 
 <x-app-layout>
 
@@ -11,17 +19,20 @@
 
     <x-card>
 
-        @if($material->image)
-            <img
-                src="{{ asset('storage/' . $material->image) }}"
-                class="w-64 rounded-lg mb-6"
-                alt="{{ $material->name }}"
-            >
-        @else
-            <div class="w-64 h-40 rounded-lg mb-6 bg-gray-100 flex items-center justify-center text-gray-500">
-                Geen afbeelding
-            </div>
-        @endif
+       @if($material->image)
+
+    <img
+        src="{{ Storage::url($material->image) }}"
+        class="w-full max-w-sm h-auto object-cover rounded mt-2">
+
+@else
+
+    <img
+        src="{{ asset('images/' . ($categoryImages[$material->category] ?? 'sidebar-bg.jpg')) }}"
+        class="w-full max-w-sm h-auto object-cover rounded mt-2"
+        alt="{{ $material->category }}">
+
+@endif
 
         <div class="space-y-3">
 
