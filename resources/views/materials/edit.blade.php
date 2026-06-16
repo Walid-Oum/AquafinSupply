@@ -73,20 +73,32 @@
                     Huidige afbeelding
                 </label>
 
-                @if($material->image)
+               @php
+    $categoryImages = [
+        'Aquafin tools' => 'aquafintools.png',
+        'Bevestigingsmateriaal' => 'bevestigingsmateriaal.png',
+        'Gereedschap' => 'gereedschap.png',
+        'PBM' => 'PBM.png',
+        'Technisch onderhoud' => 'technischeonderhoud.png',
+        'Verbruiksgoederen' => 'verbruiksgoederen.png',
+    ];
+@endphp
 
-                    <img
-                        id="materialImage"
-                        src="{{ Storage::url($material->image) }}"
-                        class="w-32 h-32 object-cover rounded">
+@if($material->image)
 
-                @else
+    <img
+        id="materialImage"
+        src="{{ Storage::url($material->image) }}"
+        class="w-32 h-32 object-cover rounded">
 
-                    <p class="text-gray-500">
-                        Geen afbeelding
-                    </p>
+@else
 
-                @endif
+    <img
+        src="{{ asset('images/' . ($categoryImages[$material->category] ?? 'sidebar-bg.jpg')) }}"
+        class="w-32 h-32 object-cover rounded"
+        alt="{{ $material->category }}">
+
+@endif
                 @if($material->image)
 
                     <input
