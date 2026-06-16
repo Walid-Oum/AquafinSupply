@@ -10,9 +10,18 @@ use App\Models\OrderItem;
 use App\Models\Material;
 use App\Models\MaterialStock;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
+
+    private const WAREHOUSE_ORDER_STATUSES = [
+        'Nieuw',
+        'In voorbereiding',
+        'Klaar om af te halen',
+        'Afgehaald',
+        'Geannuleerd',
+    ];
     public function index()
     {
         $orders = Order::where('user_id', Auth::id())
@@ -197,25 +206,27 @@ class OrderController extends Controller
             abort(403);
         }
 
-        $request->validate([
-            'status' => 'required',
-            'quantities.*' => 'nullable|integer|min:0',
+        $validated = $request->validate([
+            'status' => [
+                'required',
+                Rule::in(self::WAREHOUSE_ORDER_STATUSES),
+            ],
+            'quantities' => ['nullable', 'array'],
+            'quantities.*' => ['nullable', 'integer', 'min:0'],
         ]);
 
         try {
-            DB::transaction(function () use ($request, $order) {
-                $order->status = $request->status;
+            DB::transaction(function () use ($validated, $order) {
+                $order->status = $validated['status'];
                 $order->save();
 
-                if ($request->has('quantities')) {
-                    foreach ($request->quantities as $itemId => $newQuantity) {
-                        $item = OrderItem::find($itemId);
+                if (! empty($validated['quantities'])) {
+                    foreach ($validated['quantities'] as $itemId => $newQuantity) {
+                        $item = $order->items()
+                            ->whereKey($itemId)
+                            ->first();
 
-                        if (!$item) {
-                            continue;
-                        }
-
-                        if ($item->order_id !== $order->id) {
+                        if (! $item) {
                             abort(403);
                         }
 
@@ -227,39 +238,34 @@ class OrderController extends Controller
                             ->firstOrFail();
 
                         $oldQuantity = $item->quantity;
+                        $newQuantity = (int) $newQuantity;
 
-                        if ($newQuantity == 0) {
-                            $materialStock->increment(
-                                'stock',
-                                $oldQuantity
-                            );
-
+                        if ($newQuantity === 0) {
+                            $materialStock->increment('stock', $oldQuantity);
                             $item->delete();
-                        } else {
-                            $difference = $newQuantity - $oldQuantity;
 
-                            if ($difference > 0) {
-                                if ($materialStock->stock < $difference) {
-                                    throw new \Exception(
-                                        'Onvoldoende voorraad in jouw depot voor ' . $material->name . '.'
-                                    );
-                                }
+                            continue;
+                        }
 
-                                $materialStock->decrement(
-                                    'stock',
-                                    $difference
-                                );
-                            } elseif ($difference < 0) {
-                                $materialStock->increment(
-                                    'stock',
-                                    abs($difference)
+                        $difference = $newQuantity - $oldQuantity;
+
+                        if ($difference > 0) {
+                            if ($materialStock->stock < $difference) {
+                                throw new \Exception(
+                                    'Onvoldoende voorraad in jouw depot voor ' . $material->name . '.'
                                 );
                             }
 
-                            $item->update([
-                                'quantity' => $newQuantity
-                            ]);
+                            $materialStock->decrement('stock', $difference);
                         }
+
+                        if ($difference < 0) {
+                            $materialStock->increment('stock', abs($difference));
+                        }
+
+                        $item->update([
+                            'quantity' => $newQuantity,
+                        ]);
                     }
                 }
             });
@@ -271,10 +277,7 @@ class OrderController extends Controller
 
         return redirect()
             ->back()
-            ->with(
-                'success',
-                'Bestelling succesvol gewijzigd.'
-            );
+            ->with('success', 'Bestelling succesvol gewijzigd.');
     }
 
     public function warehouseShow($id)
