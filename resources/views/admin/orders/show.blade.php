@@ -1,3 +1,13 @@
+@php
+    $categoryImages = [
+        'Aquafin tools' => 'aquafintools.png',
+        'Bevestigingsmateriaal' => 'bevestigingsmateriaal.png',
+        'Gereedschap' => 'gereedschap.png',
+        'PBM' => 'PBM.png',
+        'Technisch onderhoud' => 'technischeonderhoud.png',
+        'Verbruiksgoederen' => 'verbruiksgoederen.png',
+    ];
+@endphp
 <x-app-layout>
 
     <x-page-header title="Bestelling Detail" />
@@ -67,13 +77,20 @@
     @foreach($order->items as $item)
         <tr class="border-b">
             <td class="p-3">
-                @if($item->material->image)
-                    <img src="{{ asset('storage/' . $item->material->image) }}" class="w-16 h-16 object-cover rounded-lg">
-                @else
-                    <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-500">
-                        Geen afbeelding
-                    </div>
-                @endif
+               @if($item->material->image)
+
+    <img
+        src="{{ asset('storage/' . $item->material->image) }}"
+        class="w-16 h-16 object-cover rounded-lg border">
+
+@else
+
+    <img
+        src="{{ asset('images/' . ($categoryImages[$item->material->category] ?? 'sidebar-bg.jpg')) }}"
+        class="w-16 h-16 object-cover rounded-lg border"
+        alt="{{ $item->material->category }}">
+
+@endif
             </td>
             <td class="p-3">
                 {{ $item->material->name }}
