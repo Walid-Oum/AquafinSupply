@@ -102,11 +102,23 @@
                                 @method('DELETE')
 
                                 <button
-                                    type="submit"
-                                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                                >
-                                    Verwijderen
-                                </button>
+    type="submit"
+    class="text-red-600 hover:text-red-800 transition">
+
+    <svg xmlns="http://www.w3.org/2000/svg"
+         fill="none"
+         viewBox="0 0 24 24"
+         stroke-width="1.8"
+         stroke="currentColor"
+         class="w-6 h-6">
+
+        <path stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 7.5h12m-10.5 0v10.125A1.875 1.875 0 009.375 19.5h5.25A1.875 1.875 0 0016.5 17.625V7.5m-6 0V5.625A1.125 1.125 0 0111.625 4.5h.75A1.125 1.125 0 0113.5 5.625V7.5" />
+
+    </svg>
+
+</button>
                             </form>
                         </td>
                     </tr>
@@ -228,19 +240,14 @@
                     const originalQuantity = input.dataset.originalQuantity;
 
                     input.readOnly = true;
-                    status.textContent = 'Opslaan...';
+                    status.textContent = '';
 
                     try {
                         const data = await sendCartRequest(form);
 
                         input.dataset.originalQuantity = input.value;
-                        status.textContent = 'Opgeslagen ✓';
-
                         updateCartCount(data.cart_count);
-
-                        setTimeout(function () {
-                            status.textContent = '';
-                        }, 900);
+status.textContent = '';
 
                     } catch (error) {
                         input.value = originalQuantity;

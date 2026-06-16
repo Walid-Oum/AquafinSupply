@@ -45,10 +45,14 @@ class MaterialController extends Controller
         );
     }
 
-    public function create()
-    {
-        return view('materials.create');
-    }
+   public function create()
+{
+    $categories = Material::select('category')
+        ->distinct()
+        ->pluck('category');
+
+    return view('materials.create', compact('categories'));
+}
 
     public function store(Request $request)
     {
@@ -56,8 +60,7 @@ class MaterialController extends Controller
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'stock' => 'required|integer|min:0',
-            'minimum_stock' => 'nullable|integer|min:0',
+            
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -73,8 +76,8 @@ class MaterialController extends Controller
             'name' => $request->name,
             'category' => $request->category,
             'description' => $request->description,
-            'stock' => $request->stock,
-            'minimum_stock' => $request->minimum_stock ?? 0,
+         'stock' => 0,
+'minimum_stock' => 0,
             'is_active' => true,
             'image' => $imagePath,
         ]);
@@ -85,10 +88,10 @@ class MaterialController extends Controller
                     'material_id' => $material->id,
                     'location_id' => $location->id,
                 ],
-                [
-                    'stock' => $request->stock,
-                    'minimum_stock' => $request->minimum_stock ?? 0,
-                ]
+              [
+    'stock' => 0,
+    'minimum_stock' => 0,
+]
             );
         }
 
@@ -125,14 +128,18 @@ class MaterialController extends Controller
     }
 
     public function edit($id)
-    {
-        $material = Material::findOrFail($id);
+{
+    $material = Material::findOrFail($id);
 
-        return view(
-            'materials.edit',
-            compact('material')
-        );
-    }
+    $categories = Material::select('category')
+        ->distinct()
+        ->pluck('category');
+
+    return view(
+        'materials.edit',
+        compact('material', 'categories')
+    );
+}
 
     public function update(Request $request, $id)
     {
