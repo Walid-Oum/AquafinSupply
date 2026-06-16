@@ -3,7 +3,9 @@
 
     @if($recommendedMaterials->count() > 0)
         <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
+
             <div class="flex items-center justify-between mb-3">
+
                 <h2 class="text-lg font-bold text-green-700">
                     Aanbevolen materialen
                     (op basis van overstromingsrisico)
@@ -16,7 +18,9 @@
                     class="text-sm font-medium text-green-700 hover:text-green-900 hover:underline"
                 >
                     ▲ Verberg
+
                 </button>
+
             </div>
 
             <div
@@ -24,15 +28,21 @@
                 class="mt-4"
             >
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+
                     @foreach($recommendedMaterials as $material)
+
                         <x-material-card
                             :material="$material"
                             :compact="true"
                         />
                     @endforeach
+
                 </div>
+
             </div>
+
         </div>
+
     @endif
 
     <div class="mb-6 flex items-center gap-4">
@@ -40,7 +50,8 @@
             method="GET"
             action="{{ route('technician.materials.index') }}"
             class="js-preserve-scroll"
-        >
+            >
+
             <select
                 name="sort"
                 onchange="this.form.submit()"
@@ -97,7 +108,7 @@
     </div>
 
     <div
-        id="materials"
+    id="materials"
         class="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-4"
     >
         @forelse($materials as $material)
@@ -105,7 +116,7 @@
                 class="js-material-item"
                 data-category="{{ $material->category }}"
             >
-                <x-material-card :material="$material" />
+            <x-material-card :material="$material" />
             </div>
         @empty
             <div class="col-span-4 text-center text-gray-500">
