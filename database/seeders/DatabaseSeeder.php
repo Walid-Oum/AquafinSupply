@@ -440,6 +440,83 @@ class DatabaseSeeder extends Seeder
             ->sync([
                 $hoog->id,
             ]);
+        Material::where('name', 'Werklaarzen PVC')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $gemiddeld->id,
+                $hoog->id,
+            ]);
+
+        Material::where('name', 'Regenjas')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $gemiddeld->id,
+                $hoog->id,
+            ]);
+
+        Material::where('name', 'Regenbroek')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $gemiddeld->id,
+                $hoog->id,
+            ]);
+
+        Material::where('name', 'Slangenwagen')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $hoog->id,
+            ]);
+
+        Material::where('name', 'Veiligheidshelm')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $laag->id,
+                $gemiddeld->id,
+            ]);
+
+        Material::where('name', 'Werkhandschoenen chemisch')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $laag->id,
+                $gemiddeld->id,
+            ]);
+
+        Material::where('name', 'Valharnas')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $gemiddeld->id,
+                $hoog->id,
+            ]);
+        Material::where('name', 'Putdekselhaak')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $gemiddeld->id,
+                $hoog->id,
+            ]);
+
+        Material::where('name', 'Gasdetectietoestel H₂S')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $hoog->id,
+            ]);
+
+        Material::where('name', 'Hogedrukreiniger')
+            ->first()
+            ?->riskLevels()
+            ->sync([
+                $hoog->id,
+            ]);
+
+
     }
 
 
