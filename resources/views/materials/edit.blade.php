@@ -36,12 +36,20 @@
                     Categorie *
                 </label>
 
-                <input
-                    type="text"
-                    name="category"
-                    value="{{ old('category', $material->category) }}"
-                    class="w-full border rounded px-3 py-2"
-                    required>
+               <select
+    name="category"
+    class="w-full border rounded px-3 py-2"
+    required>
+
+    @foreach($categories as $category)
+        <option
+            value="{{ $category }}"
+            {{ old('category', $material->category) == $category ? 'selected' : '' }}>
+            {{ $category }}
+        </option>
+    @endforeach
+
+</select>
 
                 @error('category')
                     <p class="text-red-500 text-sm mt-1">

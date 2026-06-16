@@ -15,7 +15,24 @@
 
             <div class="mb-4">
                 <label class="block font-bold mb-2">Categorie *</label>
-                <input type="text" name="category" value="{{ old('category') }}" class="w-full border rounded px-3 py-2" required>
+              <select
+    name="category"
+    class="w-full border rounded px-3 py-2"
+    required>
+
+    <option value="">
+        Kies een categorie
+    </option>
+
+    @foreach($categories as $category)
+        <option
+            value="{{ $category }}"
+            {{ old('category') == $category ? 'selected' : '' }}>
+            {{ $category }}
+        </option>
+    @endforeach
+
+</select>
                 @error('category')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror

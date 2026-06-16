@@ -45,10 +45,14 @@ class MaterialController extends Controller
         );
     }
 
-    public function create()
-    {
-        return view('materials.create');
-    }
+   public function create()
+{
+    $categories = Material::select('category')
+        ->distinct()
+        ->pluck('category');
+
+    return view('materials.create', compact('categories'));
+}
 
     public function store(Request $request)
     {
@@ -125,14 +129,18 @@ class MaterialController extends Controller
     }
 
     public function edit($id)
-    {
-        $material = Material::findOrFail($id);
+{
+    $material = Material::findOrFail($id);
 
-        return view(
-            'materials.edit',
-            compact('material')
-        );
-    }
+    $categories = Material::select('category')
+        ->distinct()
+        ->pluck('category');
+
+    return view(
+        'materials.edit',
+        compact('material', 'categories')
+    );
+}
 
     public function update(Request $request, $id)
     {
