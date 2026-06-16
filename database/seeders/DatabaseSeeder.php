@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Location;
 use App\Models\Material;
 use App\Models\MaterialStock;
+use App\Models\RiskLevel;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -394,8 +395,10 @@ class DatabaseSeeder extends Seeder
                         'minimum_stock' => max(1, (int) ceil($material->stock * 0.25)),
                     ]
                 );
+
             }
         }
+
     }
 
 
