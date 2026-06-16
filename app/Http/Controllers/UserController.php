@@ -10,12 +10,18 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
     // Toon het overzicht van alle gebruikers voor de admin.
-    public function index()
-    {
-        $users = User::with('location')->get();
+    public function index(Request $request)
+{
+    $query = User::with('location');
 
-        return view('admin.users.index', compact('users'));
+    if ($request->filled('role')) {
+        $query->where('role', $request->role);
     }
+
+    $users = $query->get();
+
+    return view('admin.users.index', compact('users'));
+}
 
     // Toon het formulier om een nieuwe gebruiker aan te maken.
     public function create()
