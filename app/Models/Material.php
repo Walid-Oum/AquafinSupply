@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\RiskLevel;
 use Illuminate\Database\Eloquent\Model;
 
 class Material extends Model
@@ -32,4 +32,9 @@ class Material extends Model
     {
         return $this->hasMany(MaterialStock::class);
     }
+    public function riskLevels()
+    {
+        return $this->belongsToMany(RiskLevel::class);
+    }
 }
+
