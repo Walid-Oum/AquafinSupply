@@ -146,37 +146,9 @@
 
             </div>
 
-            <div class="mb-4">
+            
 
-                <label class="block font-bold mb-2">
-                    Voorraad *
-                </label>
-
-                <input
-                    type="number"
-                    name="stock"
-                    min="0"
-                    value="{{ old('stock', $material->stock) }}"
-                    class="w-full border rounded px-3 py-2"
-                    required>
-
-            </div>
-
-            <div class="mb-4">
-
-                <label class="block font-bold mb-2">
-                    Minimum voorraad *
-                </label>
-
-                <input
-                    type="number"
-                    name="minimum_stock"
-                    min="0"
-                    value="{{ old('minimum_stock', $material->minimum_stock) }}"
-                    class="w-full border rounded px-3 py-2"
-                    required>
-
-            </div>
+           
 
             <div class="mb-6">
 
