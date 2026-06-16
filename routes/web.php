@@ -60,6 +60,7 @@ Route::middleware(['auth', 'password.changed', 'role:technieker,admin'])->group(
     Route::get('/bestellingen', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/bestellingen/{id}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/bestelling/plaatsen', [OrderController::class, 'store'])->name('orders.store');
+    Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
     // Eigen tickets aanmaken/bekijken
     Route::prefix('tickets')->group(function () {
