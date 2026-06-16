@@ -22,25 +22,19 @@ class CartController extends Controller
         $user = Auth::user();
 
         if (!$user->location_id) {
-            return redirect()
-                ->back()
-                ->with('error', 'Er is geen depot gekoppeld aan je account. Contacteer een administrator.');
+            return $this->cartError('Er is geen depot gekoppeld aan je account. Contacteer een administrator.');
         }
 
         $material = Material::findOrFail($id);
 
         if (!$material->is_active) {
-            return redirect()
-                ->back()
-                ->with('error', 'Dit materiaal is niet meer beschikbaar.');
+            return $this->cartError('Dit materiaal is niet meer beschikbaar.');
         }
 
         $materialStock = $this->getDepotStock($material->id, $user->location_id);
 
         if (!$materialStock || $materialStock->stock <= 0) {
-            return redirect()
-                ->back()
-                ->with('error', 'Dit materiaal is niet beschikbaar in jouw depot.');
+            return $this->cartError('Dit materiaal is niet beschikbaar in jouw depot.');
         }
 
         $cart = session()->get('cart', []);
@@ -49,9 +43,7 @@ class CartController extends Controller
         $newQuantity = $currentQuantity + 1;
 
         if ($newQuantity > $materialStock->stock) {
-            return redirect()
-                ->back()
-                ->with('error', 'Onvoldoende voorraad in jouw depot voor ' . $material->name . '.');
+            return $this->cartError('Onvoldoende voorraad in jouw depot voor ' . $material->name . '.');
         }
 
         $cart[$id] = [
@@ -64,9 +56,16 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Materiaal toegevoegd aan winkelmandje.',
+                'cart_count' => collect($cart)->sum('quantity'),
+            ]);
+        }
+
         return redirect()
             ->back()
-            ->withFragment('materials')
             ->with('success', 'Materiaal toegevoegd aan winkelmandje.');
     }
 
@@ -151,6 +150,20 @@ class CartController extends Controller
         return MaterialStock::where('material_id', $materialId)
             ->where('location_id', $locationId)
             ->first();
+    }
+
+    private function cartError(string $message)
+    {
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+            ], 422);
+        }
+
+        return redirect()
+            ->back()
+            ->with('error', $message);
     }
 
     private function refreshCartStock(): void
