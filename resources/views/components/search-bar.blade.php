@@ -9,7 +9,7 @@
 ])
 
 <div
-    class="relative w-full max-w-md"
+    class="relative w-full"
     data-search-bar
     data-endpoint="{{ $endpoint }}"
     data-target-selector="{{ $targetSelector }}"
@@ -23,12 +23,12 @@
         autocomplete="off"
         placeholder="{{ $placeholder }}"
         data-search-input
-        class="w-full rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]"
+        class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
     >
 
     <ul
         data-search-results
-        class="absolute z-50 mt-1 hidden max-h-60 w-full divide-y divide-gray-100 overflow-y-auto rounded border border-gray-200 bg-white shadow-xl"
+        class="absolute z-50 mt-2 hidden max-h-72 w-full divide-y divide-gray-100 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-xl"
     ></ul>
 </div>
 
@@ -164,7 +164,7 @@
                 resultsList.innerHTML = '';
 
                 if (suggestions.length === 0) {
-                    resultsList.innerHTML = '<li class="px-4 py-2 text-sm italic text-gray-400">Geen resultaten...</li>';
+                    resultsList.innerHTML = '<li class="px-4 py-3 text-sm italic text-gray-400">Geen resultaten...</li>';
                     resultsList.classList.remove('hidden');
                     return;
                 }
@@ -172,15 +172,15 @@
                 suggestions.forEach(function (item) {
                     const li = document.createElement('li');
 
-                    li.className = 'flex cursor-pointer items-center justify-between gap-3 px-4 py-2 text-sm hover:bg-gray-100';
+                    li.className = 'flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-gray-50';
 
                     li.innerHTML = `
-                        <div>
-                            <p class="font-medium text-gray-700">${item.label}</p>
-                            ${item.subtitle ? `<p class="text-xs text-gray-400">${item.subtitle}</p>` : ''}
+                        <div class="min-w-0">
+                            <p class="truncate font-semibold text-gray-800">${item.label}</p>
+                            ${item.subtitle ? `<p class="truncate text-xs text-gray-400">${item.subtitle}</p>` : ''}
                         </div>
 
-                        ${item.badge ? `<span class="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-500">${item.badge}</span>` : ''}
+                        ${item.badge ? `<span class="shrink-0 rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-500">${item.badge}</span>` : ''}
                     `;
 
                     li.addEventListener('click', function () {
@@ -243,4 +243,3 @@
         });
     </script>
 @endonce
-

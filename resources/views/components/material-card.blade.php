@@ -42,43 +42,45 @@
 @endphp
 
 @if($compact)
-    <div class="h-full rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+    <div class="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
         <a href="{{ route('technician.materials.show', $material->id) }}" class="block">
-            <img
-                src="{{ $imageUrl }}"
-                class="mx-auto mb-2 h-20 w-20 rounded-lg object-cover"
-                alt="{{ $material->name }}"
-            >
+            <div class="mb-3 flex h-24 items-center justify-center rounded-xl bg-gray-50 p-3">
+                <img
+                    src="{{ $imageUrl }}"
+                    class="max-h-full max-w-full object-contain"
+                    alt="{{ $material->name }}"
+                >
+            </div>
 
-            <p class="mb-1 text-xs uppercase text-gray-400">
+            <p class="mb-1 truncate text-xs uppercase tracking-wide text-gray-400">
                 {{ $material->category }}
             </p>
 
-            <h3 class="min-h-[44px] text-base font-bold text-gray-800">
+            <h3 class="line-clamp-2 min-h-[48px] text-base font-bold leading-snug text-gray-800">
                 {{ $material->name }}
             </h3>
-
-            <div class="mt-3 flex items-center justify-between">
-                <span class="text-sm text-gray-500">
-                    Voorraad
-                </span>
-
-                <span class="font-bold {{ $stockTextClasses }}">
-                    {{ $stock }}
-                </span>
-            </div>
-
-            <span class="mt-3 inline-block rounded-full px-3 py-1 text-xs font-semibold {{ $stockBadgeClasses }}">
-                {{ $stockBadgeText }}
-            </span>
         </a>
 
-        <div class="mt-3">
+        <div class="mt-3 flex items-center justify-between">
+            <span class="text-sm text-gray-500">
+                Voorraad
+            </span>
+
+            <span class="font-bold {{ $stockTextClasses }}">
+                {{ $stock }}
+            </span>
+        </div>
+
+        <span class="mt-3 inline-block w-fit rounded-full px-3 py-1 text-xs font-semibold {{ $stockBadgeClasses }}">
+            {{ $stockBadgeText }}
+        </span>
+
+        <div class="mt-auto pt-3">
             @if($isOutOfStock)
                 <button
                     type="button"
                     disabled
-                    class="w-full rounded-lg bg-gray-300 py-2 font-semibold text-gray-500 cursor-not-allowed"
+                    class="w-full cursor-not-allowed rounded-xl bg-gray-300 py-2.5 text-sm font-semibold text-gray-500"
                 >
                     Niet beschikbaar
                 </button>
@@ -90,7 +92,7 @@
                 >
                     @csrf
 
-                    <x-button type="submit" class="w-full justify-center">
+                    <x-button type="submit" class="w-full justify-center text-sm">
                         + Toevoegen
                     </x-button>
                 </form>
@@ -98,32 +100,34 @@
         </div>
     </div>
 @else
-    <div class="h-full overflow-hidden rounded-2xl bg-white shadow-md transition hover:shadow-xl">
+    <div class="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-gray-100 transition hover:shadow-xl">
         <a href="{{ route('technician.materials.show', $material->id) }}" class="block">
-            <img
-                src="{{ $imageUrl }}"
-                class="h-48 w-full object-cover"
-                alt="{{ $material->name }}"
-            >
+            <div class="flex h-40 items-center justify-center bg-gray-50 p-4 sm:h-44 lg:h-48">
+                <img
+                    src="{{ $imageUrl }}"
+                    class="max-h-full max-w-full object-contain"
+                    alt="{{ $material->name }}"
+                >
+            </div>
         </a>
 
-        <div class="flex min-h-[260px] flex-col p-5">
+        <div class="flex flex-1 flex-col p-4 sm:p-5">
             <a href="{{ route('technician.materials.show', $material->id) }}" class="block">
-                <p class="mb-1 text-xs uppercase text-gray-400">
+                <p class="mb-1 truncate text-xs uppercase tracking-wide text-gray-400">
                     {{ $material->category }}
                 </p>
 
-                <h3 class="mb-3 min-h-[64px] text-xl font-bold text-gray-800">
+                <h3 class="mb-3 line-clamp-2 min-h-[56px] text-lg font-bold leading-snug text-gray-800 sm:text-xl">
                     {{ $material->name }}
                 </h3>
             </a>
 
-            <div class="mb-4 flex items-center justify-between">
+            <div class="mb-3 flex items-center justify-between">
                 <span class="text-sm text-gray-500">
                     Voorraad
                 </span>
 
-                <span class="font-bold {{ $stockTextClasses }}">
+                <span class="text-lg font-bold {{ $stockTextClasses }}">
                     {{ $stock }}
                 </span>
             </div>
@@ -132,12 +136,12 @@
                 {{ $stockBadgeText }}
             </span>
 
-            <div class="mt-auto">
+            <div class="mt-auto pt-4">
                 @if($isOutOfStock)
                     <button
                         type="button"
                         disabled
-                        class="mt-5 w-full rounded-xl bg-gray-300 py-3 font-semibold text-gray-500 cursor-not-allowed"
+                        class="w-full cursor-not-allowed rounded-xl bg-gray-300 py-3 font-semibold text-gray-500"
                     >
                         Niet beschikbaar
                     </button>
@@ -145,7 +149,7 @@
                     <form
                         action="{{ route('cart.add', $material->id) }}"
                         method="POST"
-                        class="js-add-to-cart mt-5"
+                        class="js-add-to-cart"
                     >
                         @csrf
 
