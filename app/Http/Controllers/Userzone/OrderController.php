@@ -16,6 +16,7 @@ use App\Models\User;
 
 class OrderController extends Controller
 {
+<<<<<<< HEAD
 
     private const WAREHOUSE_ORDER_STATUSES = [
         'Nieuw',
@@ -25,11 +26,22 @@ class OrderController extends Controller
         'Geannuleerd',
     ];
     public function index()
+=======
+    public function index(Request $request)
+>>>>>>> 37120beb3a1b1f6b8f864c9da4bd4edc63aa9be7
     {
-        $orders = Order::where('user_id', Auth::id())
-            ->with('location')
-            ->latest()
-            ->get();
+        // Start met de basisrelaties en filter op de eigen bestellingen van de technieker
+        $query = Order::where('user_id', Auth::id())
+            ->with('location');
+
+        // Pas de slimme scopeSearch toe als er een zoekopdracht is ingevoerd
+        if ($request->has('search')) {
+            $query->search($request->input('search'));
+        } else {
+            $query->latest();
+        }
+
+        $orders = $query->get();
 
         return view(
             'userzone.orders.index',
@@ -183,32 +195,18 @@ class OrderController extends Controller
                 ->with('error', 'Er is geen depot gekoppeld aan je account. Contacteer een administrator.');
         }
 
+        // Bouw de basis query voor het magazijn (alleen bestellingen van hun eigen locatie)
         $query = Order::with(['user', 'location'])
             ->where('location_id', $user->location_id);
 
-        if ($request->search) {
-            $query->where(function ($q) use ($request) {
-                $q->where(
-                    'id',
-                    'like',
-                    '%' . $request->search . '%'
-                )
-                    ->orWhereHas(
-                        'user',
-                        function ($user) use ($request) {
-                            $user->where(
-                                'name',
-                                'like',
-                                '%' . $request->search . '%'
-                            );
-                        }
-                    );
-            });
+        // Hergebruik de slimme database-zoekfunctie voor de magazijnomgeving
+        if ($request->has('search')) {
+            $query->search($request->input('search'));
+        } else {
+            $query->latest();
         }
 
-        $orders = $query
-            ->latest()
-            ->get();
+        $orders = $query->get();
 
         return view(
             'magazijn.orders.index',

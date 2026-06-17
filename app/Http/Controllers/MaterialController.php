@@ -12,7 +12,7 @@ class MaterialController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Material::query()
+        $query = Material::search($request->input('search'))
             ->with('stocks');
             if ($request->filled('stock_status')) {
 
@@ -329,6 +329,8 @@ class MaterialController extends Controller
             );
     }
 
+    
+  
     public function searchSuggestions(Request $request)
     {
         $search = $request->get('q');
@@ -339,7 +341,8 @@ class MaterialController extends Controller
 
         $user = auth()->user();
 
-        $materials = Material::where('name', 'LIKE', "%{$search}%")
+        // We hergebruiken onze scopeSearch voor de API, zodat suggesties ook direct spatieloos zoeken
+        $materials = Material::search($search)
             ->where('is_active', true)
             ->with('stocks')
             ->limit(5)
