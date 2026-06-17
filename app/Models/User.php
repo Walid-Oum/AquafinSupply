@@ -30,6 +30,7 @@ class User extends Authenticatable
         'role',
         'location_id',
         'must_change_password',
+        'is_active',
     ];
 
     /**
