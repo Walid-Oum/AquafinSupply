@@ -13,10 +13,27 @@ class FuzzySearch
             return true;
         }
 
+        // 1. Directe match (inclusief hoofdletter- en accentcorrectie dankzij normalize)
         if (str_contains($text, $query)) {
             return true;
         }
 
+        // 2. Match zonder spaties (zoekt "water pomp" op als "waterpomp" en vice versa)
+        $flatQuery = str_replace(' ', '', $query);
+        $flatText = str_replace(' ', '', $text);
+        if (str_contains($flatText, $flatQuery)) {
+            return true;
+        }
+
+        // 3. Globale Levenshtein check op de platte tekst (voor typfouten over de hele zin)
+        if (strlen($flatQuery) >= 3) {
+            $allowedDistance = self::allowedDistance($flatQuery);
+            if (levenshtein($flatQuery, $flatText) <= $allowedDistance) {
+                return true;
+            }
+        }
+
+        // 4. Splitsen in woorden voor de fijnmazige fuzzy search
         $queryWords = self::words($query);
         $textWords = self::words($text);
 
@@ -36,7 +53,7 @@ class FuzzySearch
                 return true;
             }
 
-            if (str_contains($textWord, $queryWord)) {
+            if (str_contains($textWord, $queryWord) || str_contains($queryWord, $textWord)) {
                 return true;
             }
 
@@ -83,8 +100,8 @@ class FuzzySearch
     {
         $length = strlen($word);
 
-        if ($length <= 3) {
-            return 1;
+        if ($length <= 4) {
+            return 1; 
         }
 
         if ($length <= 7) {
@@ -108,31 +125,20 @@ class FuzzySearch
         $value = mb_strtolower($value ?? '');
 
         $value = strtr($value, [
-            'à' => 'a',
-            'á' => 'a',
-            'â' => 'a',
-            'ä' => 'a',
+            'à' => 'a', 'á' => 'a', 'â' => 'a', 'ä' => 'a', 'ã' => 'a',
             'ç' => 'c',
-            'è' => 'e',
-            'é' => 'e',
-            'ê' => 'e',
-            'ë' => 'e',
-            'ì' => 'i',
-            'í' => 'i',
-            'î' => 'i',
-            'ï' => 'i',
-            'ò' => 'o',
-            'ó' => 'o',
-            'ô' => 'o',
-            'ö' => 'o',
-            'ù' => 'u',
-            'ú' => 'u',
-            'û' => 'u',
-            'ü' => 'u',
+            'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e',
+            'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i',
+            'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'ö' => 'o', 'õ' => 'o',
+            'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'u',
         ]);
 
+        // Vervang alle non-alphanumerieke tekens door een spatie
         $value = preg_replace('/[^a-z0-9]+/', ' ', $value);
+        
+        // Zorg dat meerdere opeenvolgende spaties één enkele spatie worden
+        $value = preg_replace('/\s+/', ' ', $value);
 
-        return trim($value ?? '');
+        return trim($value);
     }
 }

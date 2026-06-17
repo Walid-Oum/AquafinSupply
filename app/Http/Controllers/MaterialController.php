@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Location;
 use App\Models\Material;
 use App\Models\MaterialStock;
+use App\Support\FuzzySearch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,32 +13,33 @@ class MaterialController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Material::query()
-            ->with('stocks');
-            if ($request->filled('stock_status')) {
+        $query = Material::with('stocks');
 
-    if ($request->stock_status === 'low') {
-
-        $query->whereHas('stocks', function ($q) {
-            $q->whereColumn('stock', '<=', 'minimum_stock');
-        });
-
-    } elseif ($request->stock_status === 'ok') {
-
-        $query->whereDoesntHave('stocks', function ($q) {
-            $q->whereColumn('stock', '<=', 'minimum_stock');
-        });
-
-    }
-}
+        if ($request->filled('stock_status')) {
+            if ($request->stock_status === 'low') {
+                $query->whereHas('stocks', function ($q) {
+                    $q->whereColumn('stock', '<=', 'minimum_stock');
+                });
+            } elseif ($request->stock_status === 'ok') {
+                $query->whereDoesntHave('stocks', function ($q) {
+                    $q->whereColumn('stock', '<=', 'minimum_stock');
+                });
+            }
+        }
 
         if ($request->has('category') && $request->category != '') {
             $query->where('category', $request->category);
         }
 
-        $materials = $query
-            ->orderBy('name')
-            ->get();
+        $materials = $query->orderBy('name')->get();
+
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $materials = $materials->filter(function ($material) use ($searchTerm) {
+                return FuzzySearch::matches($searchTerm, $material->name) || 
+                       FuzzySearch::matches($searchTerm, $material->description ?? '');
+            });
+        }
 
         $lowStockMaterials = Material::with('stocks')
             ->get()
@@ -53,11 +55,7 @@ class MaterialController extends Controller
 
         return view(
             'materials.index',
-            compact(
-                'materials',
-                'categories',
-                'lowStockMaterials'
-            )
+            compact('materials', 'categories', 'lowStockMaterials')
         );
     }
 
@@ -70,13 +68,9 @@ class MaterialController extends Controller
 
         $riskLevels = \App\Models\RiskLevel::all();
 
-
         return view(
             'materials.create',
-            compact(
-                'categories',
-                'riskLevels'
-            )
+            compact('categories', 'riskLevels')
         );
     }
 
@@ -86,10 +80,8 @@ class MaterialController extends Controller
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'description' => 'nullable|string',
-
             'risk_levels' => 'nullable|array',
             'risk_levels.*' => 'exists:risk_levels,id',
-
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -105,8 +97,8 @@ class MaterialController extends Controller
             'name' => $request->name,
             'category' => $request->category,
             'description' => $request->description,
-         'stock' => 0,
-'minimum_stock' => 0,
+            'stock' => 0,
+            'minimum_stock' => 0,
             'is_active' => true,
             'image' => $imagePath,
         ]);
@@ -117,26 +109,20 @@ class MaterialController extends Controller
                     'material_id' => $material->id,
                     'location_id' => $location->id,
                 ],
-              [
-    'stock' => 0,
-    'minimum_stock' => 0,
-]
+                [
+                    'stock' => 0,
+                    'minimum_stock' => 0,
+                ]
             );
         }
+
         if ($request->filled('risk_levels')) {
-
-            $material->riskLevels()->sync(
-                $request->risk_levels
-            );
-
+            $material->riskLevels()->sync($request->risk_levels);
         }
 
         return redirect()
             ->route('materials.index')
-            ->with(
-                'success',
-                'Materiaal toegevoegd!'
-            );
+            ->with('success', 'Materiaal toegevoegd!');
     }
 
     public function show($id)
@@ -178,18 +164,14 @@ class MaterialController extends Controller
 
         return view(
             'materials.edit',
-            compact(
-                'material',
-                'categories',
-                'riskLevels'
-            )
+            compact('material', 'categories', 'riskLevels')
         );
     }
+
     public function update(Request $request, $id)
     {
         $material = Material::findOrFail($id);
 
-        // Afbeelding verwijderen (alleen de afbeelding, niet het materiaal)
         if ($request->has('delete_image')) {
             if ($material->image) {
                 Storage::disk('public')->delete($material->image);
@@ -201,7 +183,6 @@ class MaterialController extends Controller
                 ->with('success', 'Afbeelding verwijderd!');
         }
 
-        // Normale validatie
         $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
@@ -210,11 +191,9 @@ class MaterialController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        
         if ($request->hasFile('image')) {
             if ($material->image) {
-                Storage::disk('public')
-                    ->delete($material->image);
+                Storage::disk('public')->delete($material->image);
             }
 
             $material->image = $request
@@ -229,16 +208,12 @@ class MaterialController extends Controller
             'is_active' => $request->is_active,
             'image' => $material->image,
         ]);
-        $material->riskLevels()->sync(
-            $request->risk_levels ?? []
-        );
+
+        $material->riskLevels()->sync($request->risk_levels ?? []);
 
         return redirect()
             ->route('materials.index')
-            ->with(
-                'success',
-                'Materiaal bijgewerkt!'
-            );
+            ->with('success', 'Materiaal bijgewerkt!');
     }
 
     public function destroy($id)
@@ -246,18 +221,14 @@ class MaterialController extends Controller
         $material = Material::findOrFail($id);
 
         if ($material->image) {
-            Storage::disk('public')
-                ->delete($material->image);
+            Storage::disk('public')->delete($material->image);
         }
 
         $material->delete();
 
         return redirect()
             ->route('materials.index')
-            ->with(
-                'success',
-                'Materiaal verwijderd!'
-            );
+            ->with('success', 'Materiaal verwijderd!');
     }
 
     /*
@@ -275,17 +246,15 @@ class MaterialController extends Controller
                 $query->where('location_id', $locationId);
             }]);
 
-        if ($request->search) {
-            $query->where(
-                'name',
-                'like',
-                '%' . $request->search . '%'
-            );
-        }
+        $materials = $query->orderBy('name')->get();
 
-        $materials = $query
-            ->orderBy('name')
-            ->get();
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $materials = $materials->filter(function ($material) use ($searchTerm) {
+                return FuzzySearch::matches($searchTerm, $material->name) || 
+                       FuzzySearch::matches($searchTerm, $material->description ?? '');
+            });
+        }
 
         return view(
             'magazijn.materials.index',
@@ -320,10 +289,7 @@ class MaterialController extends Controller
 
         return redirect()
             ->back()
-            ->with(
-                'success',
-                'Voorraad bijgewerkt voor jouw depot.'
-            );
+            ->with('success', 'Voorraad bijgewerkt voor jouw depot.');
     }
 
     public function searchSuggestions(Request $request)
@@ -336,29 +302,32 @@ class MaterialController extends Controller
 
         $user = auth()->user();
 
-        $materials = Material::where('name', 'LIKE', "%{$search}%")
-            ->where('is_active', true)
+        $materials = Material::where('is_active', true)
             ->with('stocks')
-            ->limit(5)
-            ->get()
-            ->map(function ($material) use ($user) {
-                if ($user->role === 'admin') {
-                    $stock = $material->stocks->sum('stock');
-                } else {
-                    $localStock = $material->stocks
-                        ->where('location_id', $user->location_id)
-                        ->first();
+            ->get();
 
-                    $stock = $localStock?->stock ?? 0;
-                }
+        $filtered = $materials->filter(function ($material) use ($search) {
+            return FuzzySearch::matches($search, $material->name);
+        })->take(5);
 
-                return [
-                    'id' => $material->id,
-                    'name' => $material->name,
-                    'stock' => $stock,
-                ];
-            });
+        $result = $filtered->map(function ($material) use ($user) {
+            if ($user->role === 'admin') {
+                $stock = $material->stocks->sum('stock');
+            } else {
+                $localStock = $material->stocks
+                    ->where('location_id', $user->location_id)
+                    ->first();
 
-        return response()->json($materials);
+                $stock = $localStock?->stock ?? 0;
+            }
+
+            return [
+                'id' => $material->id,
+                'name' => $material->name,
+                'stock' => $stock,
+            ];
+        });
+
+        return response()->json(array_values($result->toArray()));
     }
 }

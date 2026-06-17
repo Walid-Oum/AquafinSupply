@@ -144,16 +144,18 @@
             </div>
         @endforelse
     </div>
+<<<<<<< HEAD
+<script>
+=======
     <script>
+>>>>>>> origin/main
         document.addEventListener('DOMContentLoaded', function () {
             const scrollKey = 'technician-materials-scroll-position';
-
             const savedScroll = sessionStorage.getItem(scrollKey);
 
             if (savedScroll !== null) {
                 requestAnimationFrame(function () {
                     window.scrollTo(0, parseInt(savedScroll, 10));
-
                     setTimeout(function () {
                         window.scrollTo(0, parseInt(savedScroll, 10));
                         sessionStorage.removeItem(scrollKey);
@@ -221,11 +223,11 @@
                 });
             });
 
+            // Categorie filter functionaliteit
             document.querySelectorAll('.js-category-filter').forEach(function (button) {
                 button.addEventListener('click', function () {
                     const selectedCategory = button.dataset.categoryFilter;
-                    const materialItems = document.querySelectorAll('.js-material-item');
-
+                    
                     document.querySelectorAll('.js-category-filter').forEach(function (filterButton) {
                         filterButton.classList.remove('bg-[#0F4C81]', 'text-white');
                         filterButton.classList.add('bg-gray-100', 'hover:bg-gray-200');
@@ -234,18 +236,12 @@
                     button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
                     button.classList.add('bg-[#0F4C81]', 'text-white');
 
-                    materialItems.forEach(function (item) {
-                        const itemCategory = item.dataset.category;
-
-                        if (selectedCategory === 'all' || itemCategory === selectedCategory) {
-                            item.classList.remove('hidden');
-                        } else {
-                            item.classList.add('hidden');
-                        }
-                    });
+                    // Trigger handmatig de filter update (houdt rekening met eventuele zoektekst)
+                    applyFilters();
                 });
             });
 
+            // Winkelwagen functionaliteit via AJAX
             document.querySelectorAll('.js-add-to-cart').forEach(function (form) {
                 form.addEventListener('submit', async function (event) {
                     event.preventDefault();
@@ -275,7 +271,6 @@
                         button.textContent = 'Toegevoegd ✓';
 
                         const cartCountElement = document.getElementById('cart-count');
-
                         if (cartCountElement && data.cart_count !== undefined) {
                             cartCountElement.textContent = data.cart_count;
                             cartCountElement.classList.remove('hidden');
@@ -294,20 +289,111 @@
                 });
             });
 
+            // --- NIEUW: Snel & Fuzzy zoeken in de HTML Grid ---
             const searchInput = document.getElementById('global-material-search');
             const resultsList = document.getElementById('global-search-results');
 
-            searchInput.addEventListener('input', async function () {
-                const query = this.value;
+            function normalizeText(text) {
+                if (!text) return '';
+                return text.toLowerCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Accenten weg
+                    .replace(/[^a-z0-9]/g, ' ')                      // Speciale tekens weg
+                    .replace(/\s+/g, ' ')                             // Dubbele spaties weg
+                    .trim();
+            }
 
-                if (query.length < 2) {
+            function levenshtein(a, b) {
+                const matrix = [];
+                for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+                for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+                for (let i = 1; i <= b.length; i++) {
+                    for (let j = 1; j <= a.length; j++) {
+                        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                            matrix[i][j] = matrix[i - 1][j - 1];
+                        } else {
+                            matrix[i][j] = Math.min(
+                                matrix[i - 1][j - 1] + 1,
+                                matrix[i][j - 1] + 1,
+                                matrix[i - 1][j] + 1
+                            );
+                        }
+                    }
+                }
+                return matrix[b.length][a.length];
+            }
+
+            function getAllowedDistance(word) {
+                const length = word.length;
+                if (length <= 4) return 1;
+                if (length <= 7) return 2;
+                if (length <= 12) return 3;
+                return 4;
+            }
+
+            // Combineert de actieve categorie-knop én de fuzzy zoekterm
+            function applyFilters() {
+                const queryClean = normalizeText(searchInput.value);
+                const flatQuery = queryClean.replace(/ /g, '');
+                
+                const activeCategoryButton = document.querySelector('.js-category-filter.bg-\\[\\#0F4C81\\]');
+                const selectedCategory = activeCategoryButton ? activeCategoryButton.dataset.categoryFilter : 'all';
+
+                const materialItems = document.querySelectorAll('.js-material-item');
+                let visibleCount = 0;
+
+                materialItems.forEach(function (item) {
+                    const itemCategory = item.dataset.category;
+                    // Probeer de tekst binnen de x-material-card te pakken (meestal de titel/naam van het materiaal)
+                    const materialName = normalizeText(item.textContent);
+                    const flatName = materialName.replace(/ /g, '');
+
+                    // Check 1: Categorie filter
+                    const matchesCategory = (selectedCategory === 'all' || itemCategory === selectedCategory);
+
+                    // Check 2: Fuzzy Zoekopdracht filter
+                    let matchesSearch = true;
+                    if (queryClean !== '') {
+                        matchesSearch = false;
+
+                        // Directe match of spatieloze match
+                        if (materialName.includes(queryClean) || flatName.includes(flatQuery)) {
+                            matchesSearch = true;
+                        } 
+                        // Fuzzy match (Levenshtein)
+                        else if (flatQuery.length >= 3) {
+                            const allowedDistance = getAllowedDistance(flatQuery);
+                            if (levenshtein(flatQuery, flatName) <= allowedDistance) {
+                                matchesSearch = true;
+                            }
+                        }
+                    }
+
+                    // Toon of verberg het item op basis van beide filters
+                    if (matchesCategory && matchesSearch) {
+                        item.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+            }
+
+            searchInput.addEventListener('input', async function () {
+                const queryRaw = this.value;
+
+                // Werk de grid live bij met de fuzzy filter
+                applyFilters();
+
+                // Autocomplete dropdown via de API
+                if (queryRaw.length < 2) {
                     resultsList.innerHTML = '';
                     resultsList.classList.add('hidden');
                     return;
                 }
 
                 try {
-                    const response = await fetch(`/api/search-materials?q=${encodeURIComponent(query)}`);
+                    const response = await fetch(`/api/search-materials?q=${encodeURIComponent(queryRaw)}`);
                     const data = await response.json();
 
                     resultsList.innerHTML = '';
@@ -317,9 +403,7 @@
 
                         data.forEach(item => {
                             const li = document.createElement('li');
-
                             li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center text-sm';
-
                             li.innerHTML = `
                                 <span class="font-medium text-gray-700">${item.name}</span>
                                 <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">Stock: ${item.stock}</span>
@@ -338,7 +422,7 @@
                         resultsList.classList.remove('hidden');
                     }
                 } catch (error) {
-                    console.error('Fout:', error);
+                    console.error('Fout bij ophalen suggesties:', error);
                 }
             });
 
@@ -348,9 +432,14 @@
                 }
             });
 
+<<<<<<< HEAD
+        // Aanbevelingen verbergen/tonen helper
+        function toggleRecommendations() {
+=======
         });
         function toggleRecommendations()
         {
+>>>>>>> origin/main
             const container = document.getElementById('recommendationsContainer');
             const icon = document.getElementById('recommendationIcon');
 
@@ -363,4 +452,5 @@
             }
         }
     </script>
+    
 </x-app-layout>
