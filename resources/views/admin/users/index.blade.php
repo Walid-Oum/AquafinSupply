@@ -2,57 +2,76 @@
 <x-app-layout>
 
     <x-page-header title="Gebruikersbeheer" />
-    <p class="text-gray-500 text-sm mb-6">
-        Overzicht van alle actieve accounts binnen Aquafin Supply
-    </p>
-    
-    <div class="px-6 -mt-4 mb-6 flex justify-between items-center">
-        <p class="text-gray-500 text-sm"></p>
-        <a
-            href="{{ route('admin.users.create') }}"
-            class="bg-[#0F4C81] hover:bg-[#1E6BA8] text-white font-semibold py-2.5 px-5 rounded-lg transition-all duration-200 shadow-md flex items-center gap-2 text-sm">
-            Nieuwe Gebruiker
-        </a>
-    </div>
 
-    <div class="container mx-auto px-6">
-        <div class="flex justify-end mb-6">
-            <div class="flex items-center gap-4">
-                <form
-                    method="GET"
-                    action="{{ route('admin.users.index') }}"
-                    class="flex items-center gap-2">
+<div class="mb-4 flex justify-between items-center">
 
-                    <select
-                        name="role"
-                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                        <option value="">Alle rollen</option>
-                        <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Administrator</option>
-                        <option value="technieker" {{ request('role') == 'technieker' ? 'selected' : '' }}>Technieker</option>
-                        <option value="magazijn" {{ request('role') == 'magazijn' ? 'selected' : '' }}>Magazijnmedewerker</option>
-                    </select>
+    <a href="{{ route('admin.users.create') }}">
+        <x-button>
+            + Nieuwe gebruiker
+        </x-button>
+    </a>
 
-                    <x-button>Filter</x-button>
+    <div class="flex gap-4 items-center">
 
-                    <a
-                        href="{{ route('admin.users.index') }}"
-                        class="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-400 transition">
-                        Reset
-                    </a>
-                </form>
-
-                <div class="relative">
-                    <input
-                        type="text"
-                        id="user-table-search"
-                        autocomplete="off"
-                        placeholder="Gebruiker zoeken..."
-                        class="border border-gray-300 rounded-lg px-3 py-2 w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-[#0F4C81] transition-all shadow-sm">
-                </div>
-            </div>
+        <div class="relative">
+            <input
+                type="text"
+                id="user-table-search"
+                autocomplete="off"
+                placeholder="Gebruiker zoeken..."
+                class="border rounded px-3 py-2 w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]">
         </div>
 
-       
+        <form
+            method="GET"
+            action="{{ route('admin.users.index') }}"
+            class="flex gap-2">
+
+            <select
+                name="role"
+                class="border rounded px-3 py-2 text-sm">
+
+                <option value="">
+                    Alle rollen
+                </option>
+
+                <option
+                    value="admin"
+                    {{ request('role') == 'admin' ? 'selected' : '' }}>
+                    Administrator
+                </option>
+
+                <option
+                    value="technieker"
+                    {{ request('role') == 'technieker' ? 'selected' : '' }}>
+                    Technieker
+                </option>
+
+                <option
+                    value="magazijn"
+                    {{ request('role') == 'magazijn' ? 'selected' : '' }}>
+                    Magazijnmedewerker
+                </option>
+
+            </select>
+
+            <x-button>
+                Filter
+            </x-button>
+
+            <a
+                href="{{ route('admin.users.index') }}"
+                class="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-400 transition">
+
+                Reset
+
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
