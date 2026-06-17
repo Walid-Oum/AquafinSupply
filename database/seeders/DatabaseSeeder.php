@@ -397,6 +397,18 @@ class DatabaseSeeder extends Seeder
                 );
             }
         }
+        // Risk aanmaken
+        RiskLevel::firstOrCreate([
+            'name' => 'Laag',
+        ]);
+
+        RiskLevel::firstOrCreate([
+            'name' => 'Gemiddeld',
+        ]);
+
+        RiskLevel::firstOrCreate([
+            'name' => 'Hoog',
+        ]);
         $laag = RiskLevel::where('name', 'Laag')->first();
         $gemiddeld = RiskLevel::where('name', 'Gemiddeld')->first();
         $hoog = RiskLevel::where('name', 'Hoog')->first();
