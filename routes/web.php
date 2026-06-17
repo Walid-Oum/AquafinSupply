@@ -39,6 +39,9 @@ Route::middleware(['auth', 'password.changed', 'verified'])->group(function () {
 
     Route::get('/notificaties', [\App\Http\Controllers\NotificationController::class, 'index'])
         ->name('notifications.index');
+
+    Route::patch('/notificaties/gelezen', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])
+        ->name('notifications.markAsRead');
 });
 /*
 |--------------------------------------------------------------------------

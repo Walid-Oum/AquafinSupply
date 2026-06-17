@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Ticket;
+use App\Models\User;
 use App\Models\UserNotification;
 use App\Support\FuzzySearch;
 use Illuminate\Http\Request;
@@ -53,7 +54,7 @@ class TicketController extends Controller
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
-        Ticket::create([
+        $ticket = Ticket::create([
             'user_id' => auth()->id(),
             'order_id' => $order->id,
             'location_id' => $order->location_id,
@@ -61,6 +62,19 @@ class TicketController extends Controller
             'description' => $validated['description'],
             'status' => 'Open',
         ]);
+
+        $warehouseUsers = User::where('role', 'magazijn')
+            ->where('location_id', $ticket->location_id)
+            ->get();
+
+        foreach ($warehouseUsers as $warehouseUser) {
+            UserNotification::create([
+                'user_id' => $warehouseUser->id,
+                'title' => 'Nieuwe supportaanvraag',
+                'message' => 'Er is een nieuwe supportaanvraag "' . $ticket->subject . '" aangemaakt.',
+                'link' => route('tickets.warehouse.show', $ticket),
+            ]);
+        }
 
         return redirect()
             ->route('tickets.index')
