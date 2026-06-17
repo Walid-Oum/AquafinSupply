@@ -2,6 +2,9 @@
     <x-page-header title="Materialen overzicht" />
 
     @if($recommendedMaterials->count() > 0)
+        <p class="mb-2 text-sm font-semibold text-[#0F4C81]">
+            {{ $recommendedMaterials->count() }} aanbevolen materialen gevonden
+        </p>
         <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
             <div class="flex items-center justify-between mb-3">
                 <h2 class="text-lg font-bold text-green-700">
@@ -18,27 +21,50 @@
                     ▲ Verberg
                 </button>
             </div>
+            <div id="recommendationsContainer">
+                <div class="relative">
 
-            <div
-                id="recommendationsContainer"
-                class="mt-4"
-            >
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <button
+                    type="button"
+                    id="prevRecommendation"
+                    class="hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow"
+                >
+                    ←
+                </button>
+
+                <button
+                    type="button"
+                    id="nextRecommendation"
+                    class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow"
+                >
+                    →
+                </button>
+
+                <div
+                    id="recommendationCards"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                >
 
                     @foreach($recommendedMaterials as $material)
 
-                        <x-material-card
-                            :material="$material"
-                            :compact="true"
-                        />
+                        <div class="recommendation-card hidden">
+
+                            <x-material-card
+                                :material="$material"
+                                :compact="true"
+                            />
+
+                        </div>
 
                     @endforeach
 
                 </div>
 
-                </div>
-        </div>
+</div>
+            </div>
     @endif
+        </div>
+
 
     <div class="mb-6 flex items-center gap-4">
         <form
@@ -118,7 +144,6 @@
             </div>
         @endforelse
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const scrollKey = 'technician-materials-scroll-position';
@@ -135,6 +160,60 @@
                     }, 100);
                 });
             }
+
+            const cards = document.querySelectorAll('.recommendation-card');
+
+            let currentIndex = 0;
+            const cardsPerPage = 4;
+
+            function renderRecommendations()
+            {
+                cards.forEach(card => {
+                    card.classList.add('hidden');
+                });
+
+                for (
+                    let i = currentIndex;
+                    i < currentIndex + cardsPerPage && i < cards.length;
+                    i++
+                ) {
+                    cards[i].classList.remove('hidden');
+                }
+
+                document
+                    .getElementById('prevRecommendation')
+                    ?.classList.toggle('hidden', currentIndex === 0);
+
+                document
+                    .getElementById('nextRecommendation')
+                    ?.classList.toggle(
+                    'hidden',
+                    currentIndex + cardsPerPage >= cards.length
+                );
+            }
+
+            document
+                .getElementById('nextRecommendation')
+                ?.addEventListener('click', function () {
+
+                    if (currentIndex + cardsPerPage < cards.length) {
+                        currentIndex += cardsPerPage;
+                        renderRecommendations();
+                    }
+
+                });
+
+            document
+                .getElementById('prevRecommendation')
+                ?.addEventListener('click', function () {
+
+                    if (currentIndex - cardsPerPage >= 0) {
+                        currentIndex -= cardsPerPage;
+                        renderRecommendations();
+                    }
+
+                });
+            renderRecommendations();
 
             document.querySelectorAll('.js-preserve-scroll').forEach(function (form) {
                 form.addEventListener('submit', function () {
@@ -268,8 +347,8 @@
                     resultsList.classList.add('hidden');
                 }
             });
-        });
 
+        });
         function toggleRecommendations()
         {
             const container = document.getElementById('recommendationsContainer');
