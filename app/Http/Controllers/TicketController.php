@@ -71,7 +71,7 @@ class TicketController extends Controller
     {
         $user = auth()->user();
 
-        if (!$user->location_id) {
+        if (! $user->location_id) {
             return redirect()
                 ->back()
                 ->with('error', 'Er is geen depot gekoppeld aan je account. Contacteer een administrator.');
@@ -98,13 +98,13 @@ class TicketController extends Controller
             ->latest()
             ->get();
 
-        if (!empty($validated['status'])) {
+        if (! empty($validated['status'])) {
             $tickets = $tickets
                 ->where('status', $validated['status'])
                 ->values();
         }
 
-        if (!empty($validated['search'])) {
+        if (! empty($validated['search'])) {
             $search = $validated['search'];
 
             $tickets = $tickets
@@ -116,6 +116,7 @@ class TicketController extends Controller
                         $ticket->status,
                         $ticket->user?->name,
                         $ticket->order_id,
+                        'Bestelling #' . $ticket->order_id,
                         $ticket->location?->province,
                         $ticket->location?->name,
                         $ticket->location?->city,
@@ -130,6 +131,54 @@ class TicketController extends Controller
             'tickets' => $tickets,
             'ticketStatuses' => self::TICKET_STATUSES,
         ]);
+    }
+
+    public function searchSuggestions(Request $request)
+    {
+        $search = trim((string) $request->get('q', ''));
+
+        if (strlen($search) < 2) {
+            return response()->json([]);
+        }
+
+        $user = auth()->user();
+
+        if (! $user || ! $user->location_id) {
+            return response()->json([]);
+        }
+
+        $tickets = Ticket::with(['user', 'order', 'location'])
+            ->where('location_id', $user->location_id)
+            ->get()
+            ->filter(function (Ticket $ticket) use ($search) {
+                $searchableText = collect([
+                    $ticket->subject,
+                    $ticket->description,
+                    $ticket->warehouse_note,
+                    $ticket->status,
+                    $ticket->user?->name,
+                    $ticket->order_id,
+                    'Bestelling #' . $ticket->order_id,
+                    $ticket->location?->province,
+                    $ticket->location?->name,
+                    $ticket->location?->city,
+                ])->filter()->implode(' ');
+
+                return FuzzySearch::matches($search, $searchableText);
+            })
+            ->take(5)
+            ->map(function (Ticket $ticket) {
+                return [
+                    'id' => $ticket->id,
+                    'subject' => $ticket->subject,
+                    'technician' => $ticket->user?->name ?? 'Onbekend',
+                    'status' => $ticket->status,
+                    'order' => 'Bestelling #' . $ticket->order_id,
+                ];
+            })
+            ->values();
+
+        return response()->json($tickets);
     }
 
     public function showWarehouse(Ticket $ticket)
@@ -175,7 +224,7 @@ class TicketController extends Controller
         ]);
 
         $statusChanged = $oldStatus !== $newStatus;
-        $noteChanged = $oldWarehouseNote !== $newWarehouseNote && !empty($newWarehouseNote);
+        $noteChanged = $oldWarehouseNote !== $newWarehouseNote && ! empty($newWarehouseNote);
 
         if ($statusChanged || $noteChanged) {
             if ($statusChanged && $noteChanged) {

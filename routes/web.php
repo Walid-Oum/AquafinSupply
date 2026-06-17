@@ -175,3 +175,8 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/api/search-materials', [App\Http\Controllers\MaterialController::class, 'searchSuggestions'])->middleware('auth', 'password.changed')->name('api.materials.search');
 require __DIR__ . '/auth.php';
+
+
+Route::get('/api/search-tickets', [\App\Http\Controllers\TicketController::class, 'searchSuggestions'])
+    ->middleware('auth', 'password.changed')
+    ->name('api.tickets.search');
