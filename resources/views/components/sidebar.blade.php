@@ -23,19 +23,31 @@
 
     <div class="relative z-10 flex flex-col h-full">
 
-       {{-- Logo --}}
-<div class="p-6 border-b border-white/20 backdrop-blur-sm">
+        {{-- Logo --}}
+        <div class="p-6 border-b border-white/20 backdrop-blur-sm">
 
-    <div class="flex justify-center">
+            <div class="flex justify-center">
 
-        <img
-            src="{{ asset('images/aquafin-logo.png') }}"
-            alt="Aquafin"
-            class="w-44 object-contain">
+                <a
+                    href="
+                @if($role == 'admin')
+                    {{ route('admin.users.index') }}
+                @elseif($role == 'magazijn')
+                    {{ route('magazijn.materials.index') }}
+                @else
+                    {{ route('technician.materials.index') }}
+                @endif
+            "
+                >
+                    <img
+                        src="{{ asset('images/aquafin-logo.png') }}"
+                        alt="Aquafin"
+                        class="w-44 object-contain hover:scale-105 transition-transform duration-200 cursor-pointer">
+                </a>
 
-    </div>
+            </div>
 
-</div>
+        </div>
 
         {{-- Menu --}}
         <nav class="flex-1 px-4 py-6">
@@ -52,7 +64,7 @@
                         </a>
                     </li>
 
-                   
+
 
                     <li>
                         <a href="{{ route('orders.index') }}"
