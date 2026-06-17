@@ -2,18 +2,67 @@
 
     <x-page-header title="Voorraad overzicht"/>
 
-    <div class="mb-4">
-        <div class="relative w-full max-w-md">
-            <div class="relative">
-                <input
-                    type="text"
-                    id="global-material-search"
-                    autocomplete="off"
-                    placeholder="Zoeken op materiaal of categorie..."
-                    class="border rounded px-3 py-2 w-72 focus:outline-none focus:ring-2 focus:ring-[#0F4C81]">
-            </div>
-        </div>
+    <div class="mb-4 flex justify-between items-center">
+
+    <div class="relative">
+        <input
+            type="text"
+            id="global-material-search"
+            autocomplete="off"
+            placeholder="Materiaal zoeken..."
+            class="border rounded px-3 py-2 w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]">
     </div>
+
+    <form method="GET" action="{{ route('magazijn.materials.index') }}" class="flex gap-2">
+
+        <select name="category" class="border rounded px-3 py-2 text-sm">
+            <option value="">Alle categorieën</option>
+
+            @foreach($categories as $category)
+
+                <option
+                    value="{{ $category }}"
+                    {{ request('category') == $category ? 'selected' : '' }}>
+
+                    {{ $category }}
+
+                </option>
+
+            @endforeach
+
+        </select>
+
+        <select name="stock_status" class="border rounded px-3 py-2 text-sm">
+
+            <option value="">
+                Alle voorraadstatussen
+            </option>
+
+            <option value="low">
+                Lage voorraad
+            </option>
+
+            <option value="ok">
+                OK
+            </option>
+
+        </select>
+
+        <x-button>
+            Filter
+        </x-button>
+
+        <a
+            href="{{ route('magazijn.materials.index') }}"
+            class="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-400 transition">
+
+            Reset
+
+        </a>
+
+    </form>
+
+</div>
 
     <x-card>
 
