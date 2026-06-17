@@ -16,7 +16,6 @@
             @include('userzone.profile.partials.update-password-form')
         </x-card>
 
-       
 
     </div>
 
