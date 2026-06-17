@@ -208,12 +208,7 @@ class MaterialController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        if ($request->hasFile('image')) {
-
-                $material->image = null;
-            }
-        }
-
+        
         if ($request->hasFile('image')) {
             if ($material->image) {
                 Storage::disk('public')
