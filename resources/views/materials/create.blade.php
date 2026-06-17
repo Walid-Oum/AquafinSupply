@@ -1,6 +1,5 @@
 <x-app-layout>
     <x-page-header title="Nieuw materiaal toevoegen" />
-    {{ $riskLevels->count() }}
 
     <x-card>
         <form action="{{ route('materials.store') }}" method="POST" enctype="multipart/form-data">
@@ -63,34 +62,49 @@
                 </p>
 
             </div>
-
             <div class="mb-4">
 
-                <label class="block font-bold mb-2">
+                <label class="block font-bold mb-3">
                     Risiconiveaus
                 </label>
-                @foreach($riskLevels as $riskLevel)
 
-                    <pre>
-        {{ $riskLevel->id }}
-                        {{ $riskLevel->name }}
-    </pre>
+                <div class="space-y-3">
 
-                    <label class="flex items-center gap-2 mb-2">
+                    @foreach($riskLevels as $riskLevel)
 
-                        <input
-                            type="checkbox"
-                            name="risk_levels[]"
-                            value="{{ $riskLevel->id }}">
+                        <label
+                            class="flex items-center gap-3 rounded border border-gray-200 p-3 hover:bg-gray-50 cursor-pointer"
+                        >
 
-                        {{ $riskLevel->name }}
+                            <input
+                                type="checkbox"
+                                name="risk_levels[]"
+                                value="{{ $riskLevel->id }}"
+                                class="h-4 w-4">
 
-                    </label>
+                            <span
+                                class="
+                    px-3 py-1 rounded-full text-xs font-semibold
 
-                @endforeach
+                    @if($riskLevel->name === 'Hoog')
+                        bg-red-100 text-red-700
+                    @elseif($riskLevel->name === 'Gemiddeld')
+                        bg-yellow-100 text-yellow-700
+                    @else
+                        bg-green-100 text-green-700
+                    @endif
+                    "
+                            >
+                    {{ $riskLevel->name }}
+                </span>
+
+                        </label>
+
+                    @endforeach
+
+                </div>
 
             </div>
-
 
 
             <div class="flex justify-end">
