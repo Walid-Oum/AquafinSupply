@@ -17,12 +17,48 @@
         </div>
 
         @if($tickets->count() > 0)
-            <div class="mb-6 max-w-md">
-                <x-search-bar
-                    id="ticket-search-input"
-                    placeholder="Zoeken op onderwerp, status of bestelling..."
-                    endpoint="{{ route('api.tickets.search') }}"
-                />
+            <div class="mb-6 flex flex-col gap-4">
+                <div class="max-w-md">
+                    <x-search-bar
+                        id="ticket-search-input"
+                        placeholder="Zoeken op onderwerp, status of bestelling..."
+                        endpoint="{{ route('api.tickets.search') }}"
+                    />
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                    <button
+                        type="button"
+                        data-status-filter="all"
+                        class="js-ticket-status-filter rounded-full bg-[#0F4C81] px-5 py-2 text-xs font-medium text-white shadow-sm transition"
+                    >
+                        Alles
+                    </button>
+
+                    <button
+                        type="button"
+                        data-status-filter="Open"
+                        class="js-ticket-status-filter rounded-full bg-gray-100 px-5 py-2 text-xs font-medium text-gray-600 transition hover:bg-gray-200"
+                    >
+                        Open
+                    </button>
+
+                    <button
+                        type="button"
+                        data-status-filter="In behandeling"
+                        class="js-ticket-status-filter rounded-full bg-gray-100 px-5 py-2 text-xs font-medium text-gray-600 transition hover:bg-gray-200"
+                    >
+                        In behandeling
+                    </button>
+
+                    <button
+                        type="button"
+                        data-status-filter="Opgelost"
+                        class="js-ticket-status-filter rounded-full bg-gray-100 px-5 py-2 text-xs font-medium text-gray-600 transition hover:bg-gray-200"
+                    >
+                        Opgelost
+                    </button>
+                </div>
             </div>
         @endif
 
@@ -49,6 +85,7 @@
                 <div
                     class="js-ticket-item mb-4 rounded-xl bg-white p-5 shadow-sm transition hover:bg-gray-50"
                     data-search="{{ $ticketSearchText }}"
+                    data-status="{{ $ticket->status }}"
                 >
                     <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
@@ -99,7 +136,7 @@
                 class="hidden rounded-xl bg-white p-6 text-center shadow-sm"
             >
                 <p class="text-gray-600 italic">
-                    Geen supportaanvragen gevonden voor deze zoekterm.
+                    Geen supportaanvragen gevonden voor deze zoekterm of filter.
                 </p>
             </div>
         </div>
@@ -110,6 +147,9 @@
             const searchInput = document.getElementById('ticket-search-input');
             const ticketItems = document.querySelectorAll('.js-ticket-item');
             const emptyState = document.getElementById('tickets-empty-state');
+            const statusButtons = document.querySelectorAll('.js-ticket-status-filter');
+
+            let selectedStatus = 'all';
 
             function normalizeText(value) {
                 return (value || '')
@@ -202,18 +242,33 @@
                 });
             }
 
-            function applyTicketFilter() {
-                if (! searchInput) {
-                    return;
+            function statusMatches(ticketStatus) {
+                if (selectedStatus === 'all') {
+                    return true;
                 }
 
-                const searchValue = searchInput.value;
+                return ticketStatus === selectedStatus;
+            }
+
+            function updateStatusButtons(activeButton) {
+                statusButtons.forEach(function (button) {
+                    button.classList.remove('bg-[#0F4C81]', 'text-white', 'shadow-sm');
+                    button.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+                });
+
+                activeButton.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+                activeButton.classList.add('bg-[#0F4C81]', 'text-white', 'shadow-sm');
+            }
+
+            function applyTicketFilter() {
+                const searchValue = searchInput ? searchInput.value : '';
                 let visibleCount = 0;
 
                 ticketItems.forEach(function (item) {
                     const matchesSearch = fuzzyMatches(searchValue, item.dataset.search);
+                    const matchesStatus = statusMatches(item.dataset.status);
 
-                    if (matchesSearch) {
+                    if (matchesSearch && matchesStatus) {
                         item.classList.remove('hidden');
                         visibleCount++;
                     } else {
@@ -229,6 +284,14 @@
                     }
                 }
             }
+
+            statusButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    selectedStatus = button.dataset.statusFilter;
+                    updateStatusButtons(button);
+                    applyTicketFilter();
+                });
+            });
 
             if (searchInput) {
                 searchInput.addEventListener('input', function () {

@@ -18,25 +18,65 @@
         </div>
 
         @if($orders->count() > 0)
-            <div class="mb-6 max-w-md">
-                <x-search-bar
-                    id="order-search-input"
-                    placeholder="Zoeken op ID, status of leverdatum..."
-                />
+            <div class="mb-6 flex flex-col gap-4">
+                <div class="max-w-md">
+                    <x-search-bar
+                        id="order-search-input"
+                        placeholder="Zoeken op ID, status of leverdatum..."
+                    />
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                    <button
+                        type="button"
+                        data-status-filter="all"
+                        class="js-order-status-filter rounded-full bg-[#0F4C81] px-5 py-2 text-xs font-medium text-white shadow-sm transition"
+                    >
+                        Alles
+                    </button>
+
+                    <button
+                        type="button"
+                        data-status-filter="Nieuw"
+                        class="js-order-status-filter rounded-full bg-gray-100 px-5 py-2 text-xs font-medium text-gray-600 transition hover:bg-gray-200"
+                    >
+                        Nieuw
+                    </button>
+
+                    <button
+                        type="button"
+                        data-status-filter="In voorbereiding"
+                        class="js-order-status-filter rounded-full bg-gray-100 px-5 py-2 text-xs font-medium text-gray-600 transition hover:bg-gray-200"
+                    >
+                        In voorbereiding
+                    </button>
+
+                    <button
+                        type="button"
+                        data-status-filter="Klaar om af te halen"
+                        class="js-order-status-filter rounded-full bg-gray-100 px-5 py-2 text-xs font-medium text-gray-600 transition hover:bg-gray-200"
+                    >
+                        Klaar om af te halen
+                    </button>
+
+                    <button
+                        type="button"
+                        data-status-filter="archive"
+                        class="js-order-status-filter rounded-full bg-gray-100 px-5 py-2 text-xs font-medium text-gray-600 transition hover:bg-gray-200"
+                    >
+                        Archief
+                    </button>
+                </div>
             </div>
         @endif
 
         <x-card>
             <div class="overflow-x-auto">
-                <table class="w-full min-w-[760px]">
+                <table class="w-full min-w-[680px]">
                     <thead>
                     <tr class="border-b text-sm text-gray-600">
                         <th class="p-3 text-left">
                             ID
-                        </th>
-
-                        <th class="p-3 text-left">
-                            Technieker
                         </th>
 
                         <th class="p-3 text-left">
@@ -63,7 +103,6 @@
                             $orderSearchText = collect([
                                 $order->id,
                                 'Bestelling #' . $order->id,
-                                $order->user?->name,
                                 $order->status,
                                 $order->created_at?->format('d/m/Y'),
                                 $order->delivery_date,
@@ -73,13 +112,10 @@
                         <tr
                             class="js-order-item border-b border-gray-100 transition hover:bg-gray-50 last:border-0"
                             data-search="{{ $orderSearchText }}"
+                            data-status="{{ $order->status }}"
                         >
                             <td class="p-3 font-medium text-gray-900">
                                 #{{ $order->id }}
-                            </td>
-
-                            <td class="p-3 text-gray-700">
-                                {{ $order->user?->name ?? 'Onbekend' }}
                             </td>
 
                             <td class="p-3 text-gray-700">
@@ -104,7 +140,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="p-6 text-center text-gray-500 italic">
+                            <td colspan="5" class="p-6 text-center text-gray-500 italic">
                                 Geen bestellingen gevonden.
                             </td>
                         </tr>
@@ -117,7 +153,7 @@
                 id="orders-empty-state"
                 class="hidden p-6 text-center text-gray-500 italic"
             >
-                Geen bestellingen gevonden voor deze zoekterm.
+                Geen bestellingen gevonden voor deze zoekterm of filter.
             </div>
         </x-card>
     </div>
@@ -127,6 +163,9 @@
             const searchInput = document.getElementById('order-search-input');
             const orderItems = document.querySelectorAll('.js-order-item');
             const emptyState = document.getElementById('orders-empty-state');
+            const statusButtons = document.querySelectorAll('.js-order-status-filter');
+
+            let selectedStatus = 'all';
 
             function normalizeText(value) {
                 return (value || '')
@@ -219,18 +258,37 @@
                 });
             }
 
-            function applyOrderFilter() {
-                if (! searchInput) {
-                    return;
+            function statusMatches(orderStatus) {
+                if (selectedStatus === 'all') {
+                    return true;
                 }
 
-                const searchValue = searchInput.value;
+                if (selectedStatus === 'archive') {
+                    return orderStatus === 'Afgehaald' || orderStatus === 'Geannuleerd';
+                }
+
+                return orderStatus === selectedStatus;
+            }
+
+            function updateStatusButtons(activeButton) {
+                statusButtons.forEach(function (button) {
+                    button.classList.remove('bg-[#0F4C81]', 'text-white', 'shadow-sm');
+                    button.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+                });
+
+                activeButton.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+                activeButton.classList.add('bg-[#0F4C81]', 'text-white', 'shadow-sm');
+            }
+
+            function applyOrderFilter() {
+                const searchValue = searchInput ? searchInput.value : '';
                 let visibleCount = 0;
 
                 orderItems.forEach(function (item) {
                     const matchesSearch = fuzzyMatches(searchValue, item.dataset.search);
+                    const matchesStatus = statusMatches(item.dataset.status);
 
-                    if (matchesSearch) {
+                    if (matchesSearch && matchesStatus) {
                         item.classList.remove('hidden');
                         visibleCount++;
                     } else {
@@ -246,6 +304,14 @@
                     }
                 }
             }
+
+            statusButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    selectedStatus = button.dataset.statusFilter;
+                    updateStatusButtons(button);
+                    applyOrderFilter();
+                });
+            });
 
             if (searchInput) {
                 searchInput.addEventListener('input', function () {
