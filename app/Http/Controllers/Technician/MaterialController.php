@@ -71,34 +71,24 @@ class MaterialController extends Controller
             }
         }
 
-        if ($riskLevel === 'Hoog') {
-            $recommendedNames = [
-                'Dompelpomp',
-                'Rioolstop',
-                'Werklaarzen PVC',
-                'Slangenwagen',
-            ];
-        } elseif ($riskLevel === 'Gemiddeld') {
-            $recommendedNames = [
-                'Regenjas',
-                'Slangenwagen',
-                'Werklaarzen PVC',
-                'Fluovest',
-            ];
-        } else {
-            $recommendedNames = [
-                'Gasdetectiemeter',
-                'EHBO-kit',
-                'Fluovest',
-                'Veiligheidshelm',
-            ];
-        }
-
         $recommendedMaterials = Material::where('is_active', true)
-            ->whereIn('name', $recommendedNames)
+
+            ->whereHas('riskLevels', function ($query) use ($riskLevel) {
+
+                $query->where('name', $riskLevel);
+
+            })
+
             ->with(['stocks' => function ($query) use ($locationId) {
+
                 $query->where('location_id', $locationId);
+
             }])
+
+            ->inRandomOrder()
+
+            ->take(8)
+
             ->get();
 
         return view(
