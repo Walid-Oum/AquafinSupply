@@ -18,12 +18,21 @@ class TicketController extends Controller
         'Opgelost',
     ];
 
-    public function index()
+    public function index(Request $request)
     {
-        $tickets = Ticket::with(['order', 'location'])
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->get();
+        // Start met de basisrelaties en filter op de eigen tickets van de gebruiker
+        $query = Ticket::with(['order', 'location'])
+            ->where('user_id', auth()->id());
+
+        // Pas onze slimme zoekfunctie toe als er gezocht wordt
+        if ($request->has('search')) {
+            $query->search($request->input('search'));
+        } else {
+            // Als er niet gezocht wordt, sorteren we standaard op nieuwste eerst
+            $query->latest();
+        }
+
+        $tickets = $query->get();
 
         return view('tickets.index', [
             'tickets' => $tickets,
