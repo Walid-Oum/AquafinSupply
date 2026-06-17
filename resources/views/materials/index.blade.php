@@ -54,7 +54,6 @@
                         </option>
                     @endforeach
                 </select>
-<<<<<<< HEAD
                 <select name="stock_status" class="border rounded px-3 py-2 text-sm">
 
     <option value="">
@@ -75,9 +74,6 @@
 
 </select>
 
-=======
- 
->>>>>>> 37120beb3a1b1f6b8f864c9da4bd4edc63aa9be7
                 <x-button>
                     Filter
                 </x-button>
