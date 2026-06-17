@@ -33,6 +33,38 @@
             <strong>Categorie:</strong> {{ $material->category }}
         </div>
         <div class="mb-4">
+    <strong>Risiconiveau:</strong>
+
+    <div class="mt-2 flex gap-2 flex-wrap">
+
+        @forelse($material->riskLevels as $riskLevel)
+
+            <span
+                class="inline-block px-3 py-1 rounded-full text-xs font-semibold
+
+                @if($riskLevel->name === 'Hoog')
+                    bg-red-100 text-red-700
+                @elseif($riskLevel->name === 'Gemiddeld')
+                    bg-yellow-100 text-yellow-700
+                @else
+                    bg-green-100 text-green-700
+                @endif">
+
+                {{ $riskLevel->name }}
+
+            </span>
+
+        @empty
+
+            <span class="text-gray-500">
+                Geen risiconiveau gekoppeld
+            </span>
+
+        @endforelse
+
+    </div>
+</div>
+        <div class="mb-4">
             <strong>Beschrijving:</strong> {{ $material->description ?? 'Geen beschrijving' }}
         </div>
         

@@ -154,8 +154,10 @@ class MaterialController extends Controller
             );
         }
 
-        $material = Material::with('stocks.location')
-            ->findOrFail($id);
+        $material = Material::with([
+    'stocks.location',
+    'riskLevels'
+])->findOrFail($id);
 
         return view(
             'materials.show',
