@@ -22,7 +22,6 @@
                     action="{{ route('admin.users.index') }}"
                     class="flex items-center gap-2">
 
-<<<<<<< HEAD
                     <select
                         name="role"
                         class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
@@ -123,37 +122,6 @@
                         <tr id="no-users-found-row" class="hidden">
                             <td colspan="5" class="px-6 py-8 text-center text-gray-500 italic bg-gray-50">
                                 Geen gebruikers gevonden die voldoen aan de zoekterm.
-=======
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-left" id="user-table">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Naam</th>
-                        <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">E-mailadres</th>
-                        <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rol</th>
-                        <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Acties</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-100">
-                    @foreach($users as $user)
-                        <tr class="user-row hover:bg-gray-50/70 transition-colors duration-150">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 user-name">{{ $user->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-email">{{ $user->email }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    {{ $user->role === 'admin' ? 'bg-rose-50 text-rose-700 border border-rose-200' : '' }}
-                                    {{ $user->role === 'magazijn' ? 'bg-sky-50 text-sky-700 border border-sky-200' : '' }}
-                                    {{ $user->role === 'technieker' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : '' }}">
-                                    {{ ucfirst($user->role) }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.users.edit', $user->id) }}" class="text-[#1E6BA8] hover:text-[#0F4C81] inline-flex items-center gap-1 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                    Aanpassen
-                                </a>
->>>>>>> origin/main
                             </td>
                         </tr>
                     </tbody>
