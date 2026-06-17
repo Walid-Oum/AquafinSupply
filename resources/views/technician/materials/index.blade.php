@@ -2,6 +2,28 @@
     <x-page-header title="Materialen overzicht" />
 
     @if($recommendedMaterials->count() > 0)
+        <div class="mb-4">
+
+    <span class="font-semibold">
+        Huidig overstromingsrisico:
+    </span>
+
+            <span
+                class="
+        inline-block px-3 py-1 rounded-full text-xs font-semibold
+
+        @if($riskLevel === 'Hoog')
+            bg-red-100 text-red-700
+        @elseif($riskLevel === 'Gemiddeld')
+            bg-yellow-100 text-yellow-700
+        @else
+            bg-green-100 text-green-700
+        @endif
+        "
+            >
+        {{ $riskLevel }}
+    </span>
+        </div>
         <p class="mb-2 text-sm font-semibold text-[#0F4C81]">
             {{ $recommendedMaterials->count() }} aanbevolen materialen gevonden
         </p>
@@ -20,7 +42,7 @@
                     ▲ Verberg
                 </button>
             </div>
-            
+
             <div id="recommendationsContainer">
                 <div class="relative">
                     <button
@@ -192,7 +214,7 @@
             document.querySelectorAll('.js-category-filter').forEach(function (button) {
                 button.addEventListener('click', function () {
                     const selectedCategory = button.dataset.categoryFilter;
-                    
+
                     document.querySelectorAll('.js-category-filter').forEach(function (filterButton) {
                         filterButton.classList.remove('bg-[#0F4C81]', 'text-white');
                         filterButton.classList.add('bg-gray-100', 'hover:bg-gray-200');
@@ -298,7 +320,7 @@
             function applyFilters() {
                 const queryClean = normalizeText(searchInput.value);
                 const flatQuery = queryClean.replace(/ /g, '');
-                
+
                 const activeCategoryButton = document.querySelector('.js-category-filter.bg-\\[\\#0F4C81\\]');
                 const selectedCategory = activeCategoryButton ? activeCategoryButton.dataset.categoryFilter : 'all';
 
@@ -317,7 +339,7 @@
 
                         if (materialName.includes(queryClean) || flatName.includes(flatQuery)) {
                             matchesSearch = true;
-                        } 
+                        }
                         else if (flatQuery.length >= 3) {
                             const allowedDistance = getAllowedDistance(flatQuery);
                             if (levenshtein(flatQuery, flatName) <= allowedDistance) {
