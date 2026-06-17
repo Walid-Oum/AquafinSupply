@@ -139,19 +139,103 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('user-table-search');
     const tableRows = document.querySelectorAll('.user-row');
 
+    // Helper om tekst te normaliseren (hoofdletters weg, accenten weg, non-alfa weg)
+    function normalizeText(text) {
+        if (!text) return '';
+        return text.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Verwijdert accenten (é -> e)
+            .replace(/[^a-z0-9]/g, ' ')                      // Vervangt speciale tekens door spatie
+            .replace(/\s+/g, ' ')                             // Meerdere spaties naar 1 spatie
+            .trim();
+    }
+
+    // Levenshtein afstand berekenen in JavaScript voor typfouten
+    function levenshtein(a, b) {
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j - 1] + 1, // vervanging
+                        matrix[i][j - 1] + 1,     // invoeging
+                        matrix[i - 1][j] + 1      // verwijdering
+                    );
+                }
+            }
+        }
+        return matrix[b.length][a.length];
+    }
+
+    // Bepaal hoeveel typfouten zijn toegestaan op basis van woordlengte
+    function getAllowedDistance(word) {
+        const length = word.length;
+        if (length <= 4) return 1;
+        if (length <= 7) return 2;
+        if (length <= 12) return 3;
+        return 4;
+    }
+
     searchInput.addEventListener('input', function () {
-        const query = this.value.toLowerCase().trim();
+        const query = normalizeText(this.value);
+
+        if (query === '') {
+            tableRows.forEach(row => row.style.display = '');
+            return;
+        }
+
+        const flatQuery = query.replace(/ /g, '');
 
         tableRows.forEach(row => {
-            const name = row.querySelector('.user-name').textContent.toLowerCase();
-            const email = row.querySelector('.user-email').textContent.toLowerCase();
+            const name = normalizeText(row.querySelector('.user-name').textContent);
+            const email = normalizeText(row.querySelector('.user-email').textContent);
+            
+            const flatName = name.replace(/ /g, '');
+            const flatEmail = email.replace(/ /g, '');
 
-            // Als de naam of het e-mailadres de zoekterm bevat, toon de rij, anders verbergen
-            if (name.includes(query) || email.includes(query)) {
+            // 1. Directe match of match zonder spaties
+            if (name.includes(query) || email.includes(query) || flatName.includes(flatQuery) || flatEmail.includes(flatQuery)) {
                 row.style.display = '';
-            } else {
-                row.style.display = 'none';
+                return;
             }
+
+            // 2. Fuzzy match met Levenshtein (voor typfouten)
+            if (flatQuery.length >= 3) {
+                const allowedDistance = getAllowedDistance(flatQuery);
+                
+                // Check of de typfout binnen de marge valt voor naam of e-mail
+                if (levenshtein(flatQuery, flatName) <= allowedDistance || levenshtein(flatQuery, flatEmail) <= allowedDistance) {
+                    row.style.display = '';
+                    return;
+                }
+
+                // Check losse woorden
+                const queryWords = query.split(' ');
+                const nameWords = name.split(' ');
+                let wordMatched = false;
+
+                queryWords.forEach(qWord => {
+                    nameWords.forEach(nWord => {
+                        if (nWord.includes(qWord) || qWord.includes(nWord)) {
+                            wordMatched = true;
+                        } else if (qWord.length >= 3 && levenshtein(qWord, nWord) <= getAllowedDistance(qWord)) {
+                            wordMatched = true;
+                        }
+                    });
+                });
+
+                if (wordMatched) {
+                    row.style.display = '';
+                    return;
+                }
+            }
+
+            // Geen match? Verberg de rij
+            row.style.display = 'none';
         });
     });
 });

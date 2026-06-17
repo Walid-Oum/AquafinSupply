@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use App\Models\RiskLevel;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,39 +29,23 @@ class Material extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-   // slimme zoekfunctie die spaties negeert en prioriteit geeft aan exacte matches of items die beginnen met de zoekterm
+    /**
+     * Basis scope voor zoeken.
+     * De échte fouttolerante fuzzy search wordt nu in de controllers afgehandeld via FuzzySearch.
+     */
     public function scopeSearch($query, $searchTerm)
     {
-        if (!$searchTerm) {
-            return $query;
-        }
-
-        // Spatieloze zoekterm maken (bijv. van "pvc buis" naar "pvcbuis")
-        $cleanSearch = str_replace(' ', '', $searchTerm);
-
-        return $query->where(function ($q) use ($searchTerm, $cleanSearch) {
-            $q->whereRaw("REPLACE(name, ' ', '') LIKE ?", ["%{$cleanSearch}%"])
-              ->orWhereRaw("REPLACE(description, ' ', '') LIKE ?", ["%{$cleanSearch}%"])
-              ->orWhereRaw("REPLACE(category, ' ', '') LIKE ?", ["%{$cleanSearch}%"]);
-        })
-        
-        ->orderByRaw("
-            CASE 
-                WHEN name LIKE ? THEN 2
-                WHEN name LIKE ? THEN 1
-                ELSE 0
-            END DESC
-        ", ["{$searchTerm}", "%{$searchTerm}%"]);
+        // We retourneren simpelweg de query. De filtering gebeurt nu 100% accuraat in de controller.
+        return $query;
     }
-
 
     public function stocks()
     {
         return $this->hasMany(MaterialStock::class);
     }
+
     public function riskLevels()
     {
         return $this->belongsToMany(RiskLevel::class);
     }
 }
-

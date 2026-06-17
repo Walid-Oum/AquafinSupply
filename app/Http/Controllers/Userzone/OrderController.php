@@ -16,7 +16,6 @@ use App\Models\User;
 
 class OrderController extends Controller
 {
-<<<<<<< HEAD
 
     private const WAREHOUSE_ORDER_STATUSES = [
         'Nieuw',
@@ -26,9 +25,6 @@ class OrderController extends Controller
         'Geannuleerd',
     ];
     public function index()
-=======
-    public function index(Request $request)
->>>>>>> 37120beb3a1b1f6b8f864c9da4bd4edc63aa9be7
     {
         // Start met de basisrelaties en filter op de eigen bestellingen van de technieker
         $query = Order::where('user_id', Auth::id())

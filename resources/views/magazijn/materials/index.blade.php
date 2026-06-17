@@ -147,18 +147,100 @@
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('global-material-search');
             const resultsList = document.getElementById('global-search-results');
+            const tableRows = document.querySelectorAll('tbody tr');
+
+            // Helper om tekst te normaliseren voor lokale filtering in de tabel
+            function normalizeText(text) {
+                if (!text) return '';
+                return text.toLowerCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Accenten weg (é -> e)
+                    .replace(/[^a-z0-9]/g, ' ')                      // Speciale tekens weg
+                    .replace(/\s+/g, ' ')                             // Dubbele spaties weg
+                    .trim();
+            }
+
+            // Levenshtein afstand berekenen voor typfouten in de tabel
+            function levenshtein(a, b) {
+                const matrix = [];
+                for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+                for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+                for (let i = 1; i <= b.length; i++) {
+                    for (let j = 1; j <= a.length; j++) {
+                        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                            matrix[i][j] = matrix[i - 1][j - 1];
+                        } else {
+                            matrix[i][j] = Math.min(
+                                matrix[i - 1][j - 1] + 1,
+                                matrix[i][j - 1] + 1,
+                                matrix[i - 1][j] + 1
+                            );
+                        }
+                    }
+                }
+                return matrix[b.length][a.length];
+            }
+
+            function getAllowedDistance(word) {
+                const length = word.length;
+                if (length <= 4) return 1;
+                if (length <= 7) return 2;
+                if (length <= 12) return 3;
+                return 4;
+            }
 
             searchInput.addEventListener('input', async function () {
-                const query = this.value;
+                const queryRaw = this.value;
+                const queryClean = normalizeText(queryRaw);
 
-                if (query.length < 2) {
+                // --- DEEL 1: Live tabel filtering (Fuzzy) ---
+                if (queryClean === '') {
+                    tableRows.forEach(row => row.style.display = '');
+                } else {
+                    const flatQuery = queryClean.replace(/ /g, '');
+                    
+                    tableRows.forEach(row => {
+                        const nameTd = row.querySelector('td:nth-child(1)');
+                        const catTd = row.querySelector('td:nth-child(2)');
+                        
+                        if (!nameTd) return; // Sla eventuele lege rijen/colspan rijen over
+
+                        const name = normalizeText(nameTd.textContent);
+                        const category = normalizeText(catTd ? catTd.textContent : '');
+                        
+                        const flatName = name.replace(/ /g, '');
+                        const flatCategory = category.replace(/ /g, '');
+
+                        // Directe matches of spatieloze matches
+                        if (name.includes(queryClean) || category.includes(queryClean) || 
+                            flatName.includes(flatQuery) || flatCategory.includes(flatQuery)) {
+                            row.style.display = '';
+                            return;
+                        }
+
+                        // Fuzzy match op basis van Levenshtein
+                        if (flatQuery.length >= 3) {
+                            const allowedDistance = getAllowedDistance(flatQuery);
+                            if (levenshtein(flatQuery, flatName) <= allowedDistance || 
+                                levenshtein(flatQuery, flatCategory) <= allowedDistance) {
+                                row.style.display = '';
+                                return;
+                            }
+                        }
+
+                        row.style.display = 'none';
+                    });
+                }
+
+                // --- DEEL 2: Live Autocomplete suggestielijst via de API ---
+                if (queryRaw.length < 2) {
                     resultsList.innerHTML = '';
                     resultsList.classList.add('hidden');
                     return;
                 }
 
                 try {
-                    const response = await fetch(`/api/search-materials?q=${encodeURIComponent(query)}`);
+                    const response = await fetch(`/api/search-materials?q=${encodeURIComponent(queryRaw)}`);
                     const data = await response.json();
 
                     resultsList.innerHTML = '';
@@ -171,9 +253,9 @@
                             li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center text-sm';
 
                             li.innerHTML = `
-                            <span class="font-medium text-gray-700">${item.name}</span>
-                            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">Stock: ${item.stock}</span>
-                        `;
+                                <span class="font-medium text-gray-700">${item.name}</span>
+                                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">Stock: ${item.stock}</span>
+                            `;
 
                             li.addEventListener('click', function () {
                                 searchInput.value = item.name;
@@ -188,7 +270,7 @@
                         resultsList.classList.remove('hidden');
                     }
                 } catch (error) {
-                    console.error('Fout:', error);
+                    console.error('Fout bij ophalen suggesties:', error);
                 }
             });
 
