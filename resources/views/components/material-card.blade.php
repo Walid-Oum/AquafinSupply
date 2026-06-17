@@ -5,6 +5,7 @@
 
 
 @php
+use Illuminate\Support\Facades\Storage;
     $localStock = $material->stocks->first();
     $stock = $localStock?->stock ?? 0;
     $minimumStock = $localStock?->minimum_stock ?? 0;
@@ -27,11 +28,12 @@
 @if($compact)
     <div class="border rounded-lg p-4 bg-white hover:shadow transition block">
         <a href="{{ route('technician.materials.show', $material->id) }}" class="block">
-            <img
-                src="{{ asset('images/' . $image) }}"
-                class="w-24 h-24 md:w-32 md:h-32 object-cover rounded mb-3 mx-auto"
-                alt="{{ $material->category }}"
-            >
+          <img
+    src="{{ $material->image
+        ? Storage::url($material->image)
+        : asset('images/' . $image) }}"
+    class="w-24 h-24 md:w-32 md:h-32 object-cover rounded mb-3 mx-auto"
+    alt="{{ $material->category }}">
 
             <h3 class="text-xl font-bold min-h-[64px]">
                 {{ $material->name }}
@@ -72,11 +74,12 @@
 @else
     <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden">
         <a href="{{ route('technician.materials.show', $material->id) }}" class="block">
-            <img
-                src="{{ asset('images/' . $image) }}"
-                class="w-full h-48 object-cover"
-                alt="{{ $material->category }}"
-            >
+           <img
+    src="{{ $material->image
+        ? Storage::url($material->image)
+        : asset('images/' . $image) }}"
+    class="w-full h-48 object-cover"
+    alt="{{ $material->category }}">
         </a>
 
         <div class="p-5 flex flex-col min-h-[260px]">

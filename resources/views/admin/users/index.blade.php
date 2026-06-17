@@ -1,5 +1,4 @@
-  
-  <x-app-layout>
+<x-app-layout>
 
     <x-page-header title="Gebruikersbeheer" />
      <p class="text-gray-500 text-sm mb-6">
@@ -103,7 +102,8 @@
                     <tr>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Naam</th>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">E-mailadres</th>
-                        <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rol </th>
+                        <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Rol</th>
+                        <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Acties</th>
                     </tr>
                 </thead>
@@ -120,11 +120,38 @@
                                     {{ ucfirst($user->role) }}
                                 </span>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($user->is_active)
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">
+                                        Actief
+                                    </span>
+                                @else
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 border border-red-200">
+                                        Inactief
+                                    </span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.users.edit', $user->id) }}" class="text-[#1E6BA8] hover:text-[#0F4C81] inline-flex items-center gap-1 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                    Aanpassen
-                                </a>
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="text-[#1E6BA8] hover:text-[#0F4C81] inline-flex items-center gap-1 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                        Aanpassen
+                                    </a>
+                                    <form action="{{ route('admin.users.toggle', $user->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @if($user->is_active)
+                                            <button type="submit" class="text-red-600 hover:text-red-800 inline-flex items-center gap-1 transition-colors text-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                                                Deactiveren
+                                            </button>
+                                        @else
+                                            <button type="submit" class="text-green-600 hover:text-green-800 inline-flex items-center gap-1 transition-colors text-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                Activeren
+                                            </button>
+                                        @endif
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
@@ -197,8 +224,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const flatName = name.replace(/ /g, '');
             const flatEmail = email.replace(/ /g, '');
 
+<<<<<<< HEAD
             // 1. Directe match of match zonder spaties
             if (name.includes(query) || email.includes(query) || flatName.includes(flatQuery) || flatEmail.includes(flatQuery)) {
+=======
+            if (name.includes(query) || email.includes(query)) {
+>>>>>>> main
                 row.style.display = '';
                 return;
             }
