@@ -12,6 +12,7 @@ use App\Models\MaterialStock;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use App\Models\UserNotification;
+use App\Models\User;
 
 class OrderController extends Controller
 {
@@ -140,6 +141,20 @@ class OrderController extends Controller
         }
 
         session()->forget('cart');
+
+
+        $warehouseUsers = User::where('role', 'magazijn')
+            ->where('location_id', $order->location_id)
+            ->get();
+
+        foreach ($warehouseUsers as $warehouseUser) {
+            UserNotification::create([
+                'user_id' => $warehouseUser->id,
+                'title' => 'Nieuwe bestelling',
+                'message' => 'Er is een nieuwe bestelling #' . $order->id . ' geplaatst door ' . $user->name . '.',
+                'link' => route('magazijn.orders.show', $order->id),
+            ]);
+        }
 
         return redirect()
             ->route('orders.index')

@@ -22,4 +22,17 @@ class NotificationController extends Controller
             'notifications' => $notifications,
         ]);
     }
+
+    public function markAsRead()
+    {
+        UserNotification::where('user_id', auth()->id())
+            ->whereNull('read_at')
+            ->update([
+                'read_at' => now(),
+            ]);
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
 }

@@ -3,22 +3,24 @@
 
     $cartCount = collect(session('cart', []))->sum('quantity');
 
-    $unreadNotificationCount = $user?->userNotifications()
-        ->whereNull('read_at')
-        ->count() ?? 0;
+    $canSeeNotifications = in_array($user->role, ['technieker', 'magazijn']);
 
-    $latestNotifications = $user?->userNotifications()
-        ->latest()
-        ->take(5)
-        ->get() ?? collect();
+    $unreadNotificationCount = $canSeeNotifications
+        ? $user->userNotifications()->whereNull('read_at')->count()
+        : 0;
+
+    $latestNotifications = $canSeeNotifications
+        ? $user->userNotifications()->latest()->take(5)->get()
+        : collect();
 @endphp
 
 <div class="bg-white h-20 border-b flex justify-end items-center px-8 gap-6 shadow-md">
 
-    @if($user->role == 'technieker')
+    @if($user->role === 'technieker')
         <a
             href="{{ route('cart.index') }}"
             class="relative hover:scale-110 transition"
+            title="Winkelmandje"
         >
             <svg xmlns="http://www.w3.org/2000/svg"
                  fill="none"
@@ -45,14 +47,38 @@
                 {{ $cartCount }}
             </span>
         </a>
+    @endif
 
+    @if($canSeeNotifications)
         <div
-            x-data="{ open: false }"
+            x-data="{
+                open: false,
+
+                toggleNotifications() {
+                    this.open = !this.open;
+
+                    if (this.open) {
+                        fetch('{{ route('notifications.markAsRead') }}', {
+                            method: 'PATCH',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        const badge = document.getElementById('notification-count');
+
+                        if (badge) {
+                            badge.classList.add('hidden');
+                        }
+                    }
+                }
+            }"
             class="relative"
         >
             <button
                 type="button"
-                @click="open = !open"
+                @click="toggleNotifications()"
                 class="relative hover:scale-110 transition"
                 title="Notificaties"
             >
@@ -65,10 +91,11 @@
 
                     <path stroke-linecap="round"
                           stroke-linejoin="round"
-                          d="M14.857 17.082a2.25 2.25 0 01-4.714 0m8.607-2.332A3.375 3.375 0 0117.25 12V9.75a5.25 5.25 0 00-10.5 0V12a3.375 3.375 0 01-1.5 2.75l-.33.22a.75.75 0 00.416 1.38h13.328a.75.75 0 00.416-1.38l-.33-.22z" />
+                          d="M14.857 17.082a2.25 2.25 0 01-4.714 0m8.607-2.332A3.375 3.375 0 0117.25 12V9.75a5.25 5.25 0 00-10.5 0V12a3.375 3.375 0 01-1.5 2.75l-.33.22a.75.75 0 00.416 1.38h13.328a.75.75 0 00.416-1.38l-.33-.22z"/>
                 </svg>
 
                 <span
+                    id="notification-count"
                     class="absolute -top-1 -right-1
                            bg-red-500 text-white
                            text-xs font-bold
@@ -94,7 +121,7 @@
                     </h3>
 
                     <p class="text-sm text-gray-500">
-                        Laatste updates over je bestellingen en supportaanvragen.
+                        Laatste updates over bestellingen en supportaanvragen.
                     </p>
                 </div>
 
@@ -176,7 +203,8 @@
 
         <button
             type="submit"
-            class="hover:scale-110 transition">
+            class="hover:scale-110 transition"
+            title="Uitloggen">
 
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -189,7 +217,7 @@
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m-3-3h9m0 0l-3-3m3 3l-3 3" />
+                    d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m-3-3h9m0 0l-3-3m3 3l-3 3"/>
             </svg>
         </button>
     </form>
