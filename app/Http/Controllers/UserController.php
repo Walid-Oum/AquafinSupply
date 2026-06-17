@@ -11,17 +11,17 @@ class UserController extends Controller
 {
     // Toon het overzicht van alle gebruikers voor de admin.
     public function index(Request $request)
-{
-    $query = User::with('location');
+    {
+        $query = User::with('location');
 
-    if ($request->filled('role')) {
-        $query->where('role', $request->role);
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        $users = $query->get();
+
+        return view('admin.users.index', compact('users'));
     }
-
-    $users = $query->get();
-
-    return view('admin.users.index', compact('users'));
-}
 
     // Toon het formulier om een nieuwe gebruiker aan te maken.
     public function create()
@@ -40,16 +40,12 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-
             'email' => 'required|string|email|max:255|unique:users',
-
             'password' => 'required|string|min:8|confirmed',
-
             'role' => [
                 'required',
                 Rule::in(['admin', 'magazijn', 'technieker']),
             ],
-
             'location_id' => [
                 'required',
                 Rule::exists('locations', 'id'),
@@ -62,7 +58,6 @@ class UserController extends Controller
             'password' => bcrypt($validated['password']),
             'role' => $validated['role'],
             'location_id' => $validated['location_id'],
-            // de admin moet het niet per se doen
             'must_change_password' => $validated['role'] !== 'admin',
         ]);
 
@@ -88,7 +83,6 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-
             'email' => [
                 'required',
                 'string',
@@ -96,20 +90,19 @@ class UserController extends Controller
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
-
             'role' => [
                 'required',
                 Rule::in(['admin', 'magazijn', 'technieker']),
             ],
-
             'location_id' => [
                 'required',
                 Rule::exists('locations', 'id'),
             ],
         ]);
+
         if (auth()->id() == $user->id) {
-    unset($validated['role']);
-}
+            unset($validated['role']);
+        }
 
         $user->update([
             'name' => $validated['name'],
@@ -133,5 +126,24 @@ class UserController extends Controller
         return redirect()
             ->route('admin.users.index')
             ->with('success', 'Gebruiker succesvol aangepast!');
+    }
+
+    /**
+     * Deactiveer of activeer een gebruiker (alleen admin).
+     */
+    public function toggleActive($id)
+    {
+        $user = User::findOrFail($id);
+
+        // Admin kan zichzelf niet deactiveren
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->with('error', 'Je kunt je eigen account niet deactiveren!');
+        }
+
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        $status = $user->is_active ? 'geactiveerd' : 'gedeactiveerd';
+        return redirect()->route('admin.users.index')->with('success', "Gebruiker {$status}!");
     }
 }
