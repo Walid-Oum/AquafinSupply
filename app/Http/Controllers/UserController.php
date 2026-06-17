@@ -59,6 +59,7 @@ class UserController extends Controller
             'role' => $validated['role'],
             'location_id' => $validated['location_id'],
             'must_change_password' => $validated['role'] !== 'admin',
+            'is_active' => true,
         ]);
 
         return redirect()
@@ -107,8 +108,9 @@ class UserController extends Controller
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'role' => $validated['role'],
+            'role' => $validated['role'] ?? $user->role,
             'location_id' => $validated['location_id'],
+            'is_active' => $request->has('is_active') ? $request->is_active : $user->is_active,
         ]);
 
         // Alleen het wachtwoord updaten als er iets is ingevuld.
