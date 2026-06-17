@@ -30,6 +30,14 @@ class AuthenticatedSessionController extends Controller
 
     $user = Auth::user();
 
+    // Check of de gebruiker actief is
+    if (!$user->is_active) {
+        Auth::logout();
+        return redirect()->route('login')->withErrors([
+            'email' => 'Je account is gedeactiveerd. Neem contact op met de administrator.',
+        ]);
+    }
+
     if ($user->role === 'technieker') {
         return redirect()->route('dashboard');
     }
