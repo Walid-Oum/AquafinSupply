@@ -3,15 +3,13 @@
     'compact' => false,
 ])
 
-
 @php
-use Illuminate\Support\Facades\Storage;
     $localStock = $material->stocks->first();
     $stock = $localStock?->stock ?? 0;
     $minimumStock = $localStock?->minimum_stock ?? 0;
 
     $isOutOfStock = $stock <= 0;
-    $isLowStock = !$isOutOfStock && $stock <= $minimumStock;
+    $isLowStock = ! $isOutOfStock && $stock <= $minimumStock;
 
     $categoryImages = [
         'Aquafin tools' => 'aquafintools.png',
@@ -22,120 +20,138 @@ use Illuminate\Support\Facades\Storage;
         'Verbruiksgoederen' => 'verbruiksgoederen.png',
     ];
 
-    $image = $categoryImages[$material->category] ?? 'sidebar-bg.jpg';
+    $fallbackImage = $categoryImages[$material->category] ?? 'sidebar-bg.jpg';
+
+    $imageUrl = $material->image
+        ? \Illuminate\Support\Facades\Storage::url($material->image)
+        : asset('images/' . $fallbackImage);
+
+    if ($isOutOfStock) {
+        $stockBadgeText = 'Geen voorraad';
+        $stockBadgeClasses = 'bg-red-100 text-red-700';
+        $stockTextClasses = 'text-red-600';
+    } elseif ($isLowStock) {
+        $stockBadgeText = 'Lage voorraad';
+        $stockBadgeClasses = 'bg-orange-100 text-orange-700';
+        $stockTextClasses = 'text-orange-600';
+    } else {
+        $stockBadgeText = 'Beschikbaar';
+        $stockBadgeClasses = 'bg-green-100 text-green-700';
+        $stockTextClasses = 'text-green-600';
+    }
 @endphp
 
 @if($compact)
-    <div class="border rounded-lg p-4 bg-white hover:shadow transition block">
+    <div class="h-full rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
         <a href="{{ route('technician.materials.show', $material->id) }}" class="block">
-          <img
-    src="{{ $material->image
-        ? Storage::url($material->image)
-        : asset('images/' . $image) }}"
-    class="w-24 h-24 md:w-32 md:h-32 object-cover rounded mb-3 mx-auto"
-    alt="{{ $material->category }}">
+            <img
+                src="{{ $imageUrl }}"
+                class="mx-auto mb-2 h-20 w-20 rounded-lg object-cover"
+                alt="{{ $material->name }}"
+            >
 
-            <h3 class="text-xl font-bold min-h-[64px]">
-                {{ $material->name }}
-            </h3>
-
-            <p class="text-sm text-gray-500">
+            <p class="mb-1 text-xs uppercase text-gray-400">
                 {{ $material->category }}
             </p>
 
-            <p class="text-sm mt-2">
-                Voorraad: {{ $stock }}
-            </p>
+            <h3 class="min-h-[44px] text-base font-bold text-gray-800">
+                {{ $material->name }}
+            </h3>
+
+            <div class="mt-3 flex items-center justify-between">
+                <span class="text-sm text-gray-500">
+                    Voorraad
+                </span>
+
+                <span class="font-bold {{ $stockTextClasses }}">
+                    {{ $stock }}
+                </span>
+            </div>
+
+            <span class="mt-3 inline-block rounded-full px-3 py-1 text-xs font-semibold {{ $stockBadgeClasses }}">
+                {{ $stockBadgeText }}
+            </span>
         </a>
 
-        <div class="mt-4">
+        <div class="mt-3">
             @if($isOutOfStock)
                 <button
                     type="button"
                     disabled
-                    class="w-full bg-gray-300 text-gray-500 py-2 rounded-lg cursor-not-allowed"
+                    class="w-full rounded-lg bg-gray-300 py-2 font-semibold text-gray-500 cursor-not-allowed"
                 >
                     Niet beschikbaar
                 </button>
             @else
-                <form action="{{ route('cart.add', $material->id) }}" method="POST" class="js-add-to-cart">
+                <form
+                    action="{{ route('cart.add', $material->id) }}"
+                    method="POST"
+                    class="js-add-to-cart"
+                >
                     @csrf
 
-                    <button
-                        type="submit"
-                        class="w-full bg-[#0F4C81] hover:bg-[#1E6BA8] text-white py-2 rounded-lg transition"
-                    >
+                    <x-button type="submit" class="w-full justify-center">
                         + Toevoegen
-                    </button>
+                    </x-button>
                 </form>
             @endif
         </div>
     </div>
 @else
-    <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden">
+    <div class="h-full overflow-hidden rounded-2xl bg-white shadow-md transition hover:shadow-xl">
         <a href="{{ route('technician.materials.show', $material->id) }}" class="block">
-           <img
-    src="{{ $material->image
-        ? Storage::url($material->image)
-        : asset('images/' . $image) }}"
-    class="w-full h-48 object-cover"
-    alt="{{ $material->category }}">
+            <img
+                src="{{ $imageUrl }}"
+                class="h-48 w-full object-cover"
+                alt="{{ $material->name }}"
+            >
         </a>
 
-        <div class="p-5 flex flex-col min-h-[260px]">
+        <div class="flex min-h-[260px] flex-col p-5">
             <a href="{{ route('technician.materials.show', $material->id) }}" class="block">
-                <p class="text-xs text-gray-400 uppercase mb-1">
+                <p class="mb-1 text-xs uppercase text-gray-400">
                     {{ $material->category }}
                 </p>
 
-                <h3 class="text-xl font-bold text-gray-800 mb-3 min-h-[64px]">
+                <h3 class="mb-3 min-h-[64px] text-xl font-bold text-gray-800">
                     {{ $material->name }}
                 </h3>
             </a>
 
-            <div class="flex justify-between items-center mb-4">
+            <div class="mb-4 flex items-center justify-between">
                 <span class="text-sm text-gray-500">
                     Voorraad
                 </span>
 
-                <span class="font-bold {{ $isOutOfStock || $isLowStock ? 'text-red-600' : 'text-green-600' }}">
+                <span class="font-bold {{ $stockTextClasses }}">
                     {{ $stock }}
                 </span>
             </div>
 
-            @if($isOutOfStock)
-                <span class="inline-block bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full">
-                    Geen voorraad
-                </span>
-            @elseif($isLowStock)
-                <span class="inline-block bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full">
-                    Lage voorraad
-                </span>
-            @else
-                <span class="inline-block bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
-                    Beschikbaar
-                </span>
-            @endif
+            <span class="inline-block w-fit rounded-full px-3 py-1 text-xs font-semibold {{ $stockBadgeClasses }}">
+                {{ $stockBadgeText }}
+            </span>
 
             <div class="mt-auto">
                 @if($isOutOfStock)
                     <button
                         type="button"
                         disabled
-                        class="w-full mt-5 bg-gray-300 text-gray-500 font-semibold py-3 rounded-xl cursor-not-allowed"
+                        class="mt-5 w-full rounded-xl bg-gray-300 py-3 font-semibold text-gray-500 cursor-not-allowed"
                     >
                         Niet beschikbaar
                     </button>
                 @else
-                    <form action="{{ route('cart.add', $material->id) }}" method="POST" class="mt-5 js-add-to-cart">
+                    <form
+                        action="{{ route('cart.add', $material->id) }}"
+                        method="POST"
+                        class="js-add-to-cart mt-5"
+                    >
                         @csrf
 
-                        <button
-                            type="submit"
-                            class="w-full bg-[#0F4C81] hover:bg-[#1E6BA8] text-white font-semibold py-3 rounded-xl transition"
-                        >
+                        <x-button type="submit" class="w-full justify-center">
                             + Toevoegen
-                        </button>
+                        </x-button>
                     </form>
                 @endif
             </div>
