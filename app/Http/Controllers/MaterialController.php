@@ -247,12 +247,40 @@ class MaterialController extends Controller
     {
         $locationId = auth()->user()->location_id;
 
-        $materials = Material::where('is_active', true)
-            ->with(['stocks' => function ($query) use ($locationId) {
-                $query->where('location_id', $locationId);
-            }])
-            ->orderBy('name')
-            ->get();
+       $query = Material::where('is_active', true)
+    ->with(['stocks' => function ($query) use ($locationId) {
+        $query->where('location_id', $locationId);
+    }]);if ($request->filled('category')) {
+    $query->where('category', $request->category);
+}$materials = $query
+    ->orderBy('name')
+    ->get();
+
+    if ($request->filled('stock_status')) {
+
+    if ($request->stock_status === 'low') {
+
+        $materials = $materials->filter(function ($material) {
+
+            $stock = $material->stocks->first();
+
+            return $stock && $stock->stock <= $stock->minimum_stock;
+        });
+
+    }
+
+    if ($request->stock_status === 'ok') {
+
+        $materials = $materials->filter(function ($material) {
+
+            $stock = $material->stocks->first();
+
+            return $stock && $stock->stock > $stock->minimum_stock;
+        });
+
+    }
+
+}
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -266,6 +294,10 @@ class MaterialController extends Controller
 
         return view('magazijn.materials.index', [
             'materials' => $materials,
+            'categories' => Material::select('category')
+    ->distinct()
+    ->orderBy('category')
+    ->pluck('category'),
         ]);
     }
 

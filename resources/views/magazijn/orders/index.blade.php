@@ -2,37 +2,63 @@
 
     <x-page-header title="Bestellingen overzicht" />
 
-    <div class="mb-4">
+<div class="mb-4 flex justify-between items-center">
 
-        <form
-            method="GET"
-            action="{{ route('magazijn.orders.index') }}"
-            class="flex gap-2">
-
-            <input
-                type="text"
-                name="search"
-                value="{{ request('search') }}"
-                placeholder="Zoeken..."
-                class="border rounded px-3 py-2 w-72">
-
-            <x-button type="submit">
-
-                Zoek
-
-            </x-button>
-
-            <a
-                href="{{ route('magazijn.orders.index') }}"
-                class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg">
-
-                Reset
-
-            </a>
-
-        </form>
-
+    <div class="relative">
+        <input
+            type="text"
+            id="global-order-search"
+            autocomplete="off"
+            placeholder="Bestelling zoeken..."
+            class="border rounded px-3 py-2 w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]">
     </div>
+
+    <form
+        method="GET"
+        action="{{ route('magazijn.orders.index') }}"
+        class="flex gap-2">
+
+        <select
+            name="status"
+            class="border rounded px-3 py-2">
+
+            <option value="">
+                Alle statussen
+            </option>
+
+            <option value="Nieuw">
+                Nieuw
+            </option>
+
+            <option value="In voorbereiding">
+                In voorbereiding
+            </option>
+
+            <option value="Klaar om af te halen">
+                Klaar om af te halen
+            </option>
+
+            <option value="Afgehaald">
+                Afgehaald
+            </option>
+
+        </select>
+
+        <x-button>
+            Filter
+        </x-button>
+
+        <a
+            href="{{ route('magazijn.orders.index') }}"
+            class="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-400 transition">
+
+            Reset
+
+        </a>
+
+    </form>
+
+</div>
 
     <x-card>
 
@@ -80,15 +106,15 @@
 
                 @forelse($orders as $order)
 
-                    <tr class="border-b">
+                   <tr class="order-row border-b">
 
-                        <td class="p-3">
-                            #{{ $order->id }}
-                        </td>
+                        <td class="p-3 order-id">
+    #{{ $order->id }}
+</td>
 
-                        <td class="p-3">
-                            {{ $order->user->name }}
-                        </td>
+                        <td class="p-3 order-technician">
+    {{ $order->user->name }}
+</td>
 
                         <td class="p-3">
                             <div>
@@ -106,12 +132,11 @@
                             {{ $order->delivery_date }}
                         </td>
 
-                        <td class="p-3">
+                       <td class="p-3 order-status">
+    <span class="hidden">{{ $order->status }}</span>
 
-                            <x-status-badge
-                                :status="$order->status" />
-
-                        </td>
+    <x-status-badge :status="$order->status" />
+</td>
 
                         <td class="p-3">
 
@@ -192,5 +217,41 @@
         </div>
 
     </x-card>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
 
+    const searchInput = document.getElementById('global-order-search');
+    const rows = document.querySelectorAll('.order-row');
+
+    searchInput.addEventListener('input', function () {
+
+        const query = this.value.toLowerCase();
+
+        rows.forEach(row => {
+
+            const id =
+                row.querySelector('.order-id')?.textContent.toLowerCase() || '';
+
+            const technician =
+                row.querySelector('.order-technician')?.textContent.toLowerCase() || '';
+
+            const status =
+                row.querySelector('.order-status')?.textContent.toLowerCase() || '';
+
+            if (
+                id.includes(query) ||
+                technician.includes(query) ||
+                status.includes(query)
+            ) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+
+        });
+
+    });
+
+});
+</script>
 </x-app-layout>

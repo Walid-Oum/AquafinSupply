@@ -20,55 +20,71 @@
             </div>
         @endif
 
-        <form
-            id="ticket-search-form"
-            method="GET"
-            action="{{ route('tickets.warehouse.index') }}"
-            class="mb-6 flex flex-wrap items-center gap-3 rounded-lg bg-white p-4 shadow"
+       <div class="mb-6 flex justify-between items-center">
+
+    <div class="relative w-96">
+
+        <input
+            id="ticket-search-input"
+            type="text"
+            name="search"
+            value="{{ request('search') }}"
+            placeholder="Zoeken op onderwerp, technieker, bestelling..."
+            autocomplete="off"
+            class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]"
         >
-            <div class="relative w-full md:w-96">
-                <input
-                    id="ticket-search-input"
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Zoeken op onderwerp, technieker, bestelling..."
-                    autocomplete="off"
-                    class="w-full rounded-lg border border-gray-300 px-4 py-2"
-                >
 
-                <ul
-                    id="ticket-search-results"
-                    class="absolute z-50 mt-1 hidden max-h-60 w-full divide-y divide-gray-100 overflow-y-auto rounded border border-gray-200 bg-white shadow-xl"
-                ></ul>
-            </div>
+        <ul
+            id="ticket-search-results"
+            class="absolute z-50 mt-1 hidden max-h-60 w-full divide-y divide-gray-100 overflow-y-auto rounded border border-gray-200 bg-white shadow-xl"
+        ></ul>
 
-            <select
-                id="ticket-status-filter"
-                name="status"
-                class="rounded-lg border border-gray-300 px-4 py-2"
-            >
-                <option value="">
-                    Alle statussen
+    </div>
+
+    <form
+        id="ticket-search-form"
+        method="GET"
+        action="{{ route('tickets.warehouse.index') }}"
+        class="flex gap-2">
+
+        <select
+            id="ticket-status-filter"
+            name="status"
+            class="border rounded px-3 py-2 text-sm">
+
+            <option value="">
+                Alle statussen
+            </option>
+
+            @foreach($ticketStatuses as $status)
+
+                <option
+                    value="{{ $status }}"
+                    @selected(request('status') === $status)>
+
+                    {{ $status }}
+
                 </option>
 
-                @foreach($ticketStatuses as $status)
-                    <option value="{{ $status }}" @selected(request('status') === $status)>
-                        {{ $status }}
-                    </option>
-                @endforeach
-            </select>
+            @endforeach
 
-            <x-button type="submit">
-                Zoeken
-            </x-button>
+        </select>
 
-            <a href="{{ route('tickets.warehouse.index') }}">
-                <x-button type="button">
-                    Reset
-                </x-button>
-            </a>
-        </form>
+        <x-button>
+            Filter
+        </x-button>
+
+        <a
+            href="{{ route('tickets.warehouse.index') }}"
+            class="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-400 transition">
+
+            Reset
+
+        </a>
+
+    </form>
+
+</div>
 
         @if($tickets->isEmpty())
             <div class="rounded-lg bg-white p-6 shadow">
