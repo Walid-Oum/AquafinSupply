@@ -8,8 +8,7 @@
         <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
             <div class="flex items-center justify-between mb-3">
                 <h2 class="text-lg font-bold text-green-700">
-                    Aanbevolen materialen
-                    (op basis van overstromingsrisico)
+                    Aanbevolen materialen (op basis van overstromingsrisico)
                 </h2>
 
                 <button
@@ -21,50 +20,42 @@
                     ▲ Verberg
                 </button>
             </div>
+            
             <div id="recommendationsContainer">
                 <div class="relative">
+                    <button
+                        type="button"
+                        id="prevRecommendation"
+                        class="hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow flex items-center justify-center font-bold"
+                    >
+                        ←
+                    </button>
 
-                <button
-                    type="button"
-                    id="prevRecommendation"
-                    class="hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow"
-                >
-                    ←
-                </button>
+                    <button
+                        type="button"
+                        id="nextRecommendation"
+                        class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow flex items-center justify-center font-bold"
+                    >
+                        →
+                    </button>
 
-                <button
-                    type="button"
-                    id="nextRecommendation"
-                    class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full w-10 h-10 shadow"
-                >
-                    →
-                </button>
-
-                <div
-                    id="recommendationCards"
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-                >
-
-                    @foreach($recommendedMaterials as $material)
-
-                        <div class="recommendation-card hidden">
-
-                            <x-material-card
-                                :material="$material"
-                                :compact="true"
-                            />
-
-                        </div>
-
-                    @endforeach
-
+                    <div
+                        id="recommendationCards"
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                    >
+                        @foreach($recommendedMaterials as $material)
+                            <div class="recommendation-card hidden">
+                                <x-material-card
+                                    :material="$material"
+                                    :compact="true"
+                                />
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
-
-</div>
             </div>
-    @endif
         </div>
-
+    @endif
 
     <div class="mb-6 flex items-center gap-4">
         <form
@@ -75,14 +66,12 @@
             <select
                 name="sort"
                 onchange="this.form.submit()"
-                class="rounded border px-3 py-2"
+                class="rounded border px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]"
             >
                 <option value="">Sorteer op naam</option>
-
                 <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>
                     A-Z
                 </option>
-
                 <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>
                     Z-A
                 </option>
@@ -96,7 +85,7 @@
                 autocomplete="off"
                 placeholder="Zoeken op naam..."
                 value="{{ request('search') }}"
-                class="w-64 rounded border px-3 py-2"
+                class="w-64 rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]"
             >
 
             <ul
@@ -111,7 +100,7 @@
         <button
             type="button"
             data-category-filter="all"
-            class="js-category-filter rounded-full px-5 py-2 bg-[#0F4C81] text-white"
+            class="js-category-filter rounded-full px-5 py-2 bg-[#0F4C81] text-white text-xs font-medium transition shadow-sm"
         >
             Alles
         </button>
@@ -120,7 +109,7 @@
             <button
                 type="button"
                 data-category-filter="{{ $category }}"
-                class="js-category-filter rounded-full px-5 py-2 bg-gray-100 hover:bg-gray-200"
+                class="js-category-filter rounded-full px-5 py-2 bg-gray-100 hover:bg-gray-200 text-xs font-medium text-gray-600 transition"
             >
                 {{ $category }}
             </button>
@@ -139,16 +128,13 @@
                 <x-material-card :material="$material" />
             </div>
         @empty
-            <div class="col-span-4 text-center text-gray-500">
+            <div class="col-span-4 text-center text-gray-500 py-8 bg-white border rounded-xl shadow-sm italic">
                 Geen materialen gevonden.
             </div>
         @endforelse
     </div>
-<<<<<<< HEAD
-<script>
-=======
+
     <script>
->>>>>>> origin/main
         document.addEventListener('DOMContentLoaded', function () {
             const scrollKey = 'technician-materials-scroll-position';
             const savedScroll = sessionStorage.getItem(scrollKey);
@@ -164,57 +150,36 @@
             }
 
             const cards = document.querySelectorAll('.recommendation-card');
-
             let currentIndex = 0;
             const cardsPerPage = 4;
 
-            function renderRecommendations()
-            {
+            function renderRecommendations() {
                 cards.forEach(card => {
                     card.classList.add('hidden');
                 });
 
-                for (
-                    let i = currentIndex;
-                    i < currentIndex + cardsPerPage && i < cards.length;
-                    i++
-                ) {
-                    cards[i].classList.remove('hidden');
+                for (let i = currentIndex; i < currentIndex + cardsPerPage && i < cards.length; i++) {
+                    if (cards[i]) cards[i].classList.remove('hidden');
                 }
 
-                document
-                    .getElementById('prevRecommendation')
-                    ?.classList.toggle('hidden', currentIndex === 0);
-
-                document
-                    .getElementById('nextRecommendation')
-                    ?.classList.toggle(
-                    'hidden',
-                    currentIndex + cardsPerPage >= cards.length
-                );
+                document.getElementById('prevRecommendation')?.classList.toggle('hidden', currentIndex === 0);
+                document.getElementById('nextRecommendation')?.classList.toggle('hidden', currentIndex + cardsPerPage >= cards.length);
             }
 
-            document
-                .getElementById('nextRecommendation')
-                ?.addEventListener('click', function () {
+            document.getElementById('nextRecommendation')?.addEventListener('click', function () {
+                if (currentIndex + cardsPerPage < cards.length) {
+                    currentIndex += cardsPerPage;
+                    renderRecommendations();
+                }
+            });
 
-                    if (currentIndex + cardsPerPage < cards.length) {
-                        currentIndex += cardsPerPage;
-                        renderRecommendations();
-                    }
+            document.getElementById('prevRecommendation')?.addEventListener('click', function () {
+                if (currentIndex - cardsPerPage >= 0) {
+                    currentIndex -= cardsPerPage;
+                    renderRecommendations();
+                }
+            });
 
-                });
-
-            document
-                .getElementById('prevRecommendation')
-                ?.addEventListener('click', function () {
-
-                    if (currentIndex - cardsPerPage >= 0) {
-                        currentIndex -= cardsPerPage;
-                        renderRecommendations();
-                    }
-
-                });
             renderRecommendations();
 
             document.querySelectorAll('.js-preserve-scroll').forEach(function (form) {
@@ -236,7 +201,6 @@
                     button.classList.remove('bg-gray-100', 'hover:bg-gray-200');
                     button.classList.add('bg-[#0F4C81]', 'text-white');
 
-                    // Trigger handmatig de filter update (houdt rekening met eventuele zoektekst)
                     applyFilters();
                 });
             });
@@ -289,16 +253,16 @@
                 });
             });
 
-            // --- NIEUW: Snel & Fuzzy zoeken in de HTML Grid ---
+            // --- Snel & Fuzzy zoeken in de HTML Grid ---
             const searchInput = document.getElementById('global-material-search');
             const resultsList = document.getElementById('global-search-results');
 
             function normalizeText(text) {
                 if (!text) return '';
                 return text.toLowerCase()
-                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Accenten weg
-                    .replace(/[^a-z0-9]/g, ' ')                      // Speciale tekens weg
-                    .replace(/\s+/g, ' ')                             // Dubbele spaties weg
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[^a-z0-9]/g, ' ')
+                    .replace(/\s+/g, ' ')
                     .trim();
             }
 
@@ -331,7 +295,6 @@
                 return 4;
             }
 
-            // Combineert de actieve categorie-knop én de fuzzy zoekterm
             function applyFilters() {
                 const queryClean = normalizeText(searchInput.value);
                 const flatQuery = queryClean.replace(/ /g, '');
@@ -340,27 +303,21 @@
                 const selectedCategory = activeCategoryButton ? activeCategoryButton.dataset.categoryFilter : 'all';
 
                 const materialItems = document.querySelectorAll('.js-material-item');
-                let visibleCount = 0;
 
                 materialItems.forEach(function (item) {
                     const itemCategory = item.dataset.category;
-                    // Probeer de tekst binnen de x-material-card te pakken (meestal de titel/naam van het materiaal)
                     const materialName = normalizeText(item.textContent);
                     const flatName = materialName.replace(/ /g, '');
 
-                    // Check 1: Categorie filter
                     const matchesCategory = (selectedCategory === 'all' || itemCategory === selectedCategory);
 
-                    // Check 2: Fuzzy Zoekopdracht filter
                     let matchesSearch = true;
                     if (queryClean !== '') {
                         matchesSearch = false;
 
-                        // Directe match of spatieloze match
                         if (materialName.includes(queryClean) || flatName.includes(flatQuery)) {
                             matchesSearch = true;
                         } 
-                        // Fuzzy match (Levenshtein)
                         else if (flatQuery.length >= 3) {
                             const allowedDistance = getAllowedDistance(flatQuery);
                             if (levenshtein(flatQuery, flatName) <= allowedDistance) {
@@ -369,77 +326,72 @@
                         }
                     }
 
-                    // Toon of verberg het item op basis van beide filters
                     if (matchesCategory && matchesSearch) {
                         item.classList.remove('hidden');
-                        visibleCount++;
                     } else {
                         item.classList.add('hidden');
                     }
                 });
             }
 
-            searchInput.addEventListener('input', async function () {
-                const queryRaw = this.value;
+            if (searchInput) {
+                searchInput.addEventListener('input', async function () {
+                    const queryRaw = this.value;
 
-                // Werk de grid live bij met de fuzzy filter
-                applyFilters();
+                    applyFilters();
 
-                // Autocomplete dropdown via de API
-                if (queryRaw.length < 2) {
-                    resultsList.innerHTML = '';
-                    resultsList.classList.add('hidden');
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`/api/search-materials?q=${encodeURIComponent(queryRaw)}`);
-                    const data = await response.json();
-
-                    resultsList.innerHTML = '';
-
-                    if (data.length > 0) {
-                        resultsList.classList.remove('hidden');
-
-                        data.forEach(item => {
-                            const li = document.createElement('li');
-                            li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center text-sm';
-                            li.innerHTML = `
-                                <span class="font-medium text-gray-700">${item.name}</span>
-                                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">Stock: ${item.stock}</span>
-                            `;
-
-                            li.addEventListener('click', function () {
-                                searchInput.value = item.name;
-                                resultsList.classList.add('hidden');
-                                window.location.href = `/technician/materials/${item.id}`;
-                            });
-
-                            resultsList.appendChild(li);
-                        });
-                    } else {
-                        resultsList.innerHTML = '<li class="px-4 py-2 text-sm text-gray-400 italic">Geen resultaten...</li>';
-                        resultsList.classList.remove('hidden');
+                    if (queryRaw.length < 2) {
+                        if (resultsList) {
+                            resultsList.innerHTML = '';
+                            resultsList.classList.add('hidden');
+                        }
+                        return;
                     }
-                } catch (error) {
-                    console.error('Fout bij ophalen suggesties:', error);
-                }
-            });
+
+                    try {
+                        const response = await fetch(`/api/search-materials?q=${encodeURIComponent(queryRaw)}`);
+                        const data = await response.json();
+
+                        if (!resultsList) return;
+                        resultsList.innerHTML = '';
+
+                        if (data.length > 0) {
+                            resultsList.classList.remove('hidden');
+
+                            data.forEach(item => {
+                                const li = document.createElement('li');
+                                li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center text-sm';
+                                li.innerHTML = `
+                                    <span class="font-medium text-gray-700">${item.name}</span>
+                                    <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">Stock: ${item.stock}</span>
+                                `;
+
+                                li.addEventListener('click', function () {
+                                    searchInput.value = item.name;
+                                    resultsList.classList.add('hidden');
+                                    window.location.href = `/technician/materials/${item.id}`;
+                                });
+
+                                resultsList.appendChild(li);
+                            });
+                        } else {
+                            resultsList.innerHTML = '<li class="px-4 py-2 text-sm text-gray-400 italic">Geen resultaten...</li>';
+                            resultsList.classList.remove('hidden');
+                        }
+                    } catch (error) {
+                        console.error('Fout bij ophalen suggesties:', error);
+                    }
+                });
+            }
 
             document.addEventListener('click', function (e) {
-                if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) {
+                if (searchInput && resultsList && !searchInput.contains(e.target) && !resultsList.contains(e.target)) {
                     resultsList.classList.add('hidden');
                 }
             });
-
-<<<<<<< HEAD
-        // Aanbevelingen verbergen/tonen helper
-        function toggleRecommendations() {
-=======
         });
-        function toggleRecommendations()
-        {
->>>>>>> origin/main
+
+        function toggleRecommendations() {
             const container = document.getElementById('recommendationsContainer');
             const icon = document.getElementById('recommendationIcon');
 
@@ -452,5 +404,4 @@
             }
         }
     </script>
-    
 </x-app-layout>
