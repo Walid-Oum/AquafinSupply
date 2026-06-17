@@ -21,19 +21,30 @@
         @endif
 
         <form
+            id="ticket-search-form"
             method="GET"
             action="{{ route('tickets.warehouse.index') }}"
             class="mb-6 flex flex-wrap items-center gap-3 rounded-lg bg-white p-4 shadow"
         >
-            <input
-                type="text"
-                name="search"
-                value="{{ request('search') }}"
-                placeholder="Zoeken op onderwerp, technieker, bestelling..."
-                class="w-full rounded-lg border border-gray-300 px-4 py-2 md:w-80"
-            >
+            <div class="relative w-full md:w-96">
+                <input
+                    id="ticket-search-input"
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Zoeken op onderwerp, technieker, bestelling..."
+                    autocomplete="off"
+                    class="w-full rounded-lg border border-gray-300 px-4 py-2"
+                >
+
+                <ul
+                    id="ticket-search-results"
+                    class="absolute z-50 mt-1 hidden max-h-60 w-full divide-y divide-gray-100 overflow-y-auto rounded border border-gray-200 bg-white shadow-xl"
+                ></ul>
+            </div>
 
             <select
+                id="ticket-status-filter"
                 name="status"
                 class="rounded-lg border border-gray-300 px-4 py-2"
             >
@@ -52,11 +63,10 @@
                 Zoeken
             </x-button>
 
-            <a
-                href="{{ route('tickets.warehouse.index') }}"
-                class="rounded-lg bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300"
-            >
-                Reset
+            <a href="{{ route('tickets.warehouse.index') }}">
+                <x-button type="button">
+                    Reset
+                </x-button>
             </a>
         </form>
 
@@ -130,11 +140,10 @@
                                     </p>
                                 </div>
 
-                                <a
-                                    href="{{ route('tickets.warehouse.show', $ticket) }}"
-                                    class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                                >
-                                    Bekijken
+                                <a href="{{ route('tickets.warehouse.show', $ticket) }}">
+                                    <x-button type="button">
+                                        Bekijken
+                                    </x-button>
                                 </a>
                             </div>
                         </div>
@@ -143,4 +152,79 @@
             @endforeach
         @endif
     </div>
+
+    <script>
+        const ticketSearchInput = document.getElementById('ticket-search-input');
+        const ticketResultsList = document.getElementById('ticket-search-results');
+        const ticketSearchForm = document.getElementById('ticket-search-form');
+        const ticketStatusFilter = document.getElementById('ticket-status-filter');
+
+        let ticketSearchTimeout = null;
+
+        ticketSearchInput.addEventListener('input', function () {
+            const query = this.value.trim();
+
+            clearTimeout(ticketSearchTimeout);
+
+            if (query.length < 2) {
+                ticketResultsList.innerHTML = '';
+                ticketResultsList.classList.add('hidden');
+                return;
+            }
+
+            ticketSearchTimeout = setTimeout(async function () {
+                const response = await fetch(`/api/search-tickets?q=${encodeURIComponent(query)}`);
+                const tickets = await response.json();
+
+                ticketResultsList.innerHTML = '';
+
+                if (tickets.length === 0) {
+                    ticketResultsList.classList.add('hidden');
+                    return;
+                }
+
+                tickets.forEach(function (ticket) {
+                    const item = document.createElement('li');
+
+                    item.className = 'cursor-pointer px-4 py-3 hover:bg-gray-100';
+
+                    item.innerHTML = `
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <p class="font-semibold text-gray-800">${ticket.subject}</p>
+                                <p class="text-sm text-gray-500">${ticket.technician} — ${ticket.order}</p>
+                            </div>
+
+                            <span class="rounded bg-gray-100 px-2 py-1 text-xs text-gray-600">
+                                ${ticket.status}
+                            </span>
+                        </div>
+                    `;
+
+                    item.addEventListener('click', function () {
+                        ticketSearchInput.value = ticket.subject;
+                        ticketResultsList.classList.add('hidden');
+                        ticketSearchForm.submit();
+                    });
+
+                    ticketResultsList.appendChild(item);
+                });
+
+                ticketResultsList.classList.remove('hidden');
+            }, 250);
+        });
+
+        ticketStatusFilter.addEventListener('change', function () {
+            ticketSearchForm.submit();
+        });
+
+        document.addEventListener('click', function (event) {
+            if (
+                !ticketSearchInput.contains(event.target) &&
+                !ticketResultsList.contains(event.target)
+            ) {
+                ticketResultsList.classList.add('hidden');
+            }
+        });
+    </script>
 </x-app-layout>
