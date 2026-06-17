@@ -173,7 +173,7 @@ class CartController extends Controller
 
     private function getCartCount(): int
     {
-        return collect(session('cart', []))->sum('quantity');
+        return count(session('cart', []));
     }
 
     private function getDepotStock(int $materialId, int $locationId): ?MaterialStock

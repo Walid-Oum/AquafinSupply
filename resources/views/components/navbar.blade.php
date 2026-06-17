@@ -1,7 +1,7 @@
 @php
     $user = Auth::user();
 
-    $cartCount = collect(session('cart', []))->sum('quantity');
+    $cartCount = count(session('cart', []));
 
     $canSeeNotifications = in_array($user->role, ['technieker', 'magazijn']);
 
