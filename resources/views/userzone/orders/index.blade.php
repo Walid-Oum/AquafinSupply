@@ -1,120 +1,259 @@
-{{-- 
+{{--
     Pagina: Overzicht bestellingen
 
     User Stories:
     US12 - Eigen bestellingen bekijken
-    US15 - Alle bestellingen bekijken
 --}}
+
 <x-app-layout>
+    <div class="p-4 md:p-8">
+        <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div>
+                <x-page-header title="Mijn bestellingen" />
 
-    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-        <x-page-header title="Bestellingen"/>
+                <p class="text-gray-600">
+                    Bekijk hier al je geplaatste bestellingen en hun huidige status.
+                </p>
+            </div>
+        </div>
 
-        <form method="GET" action="{{ url()->current() }}" class="flex gap-2 items-center w-full md:w-auto justify-end">
-            <input 
-                type="text" 
-                name="search" 
-                value="{{ request('search') }}"
-                placeholder="Zoek op ID, technieker of status..." 
-                class="border rounded px-3 py-2 w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] text-black">
-            
-            <button type="submit" class="bg-[#0F4C81] hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium transition">
-                Zoek
-            </button>
+        @if($orders->count() > 0)
+            <div class="mb-6 max-w-md">
+                <x-search-bar
+                    id="order-search-input"
+                    placeholder="Zoeken op ID, status of leverdatum..."
+                />
+            </div>
+        @endif
 
-            @if(request('search'))
-                <a href="{{ url()->current() }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-400 transition">
-                    Wis
-                </a>
-            @endif
-        </form>
+        <x-card>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[760px]">
+                    <thead>
+                    <tr class="border-b text-sm text-gray-600">
+                        <th class="p-3 text-left">
+                            ID
+                        </th>
+
+                        <th class="p-3 text-left">
+                            Technieker
+                        </th>
+
+                        <th class="p-3 text-left">
+                            Besteld op
+                        </th>
+
+                        <th class="p-3 text-left">
+                            Leverdatum
+                        </th>
+
+                        <th class="p-3 text-left">
+                            Status
+                        </th>
+
+                        <th class="p-3 text-left">
+                            Actie
+                        </th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    @forelse($orders as $order)
+                        @php
+                            $orderSearchText = collect([
+                                $order->id,
+                                'Bestelling #' . $order->id,
+                                $order->user?->name,
+                                $order->status,
+                                $order->created_at?->format('d/m/Y'),
+                                $order->delivery_date,
+                            ])->filter()->implode(' ');
+                        @endphp
+
+                        <tr
+                            class="js-order-item border-b border-gray-100 transition hover:bg-gray-50 last:border-0"
+                            data-search="{{ $orderSearchText }}"
+                        >
+                            <td class="p-3 font-medium text-gray-900">
+                                #{{ $order->id }}
+                            </td>
+
+                            <td class="p-3 text-gray-700">
+                                {{ $order->user?->name ?? 'Onbekend' }}
+                            </td>
+
+                            <td class="p-3 text-gray-700">
+                                {{ $order->created_at->format('d/m/Y') }}
+                            </td>
+
+                            <td class="p-3 text-gray-700">
+                                {{ $order->delivery_date ?? 'Geen leverdatum' }}
+                            </td>
+
+                            <td class="p-3">
+                                <x-status-badge :status="$order->status" />
+                            </td>
+
+                            <td class="p-3">
+                                <a href="{{ route('orders.show', $order->id) }}">
+                                    <x-button type="button">
+                                        Bekijken
+                                    </x-button>
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="p-6 text-center text-gray-500 italic">
+                                Geen bestellingen gevonden.
+                            </td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div
+                id="orders-empty-state"
+                class="hidden p-6 text-center text-gray-500 italic"
+            >
+                Geen bestellingen gevonden voor deze zoekterm.
+            </div>
+        </x-card>
     </div>
 
-    <x-card>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('order-search-input');
+            const orderItems = document.querySelectorAll('.js-order-item');
+            const emptyState = document.getElementById('orders-empty-state');
 
-        <table class="w-full">
+            function normalizeText(value) {
+                return (value || '')
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9]+/g, ' ')
+                    .trim();
+            }
 
-            <thead>
+            function levenshtein(a, b) {
+                const matrix = [];
 
-                <tr class="border-b">
+                for (let i = 0; i <= b.length; i++) {
+                    matrix[i] = [i];
+                }
 
-                    <th class="p-3 text-left">
-                        ID
-                    </th>
+                for (let j = 0; j <= a.length; j++) {
+                    matrix[0][j] = j;
+                }
 
-                    <th class="p-3 text-left">
-                        Technieker
-                    </th>
-                    
-                    <th class="p-3 text-left">
-                        Besteld op
-                    </th>
-                    
-                    <th class="p-3 text-left">
-                        Leverdatum
-                    </th>
+                for (let i = 1; i <= b.length; i++) {
+                    for (let j = 1; j <= a.length; j++) {
+                        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                            matrix[i][j] = matrix[i - 1][j - 1];
+                        } else {
+                            matrix[i][j] = Math.min(
+                                matrix[i - 1][j - 1] + 1,
+                                matrix[i][j - 1] + 1,
+                                matrix[i - 1][j] + 1
+                            );
+                        }
+                    }
+                }
 
-                    <th class="p-3 text-left">
-                        Status
-                    </th>
+                return matrix[b.length][a.length];
+            }
 
-                    <th class="p-3 text-left">
-                        Actie
-                    </th>
+            function allowedDistance(word) {
+                if (word.length <= 5) {
+                    return 1;
+                }
 
-                </tr>
+                if (word.length <= 9) {
+                    return 2;
+                }
 
-            </thead>
+                return 3;
+            }
 
-            <tbody>
+            function wordMatches(queryWord, textWords) {
+                if (queryWord.length === 0) {
+                    return true;
+                }
 
-                @forelse($orders as $order)
+                for (const textWord of textWords) {
+                    if (textWord.includes(queryWord)) {
+                        return true;
+                    }
 
-                <tr class="hover:bg-gray-50 transition border-b border-gray-100 last:border-0">
+                    if (queryWord.length < 4) {
+                        continue;
+                    }
 
-                    <td class="p-3 font-medium text-gray-900">
-                        #{{ $order->id }}
-                    </td>
+                    if (levenshtein(queryWord, textWord) <= allowedDistance(queryWord)) {
+                        return true;
+                    }
+                }
 
-                    <td class="p-3">
-                        {{ $order->user->name }}
-                    </td>
-                    
-                    <td class="p-3">
-                        {{ $order->created_at->format('d/m/Y') }}
-                    </td>
+                return false;
+            }
 
-                    <td class="p-3">
-                        {{ $order->delivery_date }}
-                    </td>
+            function fuzzyMatches(query, text) {
+                const normalizedQuery = normalizeText(query);
+                const normalizedText = normalizeText(text);
 
-                    <td class="p-3">
-                        <x-status-badge :status="$order->status" />
-                    </td>
+                if (normalizedQuery === '') {
+                    return true;
+                }
 
-                    <td class="p-3">
-                        <a href="{{ route('orders.show', $order->id) }}">
-                            <x-button>
-                                Bekijken
-                            </x-button>
-                        </a>
-                    </td>
+                if (normalizedText.includes(normalizedQuery)) {
+                    return true;
+                }
 
-                </tr>
+                const queryWords = normalizedQuery.split(' ').filter(Boolean);
+                const textWords = normalizedText.split(' ').filter(Boolean);
 
-                @empty
+                return queryWords.every(function (queryWord) {
+                    return wordMatches(queryWord, textWords);
+                });
+            }
 
-                <tr>
-                    <td colspan="6" class="text-center p-4 text-gray-500 italic">
-                        Geen bestellingen gevonden.
-                    </td>
-                </tr>
+            function applyOrderFilter() {
+                if (! searchInput) {
+                    return;
+                }
 
-                @endforelse
+                const searchValue = searchInput.value;
+                let visibleCount = 0;
 
-            </tbody>
-        </table>
+                orderItems.forEach(function (item) {
+                    const matchesSearch = fuzzyMatches(searchValue, item.dataset.search);
 
-    </x-card>
+                    if (matchesSearch) {
+                        item.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
 
+                if (emptyState) {
+                    if (visibleCount === 0 && orderItems.length > 0) {
+                        emptyState.classList.remove('hidden');
+                    } else {
+                        emptyState.classList.add('hidden');
+                    }
+                }
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    applyOrderFilter();
+                });
+            }
+
+            applyOrderFilter();
+        });
+    </script>
 </x-app-layout>
