@@ -26,18 +26,10 @@ class OrderController extends Controller
     ];
     public function index()
     {
-        // Start met de basisrelaties en filter op de eigen bestellingen van de technieker
-        $query = Order::where('user_id', Auth::id())
-            ->with('location');
-
-        // Pas de slimme scopeSearch toe als er een zoekopdracht is ingevoerd
-        if ($request->has('search')) {
-            $query->search($request->input('search'));
-        } else {
-            $query->latest();
-        }
-
-        $orders = $query->get();
+        $orders = Order::where('user_id', Auth::id())
+            ->with('location')
+            ->latest()
+            ->get();
 
         return view(
             'userzone.orders.index',
@@ -191,18 +183,32 @@ class OrderController extends Controller
                 ->with('error', 'Er is geen depot gekoppeld aan je account. Contacteer een administrator.');
         }
 
-        // Bouw de basis query voor het magazijn (alleen bestellingen van hun eigen locatie)
         $query = Order::with(['user', 'location'])
             ->where('location_id', $user->location_id);
 
-        // Hergebruik de slimme database-zoekfunctie voor de magazijnomgeving
-        if ($request->has('search')) {
-            $query->search($request->input('search'));
-        } else {
-            $query->latest();
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where(
+                    'id',
+                    'like',
+                    '%' . $request->search . '%'
+                )
+                    ->orWhereHas(
+                        'user',
+                        function ($user) use ($request) {
+                            $user->where(
+                                'name',
+                                'like',
+                                '%' . $request->search . '%'
+                            );
+                        }
+                    );
+            });
         }
 
-        $orders = $query->get();
+        $orders = $query
+            ->latest()
+            ->get();
 
         return view(
             'magazijn.orders.index',

@@ -12,17 +12,13 @@ use Illuminate\Validation\Rule;
 
 class TicketController extends Controller
 {
-<<<<<<< HEAD
     private const TICKET_STATUSES = [
         'Open',
         'In behandeling',
         'Opgelost',
     ];
 
-    public function index()
-=======
     public function index(Request $request)
->>>>>>> 37120beb3a1b1f6b8f864c9da4bd4edc63aa9be7
     {
         // Start met de basisrelaties en filter op de eigen tickets van de gebruiker
         $query = Ticket::with(['order', 'location'])
@@ -104,7 +100,6 @@ class TicketController extends Controller
                 ->with('error', 'Er is geen depot gekoppeld aan je account. Contacteer een administrator.');
         }
 
-<<<<<<< HEAD
         $validated = $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
             'status' => [
@@ -125,20 +120,6 @@ class TicketController extends Controller
             ")
             ->latest()
             ->get();
-=======
-        // Start de query voor het magazijn (alleen tickets van hun eigen depot)
-        $query = Ticket::with(['user', 'order', 'location'])
-            ->where('location_id', $user->location_id);
-
-        // Pas onze slimme zoekfunctie toe als er gezocht wordt
-        if ($request->has('search')) {
-            $query->search($request->input('search'));
-        } else {
-            $query->latest();
-        }
-
-        $tickets = $query->get();
->>>>>>> 37120beb3a1b1f6b8f864c9da4bd4edc63aa9be7
 
         if (! empty($validated['status'])) {
             $tickets = $tickets
