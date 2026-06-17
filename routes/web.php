@@ -153,6 +153,8 @@ Route::middleware(['auth',  'password.changed', 'role:admin'])->group(function (
     // Admin Gebruikersbeheer & Rollen toewijzen
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', \App\Http\Controllers\UserController::class);
+        // Toggle user active status
+        Route::post('/users/toggle/{id}', [\App\Http\Controllers\UserController::class, 'toggleActive'])->name('users.toggle');
     });
 });
 
