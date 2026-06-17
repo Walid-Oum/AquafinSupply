@@ -2,14 +2,14 @@
     <x-page-header title="Materialen overzicht" />
 
     @if($recommendedMaterials->count() > 0)
-        <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
-            <div class="mb-3 flex items-center justify-between gap-4">
+        <section class="mb-6 rounded-2xl border border-green-200 bg-green-50 p-4 shadow-sm sm:p-5">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                    <h2 class="text-lg font-bold text-green-700">
+                    <h2 class="text-lg font-bold text-green-700 sm:text-xl">
                         Aanbevolen materialen
                     </h2>
 
-                    <p class="text-sm text-green-700">
+                    <p class="mt-1 text-sm leading-relaxed text-green-700">
                         {{ $recommendedMaterials->count() }} materialen aanbevolen op basis van het overstromingsrisico.
                     </p>
                 </div>
@@ -18,7 +18,7 @@
                     type="button"
                     onclick="toggleRecommendations()"
                     id="recommendationIcon"
-                    class="text-sm font-medium text-green-700 hover:text-green-900 hover:underline"
+                    class="inline-flex w-fit items-center rounded-full bg-white px-3 py-2 text-sm font-semibold text-green-700 shadow-sm ring-1 ring-green-200 transition hover:bg-green-100"
                 >
                     ▲ Verberg
                 </button>
@@ -26,11 +26,11 @@
 
             <div
                 id="recommendationsContainer"
-                class="mt-4 overflow-x-auto pb-4"
+                class="-mx-4 mt-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0"
             >
-                <div class="flex gap-4 snap-x snap-mandatory">
+                <div class="flex w-max snap-x snap-mandatory gap-4">
                     @foreach($recommendedMaterials as $material)
-                        <div class="w-56 flex-none snap-start">
+                        <div class="w-[220px] flex-none snap-start sm:w-56">
                             <x-material-card
                                 :material="$material"
                                 :compact="true"
@@ -39,60 +39,66 @@
                     @endforeach
                 </div>
             </div>
-        </div>
+        </section>
     @endif
 
-    <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center">
-        <form
-            method="GET"
-            action="{{ route('technician.materials.index') }}"
-            class="js-preserve-scroll"
-        >
-            <select
-                name="sort"
-                onchange="this.form.submit()"
-                class="w-full rounded border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] md:w-auto"
+    <section class="mb-5 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-3 md:items-center">
+            <form
+                method="GET"
+                action="{{ route('technician.materials.index') }}"
+                class="js-preserve-scroll md:col-span-1"
             >
-                <option value="">
-                    Sorteer op naam
-                </option>
+                <select
+                    name="sort"
+                    onchange="this.form.submit()"
+                    class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
+                >
+                    <option value="">
+                        Sorteer op naam
+                    </option>
 
-                <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>
-                    A-Z
-                </option>
+                    <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>
+                        A-Z
+                    </option>
 
-                <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>
-                    Z-A
-                </option>
-            </select>
-        </form>
+                    <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>
+                        Z-A
+                    </option>
+                </select>
+            </form>
 
-        <x-search-bar
-            id="global-material-search"
-            placeholder="Zoeken op naam, categorie of voorraadstatus..."
-            value="{{ request('search') }}"
-            endpoint="{{ route('api.materials.search') }}"
-        />
-    </div>
+            <div class="md:col-span-2">
+                <x-search-bar
+                    id="global-material-search"
+                    placeholder="Zoeken op naam, categorie of voorraadstatus..."
+                    value="{{ request('search') }}"
+                    endpoint="{{ route('api.materials.search') }}"
+                />
+            </div>
+        </div>
+    </section>
 
-    <div class="mb-6 flex flex-wrap gap-3">
-        <button
-            type="button"
-            data-category-filter="all"
-            class="js-category-filter rounded-full bg-[#0F4C81] px-5 py-2 text-xs font-medium text-white shadow-sm transition"
-        >
-            Alles
-        </button>
-
-        @foreach($categories as $category)
+    <div class="-mx-4 mb-6 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+        <div class="flex min-w-max gap-2 sm:min-w-0 sm:flex-wrap sm:gap-3">
             <button
                 type="button"
-                data-category-filter="{{ $category }}"
-                class="js-category-filter rounded-full bg-gray-100 px-5 py-2 text-xs font-medium text-gray-600 transition hover:bg-gray-200"
+                data-category-filter="all"
+                class="js-category-filter whitespace-nowrap rounded-full border border-[#0F4C81] bg-[#0F4C81] px-4 py-2 text-sm font-semibold text-white shadow-sm transition"
             >
-                {{ $category }}
+                Alles
             </button>
-        @endforeach
+
+            @foreach($categories as $category)
+                <button
+                    type="button"
+                    data-category-filter="{{ $category }}"
+                    class="js-category-filter whitespace-nowrap rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                >
+                    {{ $category }}
+                </button>
+            @endforeach
+        </div>
     </div>
 
     <div
@@ -129,7 +135,7 @@
                 <x-material-card :material="$material" />
             </div>
         @empty
-            <div class="col-span-full rounded-xl border bg-white py-8 text-center text-gray-500 shadow-sm">
+            <div class="col-span-full rounded-2xl border border-gray-100 bg-white py-10 text-center text-gray-500 shadow-sm">
                 Geen materialen gevonden.
             </div>
         @endforelse
@@ -137,7 +143,7 @@
 
     <div
         id="materials-empty-state"
-        class="mt-4 hidden rounded-xl border bg-white py-8 text-center text-gray-500 shadow-sm"
+        class="mt-4 hidden rounded-2xl border border-gray-100 bg-white py-10 text-center text-gray-500 shadow-sm"
     >
         Geen materialen gevonden voor deze zoekterm of categorie.
     </div>
@@ -281,12 +287,12 @@
 
             function updateCategoryButtons(activeButton) {
                 categoryButtons.forEach(function (button) {
-                    button.classList.remove('bg-[#0F4C81]', 'text-white', 'shadow-sm');
-                    button.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+                    button.classList.remove('border-[#0F4C81]', 'bg-[#0F4C81]', 'text-white', 'shadow-sm');
+                    button.classList.add('border-gray-200', 'bg-white', 'text-gray-700', 'hover:bg-gray-50');
                 });
 
-                activeButton.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
-                activeButton.classList.add('bg-[#0F4C81]', 'text-white', 'shadow-sm');
+                activeButton.classList.remove('border-gray-200', 'bg-white', 'text-gray-700', 'hover:bg-gray-50');
+                activeButton.classList.add('border-[#0F4C81]', 'bg-[#0F4C81]', 'text-white', 'shadow-sm');
             }
 
             function applyMaterialFilters() {
