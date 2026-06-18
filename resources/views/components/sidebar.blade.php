@@ -1,3 +1,15 @@
+{{--
+    SIDEBAR COMPONENT
+
+    @author      
+    @version     1.0
+    @since       2026-06-18
+
+    Zijbalk navigatie voor de applicatie. Toont verschillende menu-items
+    op basis van de gebruikersrol (technieker, magazijn, admin).
+    Ondersteunt zowel desktop (sticky) als mobile (fullscreen) weergave.
+--}}
+
 @php
     $user = Auth::user();
     $role = $user->role;
@@ -59,6 +71,7 @@
 
             <ul class="space-y-3">
 
+                {{-- TECHNIEKER MENU --}}
                 @if($role == 'technieker')
 
                     <li>
@@ -95,6 +108,7 @@
 
                 @endif
 
+                {{-- MAGAZIJN MENU --}}
                 @if($role == 'magazijn')
 
                     <li>
@@ -131,6 +145,7 @@
 
                 @endif
 
+                {{-- ADMIN MENU --}}
                 @if($role == 'admin')
 
                     <li>
