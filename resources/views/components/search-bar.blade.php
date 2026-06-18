@@ -1,3 +1,16 @@
+{{--
+    SEARCH BAR COMPONENT
+
+    @author      Chayma 
+    @version     1.0
+    @since       2026-06-18
+
+    Herbicules Zoekbalk component met live suggesties en fuzzy search.
+    Ondersteunt client-side filtering en API-aanroepen.
+
+    Props: id, name, value, placeholder, endpoint, targetSelector, emptyStateId
+--}}
+
 @props([
     'id',
     'name' => 'search',
@@ -33,8 +46,10 @@
 </div>
 
 @once
+    {{-- ZOEKFUNCTIE --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Normaliseert tekst (kleine letters, accenten verwijderen)
             function normalizeText(value) {
                 return (value || '')
                     .toLowerCase()
@@ -44,6 +59,7 @@
                     .trim();
             }
 
+            // Levenshtein afstand voor spellingsfouten
             function levenshtein(a, b) {
                 const matrix = [];
 
@@ -72,78 +88,48 @@
                 return matrix[b.length][a.length];
             }
 
+            // Toegestane afstand op basis van woordlengte
             function allowedDistance(word) {
-                if (word.length <= 3) {
-                    return 1;
-                }
-
-                if (word.length <= 7) {
-                    return 2;
-                }
-
-                if (word.length <= 12) {
-                    return 3;
-                }
-
+                if (word.length <= 3) return 1;
+                if (word.length <= 7) return 2;
+                if (word.length <= 12) return 3;
                 return 4;
             }
 
-            function wordMatches(queryWord, textWords) {
-                if (queryWord.length === 0) {
-                    return true;
-                }
-
-                for (const textWord of textWords) {
-                    if (textWord.includes(queryWord)) {
-                        return true;
-                    }
-
-                    if (queryWord.length >= 3 && levenshtein(queryWord, textWord) <= allowedDistance(queryWord)) {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-
+            // Fuzzy match: check of query overeenkomt met tekst
             function fuzzyMatches(query, text) {
                 const normalizedQuery = normalizeText(query);
                 const normalizedText = normalizeText(text);
 
-                if (normalizedQuery === '') {
-                    return true;
-                }
-
-                if (normalizedText.includes(normalizedQuery)) {
-                    return true;
-                }
+                if (normalizedQuery === '') return true;
+                if (normalizedText.includes(normalizedQuery)) return true;
 
                 const queryWords = normalizedQuery.split(' ').filter(Boolean);
                 const textWords = normalizedText.split(' ').filter(Boolean);
 
                 return queryWords.every(function (queryWord) {
-                    return wordMatches(queryWord, textWords);
+                    for (const textWord of textWords) {
+                        if (textWord.includes(queryWord)) return true;
+                        if (queryWord.length >= 3 && levenshtein(queryWord, textWord) <= allowedDistance(queryWord)) return true;
+                    }
+                    return false;
                 });
             }
 
+            // Filter targets client-side
             function filterTargets(searchBar, query) {
                 const targetSelector = searchBar.dataset.targetSelector;
                 const emptyStateId = searchBar.dataset.emptyStateId;
 
-                if (! targetSelector) {
-                    return;
-                }
+                if (!targetSelector) return;
 
                 const targets = document.querySelectorAll(targetSelector);
                 const emptyState = emptyStateId ? document.getElementById(emptyStateId) : null;
-
                 let visibleCount = 0;
 
                 targets.forEach(function (target) {
                     const searchableText = target.dataset.search || target.textContent;
-                    const matchesSearch = fuzzyMatches(query, searchableText);
-
-                    if (matchesSearch) {
+                    if (fuzzyMatches(query, searchableText)) {
                         target.classList.remove('hidden');
                         visibleCount++;
                     } else {
@@ -160,6 +146,7 @@
                 }
             }
 
+            // Toon suggesties in dropdown
             function renderSuggestions(resultsList, suggestions, input) {
                 resultsList.innerHTML = '';
 
@@ -171,50 +158,40 @@
 
                 suggestions.forEach(function (item) {
                     const li = document.createElement('li');
-
                     li.className = 'flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-gray-50';
-
                     li.innerHTML = `
                         <div class="min-w-0">
                             <p class="truncate font-semibold text-gray-800">${item.label}</p>
                             ${item.subtitle ? `<p class="truncate text-xs text-gray-400">${item.subtitle}</p>` : ''}
                         </div>
-
                         ${item.badge ? `<span class="shrink-0 rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-500">${item.badge}</span>` : ''}
                     `;
-
                     li.addEventListener('click', function () {
                         input.value = item.label;
                         resultsList.classList.add('hidden');
-
                         input.dispatchEvent(new Event('input'));
-
-                        if (item.url) {
-                            window.location.href = item.url;
-                        }
+                        if (item.url) window.location.href = item.url;
                     });
-
                     resultsList.appendChild(li);
                 });
 
                 resultsList.classList.remove('hidden');
             }
 
+            // Initialiseer alle search bars
             document.querySelectorAll('[data-search-bar]').forEach(function (searchBar) {
                 const input = searchBar.querySelector('[data-search-input]');
                 const resultsList = searchBar.querySelector('[data-search-results]');
                 const endpoint = searchBar.dataset.endpoint;
-
                 let searchTimeout = null;
 
                 input.addEventListener('input', function () {
                     const query = input.value.trim();
-
                     filterTargets(searchBar, query);
 
                     clearTimeout(searchTimeout);
 
-                    if (! endpoint || query.length < 2) {
+                    if (!endpoint || query.length < 2) {
                         resultsList.innerHTML = '';
                         resultsList.classList.add('hidden');
                         return;
@@ -224,7 +201,6 @@
                         try {
                             const response = await fetch(`${endpoint}?q=${encodeURIComponent(query)}`);
                             const suggestions = await response.json();
-
                             renderSuggestions(resultsList, suggestions, input);
                         } catch (error) {
                             console.error('Fout bij ophalen zoekresultaten:', error);
@@ -233,7 +209,7 @@
                 });
 
                 document.addEventListener('click', function (event) {
-                    if (! input.contains(event.target) && ! resultsList.contains(event.target)) {
+                    if (!input.contains(event.target) && !resultsList.contains(event.target)) {
                         resultsList.classList.add('hidden');
                     }
                 });
