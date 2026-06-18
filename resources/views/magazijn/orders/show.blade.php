@@ -1,3 +1,12 @@
+{{--
+    MAGAZIJN - BESTELLING DETAILS
+    Deze view toont alle details van een specifieke bestelling voor
+    magazijnmedewerkers. Hier worden bestelgegevens getoond zoals:
+    bestellingnummer, technieker, leverdatum, depot, stad en opmerking.
+    Ook worden alle materialen in de bestelling weergegeven met afbeelding,
+    categorie en hoeveelheid. De view bevat een mobiele en desktop layout.
+--}}
+
 @php
     $categoryImages = [
         'Aquafin tools' => 'aquafintools.png',
@@ -11,6 +20,7 @@
 
 <x-app-layout>
     <div class="space-y-6">
+        {{-- HEADER --}}
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
                 <x-page-header title="Bestelling details" />
@@ -28,6 +38,7 @@
             </a>
         </div>
 
+        {{-- BESTELGEGEVENS --}}
         <section class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
             <div class="mb-5 flex flex-col gap-3 border-b border-gray-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -106,6 +117,7 @@
             </div>
         </section>
 
+        {{-- MATERIALEN --}}
         <section class="rounded-2xl border border-gray-100 bg-white shadow-sm">
             <div class="border-b border-gray-100 px-4 py-4 sm:px-6">
                 <h2 class="text-xl font-bold text-[#0F4C81]">
@@ -114,7 +126,7 @@
             </div>
 
             @if($order->items->count() > 0)
-                {{-- Mobiel --}}
+                {{-- MOBIELE WEERGAVE --}}
                 <div class="space-y-3 p-4 md:hidden">
                     @foreach($order->items as $item)
                         @php
@@ -153,7 +165,7 @@
                     @endforeach
                 </div>
 
-                {{-- Desktop --}}
+                {{-- DESKTOP WEERGAVE --}}
                 <div class="hidden overflow-x-auto md:block">
                     <table class="w-full min-w-[620px]">
                         <thead>
@@ -222,6 +234,7 @@
             @endif
         </section>
 
+        {{-- ACTIES --}}
         <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <a
                 href="{{ route('magazijn.orders.edit', $order->id) }}"
