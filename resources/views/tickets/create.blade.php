@@ -1,5 +1,22 @@
+{{--
+    TECHNIEKER - NIEUWE SUPPORTAANVRAAG (TICKET)
+
+    @author      
+    @version     1.0
+    @since       2026-06-18
+
+    Deze view toont een formulier waarmee een technieker een nieuwe
+    supportaanvraag (ticket) kan aanmaken.
+    De technieker kiest een bestelling, vult een onderwerp en
+    beschrijving in. Het ticket wordt dan doorgestuurd naar het magazijn.
+
+    @see App\Http\Controllers\TicketController::create()
+    @see App\Http\Controllers\TicketController::store()
+--}}
+
 <x-app-layout>
     <div class="space-y-6">
+        {{-- HEADER --}}
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
                 <x-page-header title="Nieuwe supportaanvraag" />
@@ -17,6 +34,7 @@
             </a>
         </div>
 
+        {{-- FORMULIER --}}
         <section class="max-w-3xl rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
             <div class="mb-6 rounded-2xl bg-blue-50 p-4">
                 <h2 class="font-bold text-[#0F4C81]">
@@ -31,6 +49,7 @@
             <form method="POST" action="{{ route('tickets.store') }}" class="space-y-5">
                 @csrf
 
+                {{-- BESTELLING DROPDOWN --}}
                 <div>
                     <label for="order_id" class="mb-2 block text-sm font-semibold text-gray-700">
                         Bestelling
@@ -59,6 +78,7 @@
                     @enderror
                 </div>
 
+                {{-- ONDERWERP --}}
                 <div>
                     <label for="subject" class="mb-2 block text-sm font-semibold text-gray-700">
                         Onderwerp
@@ -80,6 +100,7 @@
                     @enderror
                 </div>
 
+                {{-- BESCHRIJVING --}}
                 <div>
                     <label for="description" class="mb-2 block text-sm font-semibold text-gray-700">
                         Beschrijving
@@ -100,6 +121,7 @@
                     @enderror
                 </div>
 
+                {{-- ACTIES --}}
                 <div class="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
                     <a
                         href="{{ route('tickets.index') }}"

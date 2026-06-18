@@ -1,3 +1,19 @@
+{{--
+    MAGAZIJN - BESTELLINGEN OVERZICHT
+
+    @author      
+    @version     1.0
+    @since       2026-06-18
+
+    Deze view toont een overzicht van alle bestellingen voor magazijnmedewerkers.
+    Magazijnmedewerkers kunnen hier de status van bestellingen wijzigen,
+    zoeken op bestellingnummer, technieker, status, depot of leverdatum.
+    De view bevat zowel een mobile (card) als desktop (tabel) layout.
+
+    @see App\Http\Controllers\Userzone\OrderController::warehouseIndex()
+    @see App\Http\Controllers\Userzone\OrderController::warehouseUpdate()
+--}}
+
 <x-app-layout>
     <div class="space-y-6">
         <div>
@@ -8,6 +24,7 @@
             </p>
         </div>
 
+        {{-- FILTERS EN ZOEKBALK --}}
         <section class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
             <div class="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:items-center">
                 <div class="lg:col-span-1">
@@ -64,9 +81,10 @@
             </div>
         </section>
 
+        {{-- BESTELLINGEN LIJST --}}
         <section class="rounded-2xl border border-gray-100 bg-white shadow-sm">
             @if($orders->count() > 0)
-                {{-- Mobile card layout --}}
+                {{-- MOBILE CARD LAYOUT --}}
                 <div class="space-y-3 p-4 md:hidden">
                     @foreach($orders as $order)
                         @php
@@ -138,6 +156,7 @@
                                 </div>
                             </div>
 
+                            {{-- STATUS UPDATE FORM (MOBILE) --}}
                             <div class="mt-4 rounded-xl bg-white p-3">
                                 <p class="mb-2 text-sm font-semibold text-gray-700">
                                     Status aanpassen
@@ -191,7 +210,7 @@
                     @endforeach
                 </div>
 
-                {{-- Desktop table layout --}}
+                {{-- DESKTOP TABLE LAYOUT --}}
                 <div class="hidden overflow-x-auto md:block">
                     <table class="w-full min-w-[980px]">
                         <thead>
@@ -273,6 +292,7 @@
                                     <x-status-badge :status="$order->status" />
                                 </td>
 
+                                {{-- STATUS UPDATE FORM (DESKTOP) --}}
                                 <td class="p-4">
                                     <form
                                         id="order-status-form-desktop-{{ $order->id }}"
@@ -338,8 +358,14 @@
         </section>
     </div>
 
+    {{-- ZOEKFUNCTIE --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            /**
+             * Zoek functionaliteit voor bestellingen.
+             * Filtert de lijst op basis van bestellingnummer, technieker,
+             * status, depot, provincie of leverdatum.
+             */
             const searchInput = document.getElementById('global-order-search');
             const orderItems = document.querySelectorAll('.js-order-item');
             const emptyState = document.getElementById('orders-empty-state');
