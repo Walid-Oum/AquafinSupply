@@ -3,7 +3,7 @@
 
     <x-page-header title="Gebruikersbeheer" />
 
-<div class="mb-4 flex justify-between items-center">
+<div class="mb-4 flex flex-col lg:flex-row gap-4 lg:justify-between lg:items-center">
 
     <a href="{{ route('admin.users.create') }}">
         <x-button>
@@ -11,7 +11,7 @@
         </x-button>
     </a>
 
-    <div class="flex gap-4 items-center">
+    <div class="flex flex-col lg:flex-row gap-3 w-full lg:w-auto">
 
         <div class="relative">
             <input
@@ -19,13 +19,13 @@
                 id="user-table-search"
                 autocomplete="off"
                 placeholder="Gebruiker zoeken..."
-                class="border rounded px-3 py-2 w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]">
+                class="border rounded px-3 py-2 w-full lg:w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]">
         </div>
 
         <form
             method="GET"
             action="{{ route('admin.users.index') }}"
-            class="flex gap-2">
+            class="flex flex-col sm:flex-row gap-2">
 
             <select
                 name="role"
@@ -72,10 +72,46 @@
     </div>
 
 </div>
+<div class="lg:hidden space-y-4">
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    @foreach($users as $user)
+
+        <x-card>
+
+            <h2 class="font-semibold text-lg">
+                {{ $user->name }}
+            </h2>
+
+            <p class="text-gray-600">
+                {{ $user->email }}
+            </p>
+
+            <p>
+                Rol:
+                {{ ucfirst($user->role) }}
+            </p>
+
+            <p>
+                Status:
+                {{ $user->is_active ? 'Actief' : 'Inactief' }}
+            </p>
+
+            <div class="mt-3">
+                <a href="{{ route('admin.users.edit', $user->id) }}">
+                    <x-button>
+                        Aanpassen
+                    </x-button>
+                </a>
+            </div>
+
+        </x-card>
+
+    @endforeach
+
+</div>
+      <div class="hidden lg:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 text-left" id="user-table">
+                <table <table class="min-w-[900px] w-full divide-y divide-gray-200 text-left" id="user-table">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Naam</th>
