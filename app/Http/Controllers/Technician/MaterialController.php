@@ -7,10 +7,30 @@ use App\Models\Material;
 use App\Support\FuzzySearch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+/**
+ * Controller voor technici om materialen te bekijken.
+ *
+ * Functionaliteiten:
+ * - Materialen overzicht tonen
+ * - Materialen zoeken via fuzzy search
+ * - Materialen filteren op categorie
+ * - Materiaaldetails bekijken
+ * - Aanbevolen materialen tonen op basis van overstromingsrisico
+ */
+
 
 class MaterialController extends Controller
 {
     // Toon lijst van materialen met zoek- en filtermogelijkheden
+    /**
+     * Toon een overzicht van alle actieve materialen.
+     *
+     * Ondersteunt:
+     * - Sorteren op naam
+     * - Zoeken via fuzzy search
+     * - Filteren op categorie
+     * - Aanbevolen materialen op basis van overstromingsrisico
+     */
     public function index(Request $request)
     {
         // Haal huidige gebruiker en locatie op
@@ -65,6 +85,8 @@ class MaterialController extends Controller
 // Bepaal het overstromingsrisiconiveau op basis van de locatie van de gebruiker
         $riskLevel = $this->calculateFloodRiskLevel($location);
 // Haal aanbevolen materialen op die overeenkomen met het risiconiveau en beschikbaar zijn in de huidige locatie
+        // Selecteer materialen die relevant zijn
+// voor het berekende overstromingsrisico.
         $recommendedMaterials = Material::where('is_active', true)
             ->whereHas('riskLevels', function ($query) use ($riskLevel) {
                 $query->where('name', $riskLevel);
@@ -83,7 +105,12 @@ class MaterialController extends Controller
             'riskLevel' => $riskLevel,
         ]);
     }
-// Toon detailpagina van een specifiek materiaal
+    /**
+     * Toon de detailpagina van een specifiek materiaal.
+     *
+     * Enkel de voorraad van het depot van de
+     * ingelogde technieker wordt weergegeven.
+     */
     public function show($id)
     {
         $locationId = auth()->user()->location_id;
@@ -95,8 +122,17 @@ class MaterialController extends Controller
         return view('technician.materials.show', [
             'material' => $material,
         ]);
-    }
-// Bepaal het overstromingsrisiconiveau op basis van de locatie van de gebruiker
+}
+    /**
+     * Bepaal het overstromingsrisico voor de locatie
+     * van de technieker op basis van weersgegevens
+     * afkomstig van de Open-Meteo API.
+     *
+     * Mogelijke waarden:
+     * - Laag
+     * - Gemiddeld
+     * - Hoog
+     */
     private function calculateFloodRiskLevel($location): string
     {
         // Als er geen locatie beschikbaar is, wordt het risiconiveau standaard op 'Laag' gezet

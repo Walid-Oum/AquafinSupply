@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use App\Models\UserNotification;
 use App\Models\User;
+/**
+ * Controller voor het beheren van bestellingen.
+ *
+ * Functionaliteiten:
+ * - Bestellingen bekijken
+ * - Bestellingen plaatsen
+ * - Bestellingen raadplegen
+ * - Magazijnbestellingen beheren
+ * - Voorraad automatisch aanpassen
+ * - Notificaties versturen bij wijzigingen
+ */
 
 class OrderController extends Controller
 {
@@ -24,6 +35,11 @@ class OrderController extends Controller
         'Afgehaald',
         'Geannuleerd',
     ];
+    /**
+     * Toon een overzicht van alle bestellingen
+     * van de ingelogde gebruiker.
+     */
+
     public function index()
     {
         $orders = Order::where('user_id', Auth::id())
@@ -36,6 +52,18 @@ class OrderController extends Controller
             compact('orders')
         );
     }
+    /**
+     * Maak een nieuwe bestelling aan op basis
+     * van de inhoud van het winkelmandje.
+     *
+     * Controleert:
+     * - Leverdatum
+     * - Beschikbaarheid van materialen
+     * - Voorraad van het gekoppelde depot
+     *
+     * Verlaagt de voorraad automatisch en
+     * verstuurt een melding naar het magazijn.
+     */
 
     public function store(Request $request)
     {
@@ -63,7 +91,8 @@ class OrderController extends Controller
                 ->withInput()
                 ->with('error', 'Winkelmandje is leeg.');
         }
-
+// Controleer of alle materialen nog bestaan
+// en voldoende voorraad hebben.
         foreach ($cart as $item) {
             $material = Material::find($item['id']);
 
@@ -99,7 +128,8 @@ class OrderController extends Controller
                     ->with('error', 'Onvoldoende voorraad in jouw depot voor ' . $material->name . '.');
             }
         }
-
+// Maak bestelling aan binnen een database-transactie.
+// Hierdoor blijft de voorraad consistent bij fouten.
         try {
             $order = DB::transaction(function () use ($cart, $user, $request) {
                 $order = Order::create([
@@ -146,7 +176,8 @@ class OrderController extends Controller
         $warehouseUsers = User::where('role', 'magazijn')
             ->where('location_id', $order->location_id)
             ->get();
-
+// Verstuur een notificatie naar alle
+// magazijnmedewerkers van hetzelfde depot.
         foreach ($warehouseUsers as $warehouseUser) {
             UserNotification::create([
                 'user_id' => $warehouseUser->id,
@@ -160,6 +191,10 @@ class OrderController extends Controller
             ->route('orders.index')
             ->with('success', 'Bestelling succesvol geplaatst.');
     }
+    /**
+     * Toon de details van één bestelling
+     * van de ingelogde gebruiker.
+     */
 
     public function show($id)
     {
@@ -172,7 +207,14 @@ class OrderController extends Controller
             compact('order')
         );
     }
-
+    /**
+     * Toon alle bestellingen van het depot
+     * van de magazijnmedewerker.
+     *
+     * Ondersteunt zoeken op:
+     * - Bestelnummer
+     * - Naam van gebruiker
+     */
     public function warehouseIndex(Request $request)
     {
         $user = Auth::user();
@@ -215,7 +257,16 @@ class OrderController extends Controller
             compact('orders')
         );
     }
-
+    /**
+     * Werk een bestelling bij vanuit het magazijn.
+     *
+     * Mogelijkheden:
+     * - Status wijzigen
+     * - Hoeveelheden aanpassen
+     * - Materialen verwijderen
+     *
+     * De voorraad wordt automatisch herberekend.
+     */
     public function warehouseUpdate(Request $request, Order $order)
     {
         if ($order->location_id !== Auth::user()->location_id) {
@@ -235,7 +286,8 @@ class OrderController extends Controller
         $newStatus = $validated['status'];
         $statusChanged = false;
 
-        try {
+        try {// Voer alle voorraad- en orderwijzigingen
+// atomair uit binnen één transactie.
             DB::transaction(function () use ($validated, $order, $oldStatus, $newStatus, &$statusChanged) {
                 $order->status = $newStatus;
                 $order->save();
@@ -296,7 +348,8 @@ class OrderController extends Controller
                 ->back()
                 ->with('error', $exception->getMessage());
         }
-
+// Informeer de gebruiker wanneer
+// de status van de bestelling gewijzigd is.
         if ($statusChanged) {
             UserNotification::create([
                 'user_id' => $order->user_id,
@@ -310,7 +363,10 @@ class OrderController extends Controller
             ->back()
             ->with('success', 'Bestelling succesvol gewijzigd.');
     }
-
+    /**
+     * Toon de details van een bestelling
+     * voor een magazijnmedewerker.
+     */
     public function warehouseShow($id)
     {
         $order = Order::with('items.material', 'user', 'location')
@@ -322,7 +378,10 @@ class OrderController extends Controller
             compact('order')
         );
     }
-
+    /**
+     * Toon het bewerkingsscherm voor een
+     * bestelling van het magazijn.
+     */
     public function warehouseEdit($id)
     {
         $order = Order::with('items.material', 'user', 'location')

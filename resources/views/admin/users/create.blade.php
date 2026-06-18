@@ -1,4 +1,26 @@
+{{--
+    Pagina: Nieuwe gebruiker aanmaken
 
+    Doel:
+    Laat een administrator toe om een nieuwe gebruiker
+    aan te maken binnen het Aquafin Supply systeem.
+
+    Functionaliteiten:
+    - Aanmaken van nieuwe gebruikers
+    - Toekennen van een rol
+    - Koppelen van een depotlocatie
+    - Instellen van een tijdelijk wachtwoord
+    - Validatie van invoervelden
+    - Weergave van foutmeldingen
+
+    Gebruikersrol:
+    - Admin
+
+    Opmerking:
+    Nieuwe gebruikers worden gekoppeld aan een specifieke
+    locatie zodat zij enkel toegang krijgen tot relevante
+    gegevens binnen hun depot.
+--}}
 <x-app-layout>
 <div class="container mx-auto px-6 py-8">
 
@@ -8,7 +30,7 @@
             Terug naar overzicht
         </a>
     </div>
-
+    {{-- Formulier voor het aanmaken van een nieuwe gebruiker --}}
     <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
             <h3 class="text-gray-800 text-xl font-bold">Nieuwe Gebruiker Aanmaken</h3>
@@ -17,13 +39,13 @@
 
         <form action="{{ route('admin.users.store') }}" method="POST" class="p-6 space-y-5">
             @csrf
-
+            {{-- Persoonlijke gegevens van de gebruiker --}}
             <div>
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Volledige Naam</label>
                 <input type="text" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" value="{{ old('name') }}" placeholder="Bijv. Jan Peeters" required>
                 @error('name') <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p> @enderror
             </div>
-
+            {{-- Selectie van gebruikersrol --}}
             <div>
                 <label class="block text-gray-700 text-sm font-semibold mb-2">E-mailadres</label>
                 <input type="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" value="{{ old('email') }}" placeholder="username@aquafin.be" required>
@@ -40,7 +62,7 @@
                 </select>
                 @error('role') <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p> @enderror
             </div>
-
+            {{-- Koppeling van gebruiker aan een depotlocatie --}}
             <div>
                 <label for="location_id" class="block text-gray-700 text-sm font-semibold mb-2">
                     Locatie
@@ -65,7 +87,7 @@
                 <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p>
                 @enderror
             </div>
-
+            {{-- Tijdelijke logingegevens --}}
             <div>
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Tijdelijk Wachtwoord</label>
                 <input type="password" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="Minimaal 8 tekens" required>
@@ -76,7 +98,7 @@
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Bevestig Wachtwoord</label>
                 <input type="password" name="password_confirmation" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="Herhaal het wachtwoord" required>
             </div>
-
+            {{-- Actieknoppen voor opslaan of annuleren --}}
            <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
                 <a href="{{ route('admin.users.index') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg transition-colors duration-150">Annuleren</a>
                 <button type="submit" class="bg-[#0F4C81] hover:bg-[#1E6BA8] text-white font-semibold py-2 px-5 rounded-lg transition-all duration-150 shadow">Gebruiker Opslaan</button>

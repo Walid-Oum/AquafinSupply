@@ -1,3 +1,25 @@
+{{--
+    Pagina: Overstromingsrisico per provincie
+
+    Doel:
+    Geeft admins een overzicht van het verwachte
+    overstromingsrisico per provincie en depot.
+
+    Functionaliteiten:
+    - Overzicht van alle provinciale depots
+    - Weergave van voorspelde neerslag
+    - Risicobeoordeling (Laag, Gemiddeld, Hoog)
+    - Aanbevolen acties per risiconiveau
+    - Grafieken met neerslag- en prioriteitsgegevens
+    - Fallback naar gecachte weersgegevens bij API-problemen
+
+    Gebruikersrol:
+    - Admin
+
+    Opmerking:
+    De gegevens worden opgehaald via de Open-Meteo API
+    en verwerkt door de Admin FloodRiskController.
+--}}
 <x-app-layout>
     <div class="p-8">
         <div class="mb-6">
@@ -19,7 +41,7 @@
                 {{ session('error') }}
             </div>
         @endif
-
+        {{-- Tabel met risico-overzicht per provincie --}}
         @if(count($provinceStats) > 0)
             <div class="mb-6 rounded-xl bg-white p-6 shadow">
                 <div class="mb-4">
@@ -135,7 +157,7 @@
             @php
                 $periodLabel = $provinceStats[0]['nextWeekPeriodLabel'] ?? null;
             @endphp
-
+            {{-- Grafieken voor neerslag, piekbelasting en prioriteiten --}}
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <div class="rounded-xl bg-white p-6 shadow">
                     <div class="mb-4">
@@ -197,7 +219,7 @@
             </div>
         @endif
     </div>
-
+    {{-- Chart.js visualisaties --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
