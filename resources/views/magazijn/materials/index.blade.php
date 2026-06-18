@@ -1,3 +1,14 @@
+{{--
+|--------------------------------------------------------------------------
+| MAGAZIJN - VOORRAAD OVERZICHT
+|--------------------------------------------------------------------------
+| Deze view toont het voorraad overzicht voor magazijnmedewerkers.
+| Magazijnmedewerkers kunnen hier de voorraad van materialen in hun eigen depot
+| bekijken en aanpassen. De view bevat zoek-, filter- en sorteer functionaliteit.
+| Ook wordt de voorraadstatus (laag/OK) weergegeven met kleurindicatie.
+|--------------------------------------------------------------------------
+--}}
+
 @php
     $categoryImages = [
         'Aquafin tools' => 'aquafintools.png',
@@ -19,6 +30,7 @@
             </p>
         </div>
 
+        {{-- FILTERS EN ZOEKBALK --}}
         <section class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
             <div class="grid grid-cols-1 gap-3 xl:grid-cols-4 xl:items-center">
                 <div class="xl:col-span-1">
@@ -85,6 +97,7 @@
             </div>
         </section>
 
+        {{-- MATERIALEN LIJST (MOBILE + DESKTOP) --}}
         <section class="rounded-2xl border border-gray-100 bg-white shadow-sm">
             @if($materials->count() > 0)
                 {{-- Mobile card layout --}}
@@ -144,6 +157,7 @@
                                 </div>
                             </div>
 
+                            {{-- Voorraad update formulier (mobile) --}}
                             <div class="mt-4 rounded-xl bg-white p-3">
                                 <label
                                     for="stock-mobile-{{ $material->id }}"
@@ -274,6 +288,7 @@
                                 </td>
 
                                 <td class="p-4 text-center">
+                                    {{-- Voorraad update formulier (desktop) --}}
                                     <form
                                         id="stock-form-desktop-{{ $material->id }}"
                                         action="{{ route('magazijn.materials.update', $material->id) }}"
@@ -329,8 +344,13 @@
         </section>
     </div>
 
+    {{-- ZOEKFUNCTIE MET LEVENSHTEIN ALGORITME --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            /**
+             * Zoek functionaliteit voor materialen.
+             * Gebruikt Levenshtein afstand voor spellingsfouten tolerantie.
+             */
             const searchInput = document.getElementById('global-material-search');
             const materialItems = document.querySelectorAll('.js-material-item');
             const noResultsRow = document.getElementById('no-materials-found-row');
@@ -346,6 +366,10 @@
                     .trim();
             }
 
+            /**
+             * Levenshtein afstand berekenen tussen twee woorden.
+             * Wordt gebruikt om spellingsfouten te tolereren bij zoeken.
+             */
             function levenshtein(a, b) {
                 const matrix = [];
 
@@ -392,6 +416,10 @@
                 return 4;
             }
 
+            /**
+             * Controleert of een item overeenkomt met de zoekterm.
+             * Gebruikt exacte overeenkomst, substrings en Levenshtein afstand.
+             */
             function itemMatchesQuery(item, queryClean) {
                 const nameEl = item.querySelector('.material-name');
                 const categoryEl = item.querySelector('.material-category');
