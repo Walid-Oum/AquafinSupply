@@ -1,12 +1,16 @@
 {{--
-|--------------------------------------------------------------------------
-| MAGAZIJN - MATERIAAL DETAILS
-|--------------------------------------------------------------------------
-| Deze view toont de detailgegevens van een specifiek materiaal voor
-| magazijnmedewerkers. Hier worden alle eigenschappen getoond: naam,
-| categorie, beschrijving, voorraadstatus, minimum voorraad en
-| de risiconiveaus die aan het materiaal zijn gekoppeld.
-|--------------------------------------------------------------------------
+    MAGAZIJN - MATERIAAL DETAILS
+
+    @author      Chayma (Team Aquafin)
+    @version     1.0
+    @since       2026-06-18
+
+    Deze view toont de detailgegevens van een specifiek materiaal voor
+    magazijnmedewerkers. Hier worden alle eigenschappen getoond: naam,
+    categorie, beschrijving, voorraadstatus, minimum voorraad en
+    de risiconiveaus die aan het materiaal zijn gekoppeld.
+
+    @see App\Http\Controllers\MaterialController::show()
 --}}
 
 @php
