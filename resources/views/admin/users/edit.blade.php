@@ -1,4 +1,27 @@
+{{--
+    Pagina: Gebruiker aanpassen
 
+    Doel:
+    Laat een administrator toe om bestaande
+    gebruikersgegevens te wijzigen.
+
+    Functionaliteiten:
+    - Wijzigen van naam en e-mailadres
+    - Wijzigen van gebruikersrol
+    - Wijzigen van depotlocatie
+    - Activeren of deactiveren van accounts
+    - Wijzigen van wachtwoord
+    - Bescherming tegen het wijzigen van eigen rol
+    - Bescherming tegen het wijzigen van eigen accountstatus
+
+    Gebruikersrol:
+    - Admin
+
+    Opmerking:
+    Administrators kunnen hun eigen rol of
+    accountstatus niet aanpassen om fouten
+    in het toegangsbeheer te voorkomen.
+--}}
 <x-app-layout>
 <div class="container mx-auto px-6 py-8">
 
@@ -14,11 +37,11 @@
             <h3 class="text-gray-800 text-xl font-bold">Gebruiker Aanpassen</h3>
             <p class="text-gray-500 text-xs mt-0.5">Wijzig de accountgegevens van <span class="font-semibold text-gray-700">{{ $user->name }}</span>.</p>
         </div>
-
+        {{-- Formulier voor het aanpassen van gebruikersgegevens --}}
         <form action="{{ route('admin.users.update', $user->id) }}" method="POST" class="p-6 space-y-5">
             @csrf
             @method('PUT')
-            
+            {{-- Basisgegevens van de gebruiker --}}
             <div>
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Naam</label>
                 <input type="text" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" value="{{ old('name', $user->name) }}" required>
@@ -33,8 +56,8 @@
 
             <div>
 
-              
 
+                {{-- Beheer van gebruikersrollen --}}
 @if(Auth::id() != $user->id)
 
 <label class="block text-gray-700 text-sm font-semibold mb-2">
@@ -70,7 +93,7 @@
 @endif
 
             </div>
-
+            {{-- Koppeling van gebruiker aan een depotlocatie --}}
             <div>
                 <label for="location_id" class="block text-gray-700 text-sm font-semibold mb-2">
                     Locatie
@@ -95,7 +118,7 @@
                 <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p>
                 @enderror
             </div>
-
+            {{-- Activeren of deactiveren van gebruikersaccounts --}}
             @if(Auth::id() != $user->id)
                 <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-2">Accountstatus</label>
@@ -103,7 +126,7 @@
                         <option value="1" {{ $user->is_active ? 'selected' : '' }}>Actief</option>
                         <option value="0" {{ !$user->is_active ? 'selected' : '' }}>Inactief</option>
                     </select>
-                    
+
                 </div>
             @else
                 <div>
@@ -111,7 +134,7 @@
                     <input type="hidden" name="is_active" value="1">
                 </div>
             @endif
-
+            {{-- Optionele wijziging van gebruikerswachtwoord --}}
             <div class="mb-4 border-t border-gray-100 pt-4">
                 <label class="block text-gray-600 text-xs font-bold mb-1 uppercase tracking-wider">Wachtwoord Wijzigen (Optioneel)</label>
                 <p class="text-gray-400 text-xs mb-3">Laat deze velden leeg als je het huidige wachtwoord wilt behouden.</p>
@@ -123,7 +146,7 @@
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Nieuw Wachtwoord Bevestigen</label>
                 <input type="password" name="password_confirmation" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="Herhaal nieuw wachtwoord">
             </div>
-
+            {{-- Actieknoppen voor opslaan of annuleren --}}
             <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
                 <a href="{{ route('admin.users.index') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg transition-colors duration-150">Annuleren</a>
                 <button type="submit" class="bg-[#0F4C81] hover:bg-[#1E6BA8] text-white font-semibold py-2 px-5 rounded-lg transition-all duration-150 shadow">Opslaan</button>
