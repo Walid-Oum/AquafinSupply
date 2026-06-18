@@ -83,7 +83,7 @@
     Voorraad per depot
 </h3>
 
-<div class="overflow-x-auto">
+<div class="hidden lg:block overflow-x-auto">
 
     <x-table>
 
