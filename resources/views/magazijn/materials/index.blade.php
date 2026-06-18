@@ -1,7 +1,7 @@
 {{--
     MAGAZIJN - VOORRAAD OVERZICHT
 
-    @author      Chayma (Team Aquafin)
+    @author      Chayma , 
     @version     1.0
     @since       2026-06-18
 
