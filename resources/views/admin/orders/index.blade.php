@@ -1,9 +1,31 @@
+{{--
+    Pagina: Bestellingen overzicht
+
+    Doel:
+    Geeft administrators een overzicht van alle
+    geplaatste bestellingen binnen het systeem.
+
+    Functionaliteiten:
+    - Overzicht van alle bestellingen
+    - Filteren op status
+    - Filteren op depot
+    - Zoeken op bestelnummer, technieker of status
+    - Bekijken van bestelgegevens
+    - Responsieve weergave voor desktop en mobiel
+
+    Gebruikersrol:
+    - Admin
+
+    Opmerking:
+    De gegevens worden opgehaald via de
+    AdminOrderController.
+--}}
 <x-app-layout>
 
     <x-page-header title="Alle Bestellingen" />
 
-   
 
+    {{-- Zoek- en filterfunctionaliteit --}}
  <div class="mb-3 flex flex-col lg:flex-row gap-4 lg:justify-end lg:items-center">
  <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
         <div class="relative">
@@ -13,7 +35,7 @@
                 autocomplete="off"
                 placeholder="Bestelling zoeken..."
               class="border rounded px-3 py-2 w-full sm:w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]">
-     
+
 </div>
 
        <form
@@ -82,7 +104,7 @@
         </form>
 
     </div>
-
+     {{-- Desktopweergave van bestellingen --}}
 </div>
    <div class="hidden lg:block">
 <x-card>
@@ -153,7 +175,7 @@
                                 href="{{ route('admin.orders.show', $order->id) }}"
                                 ><x-button> Bekijken</x-button>
 
-                              
+
 
                             </a>
 
@@ -180,7 +202,7 @@
         </table>
 
    </x-card>
-</div>
+</div> {{-- Mobiele weergave van bestellingen --}}
     <div class="lg:hidden space-y-4">
 
     @forelse($orders as $order)
@@ -235,6 +257,7 @@
     @endforelse
 
 </div>
+    {{-- Client-side zoekfunctie voor bestellingen --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
