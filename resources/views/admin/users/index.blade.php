@@ -1,8 +1,30 @@
+{{--
+    Pagina: Gebruikersbeheer
 
+    Doel:
+    Overzicht van alle gebruikers binnen het
+    Aquafin Supply systeem.
+
+    Functionaliteiten:
+    - Overzicht van alle gebruikers
+    - Zoeken op naam of e-mailadres
+    - Filteren op gebruikersrol
+    - Nieuwe gebruikers aanmaken
+    - Bestaande gebruikers aanpassen
+    - Weergave voor desktop en mobiel
+
+    Gebruikersrol:
+    - Admin
+
+    Opmerking:
+    De zoekfunctie ondersteunt fuzzy search
+    zodat gebruikers ook gevonden worden bij
+    kleine typefouten.
+--}}
 <x-app-layout>
 
     <x-page-header title="Gebruikersbeheer" />
-
+    {{-- Acties: gebruiker toevoegen, zoeken en filteren --}}
 <div class="mb-4 flex flex-col lg:flex-row gap-4 lg:justify-between lg:items-center">
 
     <a href="{{ route('admin.users.create') }}">
@@ -70,7 +92,7 @@
         </form>
 
     </div>
-
+    {{-- Mobiele weergave van gebruikers --}}
 </div>
 <div class="lg:hidden space-y-4">
 
@@ -107,11 +129,11 @@
         </x-card>
 
     @endforeach
-
+        {{-- Desktopweergave van gebruikers in tabelvorm --}}
 </div>
       <div class="hidden lg:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
-                <table <table class="min-w-[900px] w-full divide-y divide-gray-200 text-left" id="user-table">
+                 <table class="min-w-[900px] w-full divide-y divide-gray-200 text-left" id="user-table">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Naam</th>
@@ -127,7 +149,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 user-name">{{ $user->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-email">{{ $user->email }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
                                         {{ $user->role === 'admin' ? 'bg-rose-50 text-rose-700 border border-rose-200' : '' }}
                                         {{ $user->role === 'magazijn' ? 'bg-sky-50 text-sky-700 border border-sky-200' : '' }}
                                         {{ $user->role === 'technieker' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : '' }}">
@@ -151,7 +173,7 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                             Aanpassen
                                         </a>
-                                        
+
                                     </div>
                                 </td>
                             </tr>
@@ -167,13 +189,13 @@
             </div>
         </div>
     </div>
-
+    {{-- Zoekfunctionaliteit met fuzzy matching --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('user-table-search');
     const tableRows = document.querySelectorAll('.user-row');
     const noResultsRow = document.getElementById('no-users-found-row');
-
+// Normaliseer tekst voor consistente zoekresultaten
     function normalizeText(text) {
         if (!text) return '';
         return text.toLowerCase()
@@ -182,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/\s+/g, ' ')                             // Dubbele spaties weg
             .trim();
     }
-
+// Bereken Levenshtein-afstand voor fuzzy search
     function levenshtein(a, b) {
         const matrix = [];
         for (let i = 0; i <= b.length; i++) matrix[i] = [i];
@@ -211,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (length <= 12) return 3;
         return 4;
     }
-
+// Filter gebruikers tijdens het typen
     searchInput.addEventListener('input', function () {
         const query = normalizeText(this.value);
         let visibleCount = 0;
@@ -227,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function () {
         tableRows.forEach(row => {
             const name = normalizeText(row.querySelector('.user-name').textContent);
             const email = normalizeText(row.querySelector('.user-email').textContent);
-            
+
             const flatName = name.replace(/ /g, '');
             const flatEmail = email.replace(/ /g, '');
 
@@ -241,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // 2. Fuzzy match met Levenshtein
             if (!isMatch && flatQuery.length >= 3) {
                 const allowedDistance = getAllowedDistance(flatQuery);
-                
+
                 if (levenshtein(flatQuery, flatName) <= allowedDistance || levenshtein(flatQuery, flatEmail) <= allowedDistance) {
                     isMatch = true;
                 }
