@@ -4,8 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Order Model
+ * 
+ * Vertegenwoordigt een bestelling in de applicatie.
+ * Een bestelling wordt aangemaakt door een technieker en bevat meerdere orderitems.
+ * De status kan worden gewijzigd door het magazijn.
+ *
+ * @author 
+ * @version 1.0
+ */
 class Order extends Model
 {
+    /**
+     * Velden die massaal mogen worden ingevuld.
+     */
     protected $fillable = [
         'user_id',
         'delivery_date',
@@ -14,22 +27,39 @@ class Order extends Model
         'location_id'
     ];
 
+    /**
+     * Relatie: deze bestelling hoort bij een gebruiker (technieker).
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Relatie: deze bestelling bevat meerdere orderitems (materialen).
+     */
     public function items()
     {
         return $this->hasMany(OrderItem::class);
     }
 
+    /**
+     * Relatie: deze bestelling hoort bij een locatie (depot).
+     */
     public function location()
     {
         return $this->belongsTo(Location::class);
     }
 
-    
+    /**
+     * Scope: zoekfunctie voor bestellingen.
+     * Zoekt op ID, status, comment of technieker naam.
+     * Geeft prioriteit aan exacte status matches en specifieke ID's.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|null $searchTerm
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function scopeSearch($query, $searchTerm)
     {
         if (!$searchTerm) {
