@@ -7,10 +7,32 @@ use App\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+/**
+ * FloodRiskController
+ *
+ * Verantwoordelijk voor het beheren van
+ * overstromingsrisico's voor administrators.
+ *
+ * Deze controller haalt weersgegevens op via
+ * de Open-Meteo API en berekent risico's
+ * per depotlocatie.
+ *
+ * Functionaliteiten:
+ * - Overzicht van alle depots
+ * - Detailweergave per depot
+ * - Berekening van risico's
+ * - Cache ondersteuning
+ */
 
 class FloodRiskController extends Controller
 {
     // Deze controller beheert de weerrisico's voor overstromingen op basis van de locaties van de depots.
+    /**
+     * Toon het overzicht van alle depots
+     * met hun berekende overstromingsrisico.
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
         // Haal alle locaties op, gesorteerd op provincie
@@ -31,7 +53,12 @@ class FloodRiskController extends Controller
             'provinceStats' => $provinceStats,
         ]);
     }
-// De show methode toont de gedetailleerde weerrisico's voor een specifieke locatie
+    /**
+     * Toon de detailpagina van een specifieke locatie.
+     *
+     * @param Location $location
+     * @return \Illuminate\View\View
+     */
     public function show(Location $location)
     {
         // Bereken de weersstatistieken voor de geselecteerde locatie
@@ -49,13 +76,20 @@ class FloodRiskController extends Controller
         ]);
     }
 // Deze methoden bepalen het risico op overstromingen op basis van de hoeveelheid neerslag
+    /**
+     * Bepaal het algemene overstromingsrisico
+     * op basis van de totale neerslag.
+     *
+     * @param float $rainfall
+     * @return string
+     */
     private function determineRiskLevel(float $rainfall): string
     {
         // Minder dan 20mm neerslag in de komende week wordt als laag risico beschouwd, tussen 20mm en 50mm als gemiddeld, en meer dan 50mm als hoog risico
         if ($rainfall < 20) {
             return 'Laag';
         }
-// Tussen 20mm en 50mm neerslag in de komende week wordt als gemiddeld risico beschouwd
+
         if ($rainfall < 50) {
             return 'Gemiddeld';
         }
@@ -76,6 +110,20 @@ class FloodRiskController extends Controller
 // Meer dan 15mm neerslag op een dag wordt als hoog risico beschouwd
         return 'Hoog';
     }
+    /**
+     * Haal weersgegevens op voor een locatie
+     * en bouw alle statistieken op die nodig zijn
+     * voor de risicoanalyse.
+     *
+     * Inclusief:
+     * - API-oproep
+     * - Cache fallback
+     * - Risicoberekening
+     * - Weekvoorspelling
+     *
+     * @param Location $location
+     * @return array|null
+     */
 // Deze methode haalt de weersgegevens op voor een specifieke locatie en berekent de statistieken die nodig zijn om het risico op overstromingen te beoordelen
     private function buildLocationWeatherStats(Location $location): ?array
     {
