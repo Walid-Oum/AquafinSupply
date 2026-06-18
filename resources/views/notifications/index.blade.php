@@ -1,3 +1,17 @@
+{{--
+
+Pagina: Notificaties
+
+Beschrijving:
+Toont een overzicht van notificaties voor de gebruiker met updates over bestellingen, supportaanvragen en andere relevante gebeurtenissen.
+
+Functionaliteiten:
+- Overzicht van ontvangen notificaties
+- Weergeven van gelezen en ongelezen meldingen
+- Tonen van notificatiedetails en tijdstippen
+- Navigeren naar gekoppelde pagina's of acties
+
+--}}
 <x-app-layout>
     <div class="p-8">
         <div class="mb-6">
