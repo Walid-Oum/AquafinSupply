@@ -1,5 +1,23 @@
+{{--
+    MAGAZIJN - TICKET DETAIL (SUPPORTAANVRAAG)
+
+    @author      
+    @version     1.0
+    @since       2026-06-18
+
+    Deze view toont de details van een specifieke supportaanvraag voor
+    magazijnmedewerkers. Hier worden alle ticketgegevens getoond:
+    onderwerp, status, technieker, bestelling, depot en beschrijving.
+    Magazijnmedewerkers kunnen de status wijzigen en een antwoord
+    toevoegen dat zichtbaar is voor de technieker.
+
+    @see App\Http\Controllers\TicketController::showWarehouse()
+    @see App\Http\Controllers\TicketController::updateStatus()
+--}}
+
 <x-app-layout>
     <div class="space-y-6">
+        {{-- HEADER --}}
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
                 <x-page-header title="Support detail" />
@@ -17,6 +35,7 @@
             </a>
         </div>
 
+        {{-- TICKET GEGEVENS --}}
         <section class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
             <div class="mb-5 flex flex-col gap-3 border-b border-gray-100 pb-5 sm:flex-row sm:items-start sm:justify-between">
                 <div>
@@ -91,6 +110,7 @@
             </div>
         </section>
 
+        {{-- BESCHRIJVING --}}
         <section class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
             <div class="mb-4">
                 <h2 class="text-xl font-bold text-[#0F4C81]">
@@ -107,6 +127,7 @@
             </div>
         </section>
 
+        {{-- MAGAZIJN ANTWOORD --}}
         @if($ticket->warehouse_note)
             <section class="rounded-2xl border border-blue-200 bg-blue-50 p-4 shadow-sm sm:p-6">
                 <div class="mb-3">
@@ -125,6 +146,7 @@
             </section>
         @endif
 
+        {{-- TICKET OPVOLGEN FORM --}}
         <form
             method="POST"
             action="{{ route('tickets.warehouse.updateStatus', $ticket) }}"
@@ -145,6 +167,7 @@
                 </div>
 
                 <div class="space-y-5">
+                    {{-- STATUS DROPDOWN --}}
                     <div>
                         <label for="status" class="mb-2 block text-sm font-semibold text-gray-700">
                             Status aanpassen
@@ -175,6 +198,7 @@
                         @enderror
                     </div>
 
+                    {{-- ANTWOORD TEXTAREA --}}
                     <div>
                         <label for="warehouse_note" class="mb-2 block text-sm font-semibold text-gray-700">
                             Antwoord/opmerking voor technieker
@@ -197,6 +221,7 @@
                 </div>
             </section>
 
+            {{-- ACTIES --}}
             <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <a
                     href="{{ route('tickets.warehouse.index') }}"
