@@ -1,3 +1,18 @@
+{{--
+
+Pagina: Hoofdlayout
+
+Beschrijving:
+Basislayout van de applicatie die gebruikt wordt voor alle beveiligde pagina's binnen Aquafin Supply.
+
+Functionaliteiten:
+- Weergeven van navigatie en sidebar
+- Ondersteuning voor mobiele navigatie
+- Tonen van meldingen en validatiefouten
+- Weergeven van herinneringen voor techniekers
+- Inladen van pagina-inhoud via de slot component
+
+--}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -99,7 +114,7 @@
                     ✓ Ik heb dit gecontroleerd
                 </button>
             </div>
-
+            {{-- Verbergt de gasdetectorherinnering nadat de gebruiker deze heeft bevestigd --}}
             <script>
                 document.addEventListener("DOMContentLoaded", function () {
                     const reminder = document.getElementById("gasReminder");
