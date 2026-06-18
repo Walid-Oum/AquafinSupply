@@ -9,7 +9,7 @@
         </a>
     </div>
 
-    <div class="max-w-2xl bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+    <div class="w-full bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
             <h3 class="text-gray-800 text-xl font-bold">Gebruiker Aanpassen</h3>
             <p class="text-gray-500 text-xs mt-0.5">Wijzig de accountgegevens van <span class="font-semibold text-gray-700">{{ $user->name }}</span>.</p>

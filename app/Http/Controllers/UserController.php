@@ -91,10 +91,10 @@ class UserController extends Controller
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
-            'role' => [
-                'required',
-                Rule::in(['admin', 'magazijn', 'technieker']),
-            ],
+          'role' => auth()->id() == $user->id
+    ? ['nullable', Rule::in(['admin', 'magazijn', 'technieker'])]
+    : ['required', Rule::in(['admin', 'magazijn', 'technieker'])],
+            
             'location_id' => [
                 'required',
                 Rule::exists('locations', 'id'),

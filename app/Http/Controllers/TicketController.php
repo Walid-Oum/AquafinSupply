@@ -12,27 +12,31 @@ use Illuminate\Validation\Rule;
 
 class TicketController extends Controller
 {
+    /** de hardcoded statussen voor tickets */
     private const TICKET_STATUSES = [
         'Open',
         'In behandeling',
         'Opgelost',
     ];
-
+/**
+     * Toon een overzicht van de tickets van de ingelogde klant.
+     */
     public function index(Request $request)
     {
-        // Start met de basisrelaties en filter op de eigen tickets van de gebruiker
-        $query = Ticket::with(['order', 'location'])
-            ->where('user_id', auth()->id());
+        $tickets = Ticket::with(['order', 'location'])
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get();
 
-        // Pas onze slimme zoekfunctie toe als er gezocht wordt
-        if ($request->has('search')) {
-            $query->search($request->input('search'));
-        } else {
-            // Als er niet gezocht wordt, sorteren we standaard op nieuwste eerst
-            $query->latest();
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $tickets = $tickets
+                ->filter(function (Ticket $ticket) use ($search) {
+                    return FuzzySearch::matches($search, $this->ticketSearchText($ticket));
+                })
+                ->values();
         }
-
-        $tickets = $query->get();
 
         return view('tickets.index', [
             'tickets' => $tickets,
@@ -132,20 +136,7 @@ class TicketController extends Controller
 
             $tickets = $tickets
                 ->filter(function (Ticket $ticket) use ($search) {
-                    $searchableText = collect([
-                        $ticket->subject,
-                        $ticket->description,
-                        $ticket->warehouse_note,
-                        $ticket->status,
-                        $ticket->user?->name,
-                        $ticket->order_id,
-                        'Bestelling #' . $ticket->order_id,
-                        $ticket->location?->province,
-                        $ticket->location?->name,
-                        $ticket->location?->city,
-                    ])->filter()->implode(' ');
-
-                    return FuzzySearch::matches($search, $searchableText);
+                    return FuzzySearch::matches($search, $this->ticketSearchText($ticket));
                 })
                 ->values();
         }
@@ -166,37 +157,42 @@ class TicketController extends Controller
 
         $user = auth()->user();
 
-        if (! $user || ! $user->location_id) {
+        if (! $user) {
             return response()->json([]);
         }
 
-        $tickets = Ticket::with(['user', 'order', 'location'])
-            ->where('location_id', $user->location_id)
+        $tickets = Ticket::with(['user', 'order', 'location']);
+
+        if ($user->role === 'magazijn') {
+            if (! $user->location_id) {
+                return response()->json([]);
+            }
+
+            $tickets->where('location_id', $user->location_id);
+        } else {
+            $tickets->where('user_id', $user->id);
+        }
+
+        $tickets = $tickets
+            ->latest()
             ->get()
             ->filter(function (Ticket $ticket) use ($search) {
-                $searchableText = collect([
-                    $ticket->subject,
-                    $ticket->description,
-                    $ticket->warehouse_note,
-                    $ticket->status,
-                    $ticket->user?->name,
-                    $ticket->order_id,
-                    'Bestelling #' . $ticket->order_id,
-                    $ticket->location?->province,
-                    $ticket->location?->name,
-                    $ticket->location?->city,
-                ])->filter()->implode(' ');
-
-                return FuzzySearch::matches($search, $searchableText);
+                return FuzzySearch::matches($search, $this->ticketSearchText($ticket));
             })
             ->take(5)
-            ->map(function (Ticket $ticket) {
+            ->map(function (Ticket $ticket) use ($user) {
+                $subtitleParts = collect([
+                    $ticket->user?->name,
+                    'Bestelling #' . $ticket->order_id,
+                ])->filter()->implode(' — ');
+
                 return [
-                    'id' => $ticket->id,
-                    'subject' => $ticket->subject,
-                    'technician' => $ticket->user?->name ?? 'Onbekend',
-                    'status' => $ticket->status,
-                    'order' => 'Bestelling #' . $ticket->order_id,
+                    'label' => $ticket->subject,
+                    'subtitle' => $subtitleParts,
+                    'badge' => $ticket->status,
+                    'url' => $user->role === 'magazijn'
+                        ? route('tickets.warehouse.show', $ticket)
+                        : null,
                 ];
             })
             ->values();
@@ -216,13 +212,16 @@ class TicketController extends Controller
             'ticket' => $ticket,
         ]);
     }
-
+/**
+     * Update de status en/of de magazijnnotitie van een ticket, en stel de klant op de hoogte.
+     */
     public function updateStatus(Ticket $ticket, Request $request)
     {
+        // Beveiliging: Controleer locatie-overeenkomst
         if ($ticket->location_id !== auth()->user()->location_id) {
             abort(403);
         }
-
+// valideer wijziging
         $validated = $request->validate([
             'status' => [
                 'required',
@@ -234,7 +233,7 @@ class TicketController extends Controller
                 'max:2000',
             ],
         ]);
-
+// Bewaar de oude waarden voor vergelijking
         $oldStatus = $ticket->status;
         $oldWarehouseNote = $ticket->warehouse_note;
 
@@ -245,7 +244,7 @@ class TicketController extends Controller
             'status' => $newStatus,
             'warehouse_note' => $newWarehouseNote,
         ]);
-
+// Controleer wat er veranderd is ten behoeve van de notificatietekst
         $statusChanged = $oldStatus !== $newStatus;
         $noteChanged = $oldWarehouseNote !== $newWarehouseNote && ! empty($newWarehouseNote);
 
@@ -269,5 +268,24 @@ class TicketController extends Controller
         return redirect()
             ->route('tickets.warehouse.show', $ticket)
             ->with('success', 'Ticket succesvol bijgewerkt.');
+    }
+/**
+     * Private helper: Combineert alle doorzoekbare velden van een ticket tot één string.
+     * Dit zorgt ervoor dat FuzzySearch op alle relevante data kan zoeken.
+     */
+    private function ticketSearchText(Ticket $ticket): string
+    {
+        return collect([
+            $ticket->subject,
+            $ticket->description,
+            $ticket->warehouse_note,
+            $ticket->status,
+            $ticket->user?->name,
+            $ticket->order_id,
+            'Bestelling #' . $ticket->order_id,
+            $ticket->location?->province,
+            $ticket->location?->name,
+            $ticket->location?->city,
+        ])->filter()->implode(' ');
     }
 }

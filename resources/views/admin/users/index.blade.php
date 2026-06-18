@@ -2,66 +2,116 @@
 <x-app-layout>
 
     <x-page-header title="Gebruikersbeheer" />
-    <p class="text-gray-500 text-sm mb-6">
-        Overzicht van alle actieve accounts binnen Aquafin Supply
-    </p>
-    
-    <div class="px-6 -mt-4 mb-6 flex justify-between items-center">
-        <p class="text-gray-500 text-sm"></p>
-        <a
-            href="{{ route('admin.users.create') }}"
-            class="bg-[#0F4C81] hover:bg-[#1E6BA8] text-white font-semibold py-2.5 px-5 rounded-lg transition-all duration-200 shadow-md flex items-center gap-2 text-sm">
-            Nieuwe Gebruiker
-        </a>
-    </div>
 
-    <div class="container mx-auto px-6">
-        <div class="flex justify-end mb-6">
-            <div class="flex items-center gap-4">
-                <form
-                    method="GET"
-                    action="{{ route('admin.users.index') }}"
-                    class="flex items-center gap-2">
+<div class="mb-4 flex flex-col lg:flex-row gap-4 lg:justify-between lg:items-center">
 
-                    <select
-                        name="role"
-                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-                        <option value="">Alle rollen</option>
-                        <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Administrator</option>
-                        <option value="technieker" {{ request('role') == 'technieker' ? 'selected' : '' }}>Technieker</option>
-                        <option value="magazijn" {{ request('role') == 'magazijn' ? 'selected' : '' }}>Magazijnmedewerker</option>
-                    </select>
+    <a href="{{ route('admin.users.create') }}">
+        <x-button>
+            + Nieuwe gebruiker
+        </x-button>
+    </a>
 
-                    <x-button>Filter</x-button>
+    <div class="flex flex-col lg:flex-row gap-3 w-full lg:w-auto">
 
-                    <a
-                        href="{{ route('admin.users.index') }}"
-                        class="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-400 transition">
-                        Reset
-                    </a>
-                </form>
-
-                <div class="relative">
-                    <input
-                        type="text"
-                        id="user-table-search"
-                        autocomplete="off"
-                        placeholder="Gebruiker zoeken..."
-                        class="border border-gray-300 rounded-lg px-3 py-2 w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-[#0F4C81] transition-all shadow-sm">
-                </div>
-            </div>
+        <div class="relative">
+            <input
+                type="text"
+                id="user-table-search"
+                autocomplete="off"
+                placeholder="Gebruiker zoeken..."
+                class="border rounded px-3 py-2 w-full lg:w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]">
         </div>
 
-        @if(session('success'))
-            <div class="bg-emerald-50 border-l-4 border-emerald-500 text-emerald-800 p-4 rounded-r-lg mb-6 shadow-sm flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span class="font-medium">{{ session('success') }}</span>
-            </div>
-        @endif
+        <form
+            method="GET"
+            action="{{ route('admin.users.index') }}"
+            class="flex flex-col sm:flex-row gap-2">
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <select
+                name="role"
+                class="border rounded px-3 py-2 text-sm">
+
+                <option value="">
+                    Alle rollen
+                </option>
+
+                <option
+                    value="admin"
+                    {{ request('role') == 'admin' ? 'selected' : '' }}>
+                    Administrator
+                </option>
+
+                <option
+                    value="technieker"
+                    {{ request('role') == 'technieker' ? 'selected' : '' }}>
+                    Technieker
+                </option>
+
+                <option
+                    value="magazijn"
+                    {{ request('role') == 'magazijn' ? 'selected' : '' }}>
+                    Magazijnmedewerker
+                </option>
+
+            </select>
+
+            <x-button>
+                Filter
+            </x-button>
+
+            <a
+                href="{{ route('admin.users.index') }}"
+                class="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-400 transition">
+
+                Reset
+
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+<div class="lg:hidden space-y-4">
+
+    @foreach($users as $user)
+
+        <x-card>
+
+            <h2 class="font-semibold text-lg">
+                {{ $user->name }}
+            </h2>
+
+            <p class="text-gray-600">
+                {{ $user->email }}
+            </p>
+
+            <p>
+                Rol:
+                {{ ucfirst($user->role) }}
+            </p>
+
+            <p>
+                Status:
+                {{ $user->is_active ? 'Actief' : 'Inactief' }}
+            </p>
+
+            <div class="mt-3">
+                <a href="{{ route('admin.users.edit', $user->id) }}">
+                    <x-button>
+                        Aanpassen
+                    </x-button>
+                </a>
+            </div>
+
+        </x-card>
+
+    @endforeach
+
+</div>
+      <div class="hidden lg:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 text-left" id="user-table">
+                <table <table class="min-w-[900px] w-full divide-y divide-gray-200 text-left" id="user-table">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Naam</th>

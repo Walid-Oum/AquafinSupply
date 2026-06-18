@@ -413,120 +413,211 @@ class DatabaseSeeder extends Seeder
         $gemiddeld = RiskLevel::where('name', 'Gemiddeld')->first();
         $hoog = RiskLevel::where('name', 'Hoog')->first();
 
-        Material::where('name', 'EHBO-kit')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $laag->id,
-                $gemiddeld->id,
-                $hoog->id,
-            ]);
 
-        Material::where('name', 'Fluovest')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $laag->id,
-                $gemiddeld->id,
-            ]);
 
-        Material::where('name', 'Gasdetectiemeter')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $gemiddeld->id,
-                $hoog->id,
-            ]);
+// ==================== LAAG ====================
 
-        Material::where('name', 'Dompelpomp')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $gemiddeld->id,
-                $hoog->id,
-            ]);
+$laagMaterialen = [
+    'Bout M6',
+    'Bout M8',
+    'Bout M10',
+    'Bout M12',
+    'Bout M16',
+    'Zeskantmoeren',
+    'Borgmoeren',
+    'Flensmoeren',
+    'Sluitringen',
+    'Veerringen',
+    'Tandringen',
+    'Ankerbouten',
+    'Chemische ankers',
+    'Keilbouten',
+    'Draadstangen',
+    'Inslagmoeren',
+    'Tapbouten',
+    'Zeskantkopschroeven',
+    'Inbusbouten',
+    'Torxschroeven',
+    'Kruiskopschroeven',
+    'Zelftappende vijzen',
+    'Parkervijzen',
+    'Spaanplaatschroeven',
+    'Slangenklemmen',
 
-        Material::where('name', 'Rioolstop')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $hoog->id,
-            ]);
-        Material::where('name', 'Werklaarzen PVC')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $gemiddeld->id,
-                $hoog->id,
-            ]);
+    'Tie-wraps',
+    'Kabelschoenen',
+    'Markeringstape',
+    'Siliconenkit',
+    'Lijm',
+    'Reinigingsdoekjes',
+    'WD-40',
+    'Contactspray',
+    'Kettingspray',
+    'Duct tape',
+    'Isolatietape',
+    'Batterijen AA',
+    'Batterijen AAA',
+];
 
-        Material::where('name', 'Regenjas')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $gemiddeld->id,
-                $hoog->id,
-            ]);
+foreach ($laagMaterialen as $naam) {
+    Material::where('name', $naam)->first()?->riskLevels()->sync([$laag->id]);
+}
 
-        Material::where('name', 'Regenbroek')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $gemiddeld->id,
-                $hoog->id,
-            ]);
+// ==================== GEMIDDELD ====================
 
-        Material::where('name', 'Slangenwagen')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $hoog->id,
-            ]);
+$gemiddeldMaterialen = [
+    'Oordoppen',
+    'Gehoorkappen',
+    'Veiligheidsbril',
+    'Stofmaskers FFP2',
+    'Werkhandschoenen snijvast',
 
-        Material::where('name', 'Veiligheidshelm')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $laag->id,
-                $gemiddeld->id,
-            ]);
+    'Dopsleutelset metrisch',
+    'Dopsleutelset inch',
+    'Ringsleutelset',
+    'Steeksleutelset',
+    'Momentsleutel',
+    'Inbussleutelset',
+    'Schroevendraaierset plat',
+    'Schroevendraaierset kruiskop',
+    'Schroevendraaierset Torx',
+    'Geïsoleerde schroevendraaiers',
+    'Combinatietang',
+    'Waterpomptang',
+    'Kniptang',
+    'Punttang',
+    'Krimptang',
+    'Kabelstripper',
+    'Hamer',
+    'Kunststofhamer',
+    'Moker',
+    'Breekijzer',
+    'Accuboormachine',
+    'Klopboormachine',
+    'Schroefmachine',
+    'Slagmoersleutel',
+    'Waterpas',
+    'Laserwaterpas',
+    'Meetlint',
+    'Rolmeter',
+    'Spanningstester',
+    'Multimeter',
 
-        Material::where('name', 'Werkhandschoenen chemisch')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $laag->id,
-                $gemiddeld->id,
-            ]);
+    'Smeervet foodgrade',
+    'Smeervet EP2',
+    'Smeervet lithium',
+    'O-ringen set',
+    'Pakkingen papier',
+    'Pakkingen rubber',
+    'Pakkingen EPDM',
+    'PTFE tape',
+    'Loctite',
+    'PVC-fittingen',
+    'Koppeling Gardena',
+    'V-snaren',
+    'Kettingen',
+    'Kabels M16-M32',
+    'Wartels M16-M32',
+    'Aansluitdozen',
+    'Pneumatische koppelingen',
+    'Trillingsdempers',
 
-        Material::where('name', 'Valharnas')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $gemiddeld->id,
-                $hoog->id,
-            ]);
-        Material::where('name', 'Putdekselhaak')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $gemiddeld->id,
-                $hoog->id,
-            ]);
+    'Accu\'s 18V',
+];
 
-        Material::where('name', 'Gasdetectietoestel H₂S')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $hoog->id,
-            ]);
+foreach ($gemiddeldMaterialen as $naam) {
+    Material::where('name', $naam)->first()?->riskLevels()->sync([$gemiddeld->id]);
+}
 
-        Material::where('name', 'Hogedrukreiniger')
-            ->first()
-            ?->riskLevels()
-            ->sync([
-                $hoog->id,
-            ]);
+// ==================== GEMIDDELD + HOOG ====================
+
+$gemiddeldHoogMaterialen = [
+    'Werkhandschoenen chemisch',
+    'Werkhandschoenen elektrisch',
+    'Veiligheidsschoenen S3',
+
+    'Regenjas',
+    'Regenbroek',
+    'Werklaarzen PVC',
+
+    'Valharnas',
+    'Valbeveiligingslijn',
+
+    'Gasdetectiemeter',
+
+    'Persslang',
+    'PVC slang',
+    'PE slang',
+    'Koppeling Geka',
+    'Camlock koppeling',
+
+    'Putdekselhaak',
+    'Gasdetectietoestel CO',
+    'Vlotterschakelaar',
+    'Ultrasoon niveaumeting',
+    'Radar niveaumeting',
+    'Staalnamepot',
+    'Monsternameapparatuur',
+
+    'Fles perslucht',
+];
+
+foreach ($gemiddeldHoogMaterialen as $naam) {
+    Material::where('name', $naam)->first()?->riskLevels()->sync([
+        $gemiddeld->id,
+        $hoog->id,
+    ]);
+}
+
+// ==================== LAAG + GEMIDDELD ====================
+
+$laagGemiddeldMaterialen = [
+    'Fluovest',
+    'Veiligheidshelm',
+];
+
+foreach ($laagGemiddeldMaterialen as $naam) {
+    Material::where('name', $naam)->first()?->riskLevels()->sync([
+        $laag->id,
+        $gemiddeld->id,
+    ]);
+}
+
+// ==================== LAAG + GEMIDDELD + HOOG ====================
+
+Material::where('name', 'EHBO-kit')
+    ->first()
+    ?->riskLevels()
+    ->sync([
+        $laag->id,
+        $gemiddeld->id,
+        $hoog->id,
+    ]);
+
+// ==================== HOOG ====================
+
+$hoogMaterialen = [
+    'Stofmaskers FFP3',
+    'Overall brandvertragend',
+    'Karabijnhaken',
+
+    'Gasdetectietoestel H₂S',
+
+    'Rioolcamera',
+    'Ontstoppingsveer',
+    'Hogedrukreiniger',
+    'Slangenwagen',
+    'Dompelpomp',
+    'Rioolstop',
+];
+
+foreach ($hoogMaterialen as $naam) {
+    Material::where('name', $naam)->first()?->riskLevels()->sync([$hoog->id]);
+}
+
+
+
+
 
 
     }

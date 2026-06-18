@@ -53,17 +53,15 @@
 
     </x-card>
 
-    <div class="mt-6">
+   <div class="hidden lg:block mt-6">
 
-        <x-card>
+<x-card>
 
-            <h2 class="text-xl font-semibold mb-4">
+    <h2 class="text-xl font-semibold mb-4">
+        Bestelde materialen
+    </h2>
 
-                Bestelde materialen
-
-            </h2>
-
-            <table class="w-full">
+    <table class="w-full">
 
                 <thead>
     <tr class="border-b">
@@ -105,6 +103,42 @@
             </table>
 
         </x-card>
+        </div>
+   <div class="lg:hidden space-y-4 mt-8">
+
+    @foreach($order->items as $item)
+
+        <x-card>
+
+            <div class="flex gap-4 items-center">
+
+                @if($item->material->image)
+                    <img
+                        src="{{ asset('storage/' . $item->material->image) }}"
+                        class="w-16 h-16 object-cover rounded-lg border">
+                @else
+                    <img
+                        src="{{ asset('images/' . ($categoryImages[$item->material->category] ?? 'sidebar-bg.jpg')) }}"
+                        class="w-16 h-16 object-cover rounded-lg border">
+                @endif
+
+                <div>
+                    <p class="font-semibold">
+                        {{ $item->material->name }}
+                    </p>
+
+                    <p class="text-sm text-gray-500">
+                        Hoeveelheid: {{ $item->quantity }}
+                    </p>
+                </div>
+
+            </div>
+
+        </x-card>
+
+    @endforeach
+
+</div>     
 <div class="mt-6">
 
   <a href="{{ route('admin.orders.index') }}">

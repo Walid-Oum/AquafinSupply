@@ -5,11 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Ticket Model
+ * 
+ * Vertegenwoordigt een supportaanvraag (ticket) in de applicatie.
+ * Een ticket wordt aangemaakt door een technieker en behandeld door het magazijn.
+ * Bevat status, onderwerp, beschrijving en eventueel een antwoord van het magazijn.
+ *
+ * @author 
+ * @version 1.0
+ */
 class Ticket extends Model
 {
     /** @use HasFactory<\Database\Factories\TicketFactory> */
     use HasFactory;
 
+    /**
+     * Velden die massaal mogen worden ingevuld.
+     */
     protected $fillable = [
         'user_id',
         'order_id',
@@ -20,19 +33,39 @@ class Ticket extends Model
         'location_id',
     ];
 
-    public function user(){
+    /**
+     * Relatie: dit ticket hoort bij een gebruiker (technieker).
+     */
+    public function user()
+    {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function order(){
+    /**
+     * Relatie: dit ticket hoort bij een bestelling.
+     */
+    public function order()
+    {
         return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 
-    public function location(){
+    /**
+     * Relatie: dit ticket hoort bij een locatie (depot).
+     */
+    public function location()
+    {
         return $this->belongsTo(Location::class, 'location_id', 'id');
     }
 
-    
+    /**
+     * Scope: zoekfunctie voor tickets.
+     * Zoekt op onderwerp, beschrijving of status.
+     * Geeft prioriteit aan exacte matches en matches die beginnen met de zoekterm.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|null $searchTerm
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function scopeSearch($query, $searchTerm)
     {
         if (!$searchTerm) {

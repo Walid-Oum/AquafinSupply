@@ -8,11 +8,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * User Model
+ * 
+ * Vertegenwoordigt een gebruiker in de applicatie.
+ * Ondersteunt drie rollen: technieker, magazijnmedewerker en administrator.
+ * Gebruikers zijn gekoppeld aan een locatie (depot) en kunnen tickets,
+ * bestellingen en notificaties hebben.
+ *
+ * @author 
+ * @version 1.0
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    /**
+     * Relatie: een gebruiker heeft meerdere tickets (supportaanvragen).
+     */
     public function tickets()
     {
         return $this->hasMany(Ticket::class, 'user_id', 'id');
@@ -56,17 +70,25 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Relatie: een gebruiker heeft meerdere bestellingen.
+     */
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
 
+    /**
+     * Relatie: een gebruiker hoort bij een locatie (depot).
+     */
     public function location()
     {
         return $this->belongsTo(Location::class);
     }
 
-
+    /**
+     * Relatie: een gebruiker heeft meerdere notificaties.
+     */
     public function userNotifications()
     {
         return $this->hasMany(UserNotification::class);

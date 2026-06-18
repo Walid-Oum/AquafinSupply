@@ -133,8 +133,8 @@
                 @endif
             </div>
 
-            <div class="mb-4">
-
+           
+<div class="mb-4">
                 <label class="block font-bold mb-2">
                     Nieuwe afbeelding
                 </label>
@@ -152,24 +152,49 @@
                     Risiconiveaus
                 </label>
 
-                @foreach($riskLevels as $riskLevel)
+               <div class="mb-4">
 
-                    <label class="flex items-center gap-2 mb-2">
 
-                        <input
-                            type="checkbox"
-                            name="risk_levels[]"
-                            value="{{ $riskLevel->id }}"
-                            {{ $material->riskLevels->contains($riskLevel->id) ? 'checked' : '' }}>
+    <div class="space-y-3">
 
-                        {{ $riskLevel->name }}
+        @foreach($riskLevels as $riskLevel)
 
-                    </label>
+            <label
+                class="flex items-center gap-3 rounded border border-gray-200 p-3 hover:bg-gray-50 cursor-pointer"
+            >
 
-                @endforeach
+                <input
+                    type="checkbox"
+                    name="risk_levels[]"
+                    value="{{ $riskLevel->id }}"
+                    class="h-4 w-4"
+                    {{ $material->riskLevels->contains($riskLevel->id) ? 'checked' : '' }}>
+
+                <span
+                    class="
+                        px-3 py-1 rounded-full text-xs font-semibold
+
+                        @if($riskLevel->name === 'Hoog')
+                            bg-red-100 text-red-700
+                        @elseif($riskLevel->name === 'Gemiddeld')
+                            bg-yellow-100 text-yellow-700
+                        @else
+                            bg-green-100 text-green-700
+                        @endif
+                    "
+                >
+                    {{ $riskLevel->name }}
+                </span>
+
+            </label>
+
+        @endforeach
+
+    </div>
+
+ </div>
 
             </div>
-
 
 
 

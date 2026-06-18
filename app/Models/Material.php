@@ -5,8 +5,21 @@ namespace App\Models;
 use App\Models\RiskLevel;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Material Model
+ * 
+ * Vertegenwoordigt een materiaal in de applicatie. Bevat alle eigenschappen
+ * zoals naam, categorie, voorraad en afbeelding. Heeft relaties met
+ * orderitems, voorraden en risiconiveaus.
+ *
+ * @author
+ * @version 1.0
+ */
 class Material extends Model
 {
+    /**
+     * Velden die massaal mogen worden ingevuld.
+     */
     protected $fillable = [
         'name',
         'category',
@@ -17,13 +30,18 @@ class Material extends Model
         'image',
     ];
 
+    /**
+     * Attributen die naar een specifiek type moeten worden omgezet.
+     */
     protected $casts = [
         'is_active' => 'boolean',
         'stock' => 'integer',
         'minimum_stock' => 'integer',
     ];
 
-    // Relatie met OrderItem: een materiaal kan in meerdere orderitems voorkomen
+    /**
+     * Relatie: een materiaal kan in meerdere orderitems voorkomen.
+     */
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
@@ -31,19 +49,24 @@ class Material extends Model
 
     /**
      * Basis scope voor zoeken.
-     * De échte fouttolerante fuzzy search wordt nu in de controllers afgehandeld via FuzzySearch.
+     * De échte fouttolerante fuzzy search wordt in de controllers afgehandeld.
      */
     public function scopeSearch($query, $searchTerm)
     {
-        // We retourneren simpelweg de query. De filtering gebeurt nu 100% accuraat in de controller.
         return $query;
     }
 
+    /**
+     * Relatie: voorraden van dit materiaal per locatie.
+     */
     public function stocks()
     {
         return $this->hasMany(MaterialStock::class);
     }
 
+    /**
+     * Relatie: risiconiveaus die aan dit materiaal zijn gekoppeld.
+     */
     public function riskLevels()
     {
         return $this->belongsToMany(RiskLevel::class);
