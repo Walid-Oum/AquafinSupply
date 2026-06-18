@@ -1,5 +1,22 @@
+{{--
+    TECHNIEKER - MIJN SUPPORTAANVRAGEN (TICKETS OVERZICHT)
+
+    @author      
+    @version     1.0
+    @since       2026-06-18
+
+    Deze view toont alle supportaanvragen van de ingelogde technieker.
+    Techniekers kunnen hun tickets bekijken, filteren op status,
+    zoeken op onderwerp, status of bestelling.
+    De view bevat ook een knop om een nieuwe supportaanvraag aan te maken.
+    Het magazijnantwoord wordt getoond indien beschikbaar.
+
+    @see App\Http\Controllers\TicketController::index()
+--}}
+
 <x-app-layout>
     <div class="space-y-6">
+        {{-- HEADER --}}
         <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
                 <x-page-header title="Mijn supportaanvragen" />
@@ -16,6 +33,7 @@
             </a>
         </div>
 
+        {{-- FILTERS EN ZOEKBALK --}}
         @if($tickets->count() > 0)
             <section class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
                 <div class="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:items-center">
@@ -29,6 +47,7 @@
 
                     <div class="-mx-3 overflow-x-auto px-3 pb-1 lg:col-span-2 lg:mx-0 lg:px-0">
                         <div class="flex min-w-max gap-2 lg:min-w-0 lg:flex-wrap lg:justify-end">
+                            {{-- STATUS FILTERS --}}
                             <button
                                 type="button"
                                 data-status-filter="all"
@@ -66,6 +85,7 @@
             </section>
         @endif
 
+        {{-- TICKETS LIJST --}}
         <section id="tickets-container" class="space-y-4">
             @forelse ($tickets as $ticket)
                 @php
@@ -125,6 +145,7 @@
                                 </div>
                             </div>
 
+                            {{-- BESCHRIJVING --}}
                             @if($ticket->description)
                                 <div class="mt-4 rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-700">
                                     <p class="font-semibold text-gray-800">
@@ -137,6 +158,7 @@
                                 </div>
                             @endif
 
+                            {{-- MAGAZIJN ANTWOORD --}}
                             @if($ticket->warehouse_note)
                                 <div class="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-gray-700">
                                     <p class="font-semibold text-blue-700">
@@ -180,6 +202,7 @@
         </section>
     </div>
 
+    {{-- ZOEK- EN FILTERFUNCTIE --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('ticket-search-input');
