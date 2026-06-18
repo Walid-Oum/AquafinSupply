@@ -16,35 +16,35 @@
 
 --}}
  
-<x-app-layout>
-<div class="min-w-0 max-w-full space-y-6 overflow-x-hidden">
+       <x-app-layout>
+        <div class="min-w-0 max-w-full space-y-6 overflow-x-hidden">
 
         {{-- Pagina-header --}}
-<div>
-<x-page-header title="Materialen overzicht" />
+       <div>
+        <x-page-header title="Materialen overzicht" />
  
             <p class="mt-1 text-sm text-gray-600 sm:text-base">
 
                 Bekijk materialen, zoek op categorie en voeg materiaal toe aan je winkelmandje.
-</p>
-</div>
+         </p>
+          </div>
  
         {{-- Aanbevolen materialen op basis van overstromingsrisico --}}
 
         @if($recommendedMaterials->count() > 0)
-<section class="min-w-0 max-w-full overflow-hidden rounded-2xl border border-green-200 bg-green-50 shadow-sm">
-<div class="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
-<div class="min-w-0">
-<h2 class="text-lg font-bold text-green-700">
+       <section class="min-w-0 max-w-full overflow-hidden rounded-2xl border border-green-200 bg-green-50 shadow-sm">
+       <div class="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
+         <div class="min-w-0">
+   <h2 class="text-lg font-bold text-green-700">
 
                             Aanbevolen materialen
-</h2>
+    </h2>
  
                         <p class="mt-1 text-sm text-green-700">
 
                             {{ $recommendedMaterials->count() }} materialen aanbevolen op basis van het overstromingsrisico.
-</p>
-</div>
+      </p>
+        </div>
  
                     <button
 
@@ -58,8 +58,8 @@
 >
 
                         ▲ Verberg
-</button>
-</div>
+       </button>
+         </div>
  
                 <div
 
@@ -67,12 +67,12 @@
 
                     class="min-w-0 max-w-full overflow-hidden pb-4"
 >
-<div class="max-w-full overflow-x-auto overscroll-x-contain px-4 pb-3 sm:px-5">
-<div class="flex w-max gap-4">
+        <div class="max-w-full overflow-x-auto overscroll-x-contain px-4 pb-3 sm:px-5">
+           <div class="flex w-max gap-4">
 
                             @foreach($recommendedMaterials as $material)
-<div class="w-56 shrink-0">
-<x-material-card
+            <div class="w-56 shrink-0">
+        <x-material-card
 
                                         :material="$material"
 
@@ -100,7 +100,7 @@
 
                     class="js-preserve-scroll min-w-0 lg:col-span-1"
 >
-<select
+              <select
 
                         name="sort"
 
@@ -108,25 +108,25 @@
 
                         class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
 >
-<option value="">
+             <option value="">
 
                             Sorteer op naam
-</option>
+            </option>
  
                         <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>
 
                             A-Z
-</option>
+          </option>
  
                         <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>
 
                             Z-A
-</option>
-</select>
-</form>
+           </option>
+         </select>
+         </form>
  
                 <div class="min-w-0 lg:col-span-3">
-<x-search-bar
+          <x-search-bar
 
                         id="global-material-search"
 
@@ -137,14 +137,14 @@
                         endpoint="{{ route('api.materials.search') }}"
 
                     />
-</div>
-</div>
-</section>
+           </div>
+         </div>
+          </section>
  
-        {{-- Categoriefilters --}}
-<div class="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
-<div class="flex min-w-max gap-3 sm:min-w-0 sm:flex-wrap">
-<button
+          {{-- Categoriefilters --}}
+        <div class="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+        <div class="flex min-w-max gap-3 sm:min-w-0 sm:flex-wrap">
+        <button
 
                     type="button"
 
@@ -154,10 +154,10 @@
 >
 
                     Alles
-</button>
+            </button>
  
                 @foreach($categories as $category)
-<button
+             <button
 
                         type="button"
 
@@ -167,14 +167,14 @@
 >
 
                         {{ $category }}
-</button>
+           </button>
 
                 @endforeach
-</div>
-</div>
+          </div>
+          </div>
  
         {{-- Materialen grid --}}
-<div
+       <div
 
             id="materials"
 
@@ -227,20 +227,20 @@
 
                     data-search="{{ $searchText }}"
 >
-<x-material-card :material="$material" />
-</div>
+         <x-material-card :material="$material" />
+          </div>
 
             @empty
-<div class="col-span-full rounded-xl border bg-white py-8 text-center text-gray-500 shadow-sm">
+        <div class="col-span-full rounded-xl border bg-white py-8 text-center text-gray-500 shadow-sm">
 
                     Geen materialen gevonden.
-</div>
+            </div>
 
             @endforelse
-</div>
+            </div>
  
-        {{-- Lege staat bij zoeken/filteren --}}
-<div
+                {{-- Lege staat bij zoeken/filteren --}}
+         <div
 
             id="materials-empty-state"
 
@@ -248,8 +248,8 @@
 >
 
             Geen materialen gevonden voor deze zoekterm of categorie.
-</div>
-</div>
+          </div>
+         </div>
  
     <script>
 
