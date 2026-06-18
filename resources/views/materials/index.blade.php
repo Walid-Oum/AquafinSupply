@@ -1,68 +1,122 @@
 <x-app-layout>
-    <x-page-header title="Materialen overzicht"/>
-
-    <div class="mb-4 flex flex-col lg:flex-row gap-4 lg:justify-between lg:items-center">
-        <a href="{{ route('materials.create') }}">
-            <x-button>
-                + Nieuw materiaal
-            </x-button>
-        </a>
-
-        <div class="flex flex-col lg:flex-row gap-4 lg:items-center">
-            <div class="relative">
-                <input
-                    type="text"
-                    id="global-material-search"
-                    autocomplete="off"
-                    placeholder="Materiaal zoeken..."
-                    class="border rounded px-3 py-2 w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]">
-            </div>
-
-            <form method="GET" action="{{ route('materials.index') }}" class="flex gap-2">
-                <select name="category" class="border rounded px-3 py-2 text-sm">
-                    <option value="">Alle categorieën</option>
-                    @foreach($categories as $category)
-                        <option value="{{ $category }}" {{ request('category') == $category ? 'selected' : '' }}>
-                            {{ $category }}
-                        </option>
-                    @endforeach
-                </select>
-                
-                <select name="stock_status" class="border rounded px-3 py-2 text-sm">
-                    <option value="">Alle voorraadstatussen</option>
-                    <option value="low" {{ request('stock_status') == 'low' ? 'selected' : '' }}>Lage voorraad</option>
-                    <option value="ok" {{ request('stock_status') == 'ok' ? 'selected' : '' }}>OK</option>
-                </select>
-
-                <x-button>Filter</x-button>
-                <a href="{{ route('materials.index') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-400 transition">Reset</a>
-            </form>
+    <div class="min-w-0 max-w-full space-y-6 overflow-x-hidden">
+        {{-- HEADER --}}
+        <div>
+            <x-page-header title="Materialen overzicht" />
         </div>
-    </div>
-<div class="hidden lg:block">
-    <x-card>
-        <div class="overflow-x-auto">
-            <table class="min-w-[1100px] w-full text-sm">
-                <thead class="bg-gray-50 border-b">
-                    <tr>
-                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Naam</th>
-                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Categorie</th>
-                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Totale voorraad</th>
-                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Minimum per depot</th>
-                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Voorraadstatus</th>
-                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Status</th>
-                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Acties</th>
-                    </tr>
-                </thead>
 
-                <tbody class="divide-y divide-gray-100" id="material-table-body">
+        {{-- ACTIES + ZOEKEN EN FILTEREN --}}
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <a href="{{ route('materials.create') }}" class="w-full sm:w-auto">
+                <x-button class="w-full justify-center sm:w-auto">
+                    + Nieuw materiaal
+                </x-button>
+            </a>
+
+            <div class="flex w-full flex-col gap-3 lg:w-auto lg:flex-row lg:items-center">
+                <div class="w-full lg:w-72">
+                    <input
+                        type="text"
+                        id="global-material-search"
+                        autocomplete="off"
+                        placeholder="Materiaal zoeken..."
+                        class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
+                    >
+                </div>
+
+                <form
+                    method="GET"
+                    action="{{ route('materials.index') }}"
+                    class="flex w-full flex-col gap-3 sm:flex-row lg:w-auto"
+                >
+                    <select
+                        name="category"
+                        class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20 sm:w-auto"
+                    >
+                        <option value="">Alle categorieën</option>
+
+                        @foreach($categories as $category)
+                            <option value="{{ $category }}" {{ request('category') == $category ? 'selected' : '' }}>
+                                {{ $category }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <select
+                        name="stock_status"
+                        class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20 sm:w-auto"
+                    >
+                        <option value="">Alle voorraadstatussen</option>
+
+                        <option value="low" {{ request('stock_status') == 'low' ? 'selected' : '' }}>
+                            Lage voorraad
+                        </option>
+
+                        <option value="ok" {{ request('stock_status') == 'ok' ? 'selected' : '' }}>
+                            OK
+                        </option>
+                    </select>
+
+                    <x-button class="w-full justify-center sm:w-auto">
+                        Filter
+                    </x-button>
+
+                    <a
+                        href="{{ route('materials.index') }}"
+                        class="inline-flex w-full items-center justify-center rounded-xl bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 sm:w-auto"
+                    >
+                        Reset
+                    </a>
+                </form>
+            </div>
+        </div>
+
+        {{-- DESKTOPWEERGAVE --}}
+        <div class="hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:block">
+            <div class="w-full overflow-hidden rounded-2xl">
+                <table class="w-full table-fixed divide-y divide-gray-200 text-sm">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th class="w-[22%] px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                            Naam
+                        </th>
+
+                        <th class="w-[18%] px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                            Categorie
+                        </th>
+
+                        <th class="w-[13%] px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                            Totale voorraad
+                        </th>
+
+                        <th class="w-[13%] px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                            Minimum per depot
+                        </th>
+
+                        <th class="w-[15%] px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                            Voorraadstatus
+                        </th>
+
+                        <th class="w-[10%] px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                            Status
+                        </th>
+
+                        <th class="w-[9%] px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                            Acties
+                        </th>
+                    </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-gray-100 bg-white" id="material-table-body">
                     @forelse($materials as $material)
                         @php
                             $totalStock = $material->stocks->sum('stock');
                             $minimumStock = $material->stocks->max('minimum_stock') ?? $material->minimum_stock;
+
                             $hasLowStock = $material->stocks->contains(function ($stock) {
                                 return $stock->stock <= $stock->minimum_stock;
                             });
+
                             $lowStockDepots = $material->stocks->filter(function ($stock) {
                                 return $stock->stock <= $stock->minimum_stock;
                             })->count();
@@ -70,161 +124,207 @@
 
                         <tr
                             onclick="window.location='{{ route('materials.show', $material->id) }}'"
-                            class="material-row cursor-pointer hover:bg-gray-100 transition">
-                            <td class="px-4 py-3 font-medium text-gray-800 material-name">
-                                {{ $material->name }}
+                            class="material-row cursor-pointer transition hover:bg-gray-50/70"
+                        >
+                            <td class="material-name px-4 py-4 font-medium text-gray-800">
+                                <div class="truncate">
+                                    {{ $material->name }}
+                                </div>
                             </td>
-                            <td class="px-4 py-3 text-gray-600 material-category">
-                                {{ $material->category }}
+
+                            <td class="material-category px-4 py-4 text-gray-600">
+                                <div class="truncate">
+                                    {{ $material->category }}
+                                </div>
                             </td>
-                            <td class="px-4 py-3">
+
+                            <td class="px-4 py-4">
                                 @if($hasLowStock)
-                                    <span class="text-red-600 font-bold">{{ $totalStock }}</span>
+                                    <span class="font-bold text-red-600">
+                                            {{ $totalStock }}
+                                        </span>
                                 @else
-                                    <span class="text-gray-800">{{ $totalStock }}</span>
+                                    <span class="text-gray-800">
+                                            {{ $totalStock }}
+                                        </span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 text-gray-700">{{ $minimumStock }}</td>
-                            <td class="px-4 py-3">
+
+                            <td class="px-4 py-4 text-gray-700">
+                                {{ $minimumStock }}
+                            </td>
+
+                            <td class="px-4 py-4">
                                 @if($hasLowStock)
                                     <div class="space-y-1">
-                                        <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">Lage voorraad</span>
-                                        <p class="text-xs text-red-600 font-medium">{{ $lowStockDepots }} depot(s) onder minimum</p>
+                                            <span class="inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                                                Lage voorraad
+                                            </span>
+
+                                        <p class="text-xs font-medium text-red-600">
+                                            {{ $lowStockDepots }} depot(s)
+                                        </p>
                                     </div>
                                 @else
-                                    <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">OK</span>
+                                    <span class="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                                            OK
+                                        </span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3">
+
+                            <td class="px-4 py-4">
                                 @if($material->is_active)
-                                    <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">Actief</span>
+                                    <span class="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                                            Actief
+                                        </span>
                                 @else
-                                    <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">Inactief</span>
+                                    <span class="inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                                            Inactief
+                                        </span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3">
-                                <a href="{{ route('materials.show', $material->id) }}" onclick="event.stopPropagation();">
-                                    <x-button>Bekijk</x-button>
+
+                            <td class="px-4 py-4">
+                                <a
+                                    href="{{ route('materials.show', $material->id) }}"
+                                    onclick="event.stopPropagation();"
+                                >
+                                    <x-button>
+                                        Bekijk
+                                    </x-button>
                                 </a>
                             </td>
                         </tr>
                     @empty
                         <tr id="no-materials-backend">
-                            <td colspan="7" class="px-4 py-6 text-center text-gray-500">
+                            <td colspan="7" class="px-4 py-8 text-center text-gray-500">
                                 Geen materialen gevonden.
                             </td>
                         </tr>
                     @endforelse
 
                     <tr id="no-materials-found-row" class="hidden">
-                        <td colspan="7" class="px-4 py-8 text-center text-gray-500 italic bg-gray-50">
+                        <td colspan="7" class="bg-gray-50 px-4 py-8 text-center italic text-gray-500">
                             Geen materialen gevonden die voldoen aan de zoekterm.
                         </td>
                     </tr>
-                </tbody>
-            </table>
-        </div>
-   </x-card>
-</div>
-
-<div class="lg:hidden space-y-4">
-    @forelse($materials as $material)
-
-        @php
-            $totalStock = $material->stocks->sum('stock');
-            $hasLowStock = $material->stocks->contains(function ($stock) {
-                return $stock->stock <= $stock->minimum_stock;
-            });
-        @endphp
-
-        <x-card>
-
-            <div class="space-y-2">
-
-                <p>
-                    <strong>Naam:</strong>
-                    {{ $material->name }}
-                </p>
-
-                <p>
-                    <strong>Categorie:</strong>
-                    {{ $material->category }}
-                </p>
-
-                <p>
-                    <strong>Totale voorraad:</strong>
-                    {{ $totalStock }}
-                </p>
-
-                <div>
-                    <strong>Voorraadstatus:</strong>
-
-                    @if($hasLowStock)
-                        <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">
-                            Lage voorraad
-                        </span>
-                    @else
-                        <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
-                            OK
-                        </span>
-                    @endif
-                </div>
-
-                <div>
-                    <strong>Status:</strong>
-
-                    @if($material->is_active)
-                        <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
-                            Actief
-                        </span>
-                    @else
-                        <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">
-                            Inactief
-                        </span>
-                    @endif
-                </div>
-
-                <div class="pt-2">
-                    <a href="{{ route('materials.show', $material->id) }}">
-                        <x-button>
-                            Bekijk
-                        </x-button>
-                    </a>
-                </div>
-
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-        </x-card>
+        {{-- MOBIELE WEERGAVE --}}
+        <div class="space-y-4 lg:hidden">
+            @forelse($materials as $material)
+                @php
+                    $totalStock = $material->stocks->sum('stock');
 
-    @empty
+                    $hasLowStock = $material->stocks->contains(function ($stock) {
+                        return $stock->stock <= $stock->minimum_stock;
+                    });
+                @endphp
 
-        <x-card>
-            Geen materialen gevonden.
-        </x-card>
+                <article class="material-card rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+                    <div class="space-y-4">
+                        <div>
+                            <h2 class="material-name-mobile text-lg font-bold text-gray-900">
+                                {{ $material->name }}
+                            </h2>
 
-    @endforelse
+                            <p class="material-category-mobile mt-1 text-sm text-gray-500">
+                                {{ $material->category }}
+                            </p>
+                        </div>
 
-</div>
+                        <div class="grid gap-2 text-sm text-gray-700">
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-gray-500">Totale voorraad</span>
+
+                                @if($hasLowStock)
+                                    <span class="font-bold text-red-600">
+                                        {{ $totalStock }}
+                                    </span>
+                                @else
+                                    <span class="font-semibold text-gray-900">
+                                        {{ $totalStock }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-gray-500">Voorraadstatus</span>
+
+                                @if($hasLowStock)
+                                    <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                                        Lage voorraad
+                                    </span>
+                                @else
+                                    <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                                        OK
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-gray-500">Status</span>
+
+                                @if($material->is_active)
+                                    <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                                        Actief
+                                    </span>
+                                @else
+                                    <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                                        Inactief
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <a href="{{ route('materials.show', $material->id) }}">
+                            <x-button class="w-full justify-center">
+                                Bekijk
+                            </x-button>
+                        </a>
+                    </div>
+                </article>
+            @empty
+                <div class="rounded-2xl border border-gray-100 bg-white p-6 text-center text-gray-500 shadow-sm">
+                    Geen materialen gevonden.
+                </div>
+            @endforelse
+
+            <div
+                id="no-materials-found-mobile"
+                class="hidden rounded-2xl border border-gray-100 bg-white p-6 text-center text-gray-500 shadow-sm"
+            >
+                Geen materialen gevonden die voldoen aan de zoekterm.
+            </div>
+        </div>
+    </div>
+
+    {{-- CLIENT-SIDE ZOEKFUNCTIE --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('global-material-search');
             const tableRows = document.querySelectorAll('.material-row');
+            const mobileCards = document.querySelectorAll('.material-card');
             const noResultsRow = document.getElementById('no-materials-found-row');
+            const noResultsMobile = document.getElementById('no-materials-found-mobile');
             const backendEmptyRow = document.getElementById('no-materials-backend');
 
-            // Helper om tekst te herleiden naar basisvorm
             function normalizeText(text) {
                 if (!text) return '';
+
                 return text.toLowerCase()
-                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // é -> e, à -> a
-                    .replace(/[^a-z0-9]/g, ' ')                      // Speciale tekens naar spaties
-                    .replace(/\s+/g, ' ')                             // Dubbele spaties weg
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[^a-z0-9]/g, ' ')
+                    .replace(/\s+/g, ' ')
                     .trim();
             }
 
-            // Levenshtein-distantie voor typfouten
             function levenshtein(a, b) {
                 const matrix = [];
+
                 for (let i = 0; i <= b.length; i++) matrix[i] = [i];
                 for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
 
@@ -234,104 +334,132 @@
                             matrix[i][j] = matrix[i - 1][j - 1];
                         } else {
                             matrix[i][j] = Math.min(
-                                matrix[i - 1][j - 1] + 1, // vervanging
-                                matrix[i][j - 1] + 1,     // invoeging
-                                matrix[i - 1][j] + 1      // verwijdering
+                                matrix[i - 1][j - 1] + 1,
+                                matrix[i][j - 1] + 1,
+                                matrix[i - 1][j] + 1
                             );
                         }
                     }
                 }
+
                 return matrix[b.length][a.length];
             }
 
             function getAllowedDistance(word) {
                 const length = word.length;
+
                 if (length <= 4) return 1;
                 if (length <= 7) return 2;
                 if (length <= 12) return 3;
+
                 return 4;
             }
 
-            if (searchInput) {
-                searchInput.addEventListener('input', function () {
-                    const query = normalizeText(this.value);
-                    let visibleCount = 0;
+            function isMaterialMatch(name, category, query) {
+                const flatQuery = query.replace(/ /g, '');
+                const flatName = name.replace(/ /g, '');
+                const flatCategory = category.replace(/ /g, '');
 
-                    if (query === '') {
-                        tableRows.forEach(row => row.style.display = '');
-                        if (noResultsRow) noResultsRow.classList.add('hidden');
-                        if (backendEmptyRow) backendEmptyRow.style.display = '';
-                        return;
+                if (
+                    name.includes(query) ||
+                    category.includes(query) ||
+                    flatName.includes(flatQuery) ||
+                    flatCategory.includes(flatQuery)
+                ) {
+                    return true;
+                }
+
+                if (flatQuery.length < 3) {
+                    return false;
+                }
+
+                const allowedDistance = getAllowedDistance(flatQuery);
+
+                if (
+                    levenshtein(flatQuery, flatName) <= allowedDistance ||
+                    levenshtein(flatQuery, flatCategory) <= allowedDistance
+                ) {
+                    return true;
+                }
+
+                const queryWords = query.split(' ');
+                const nameWords = name.split(' ');
+
+                for (const qWord of queryWords) {
+                    for (const nWord of nameWords) {
+                        if (
+                            nWord.includes(qWord) ||
+                            qWord.includes(nWord) ||
+                            (qWord.length >= 3 && levenshtein(qWord, nWord) <= getAllowedDistance(qWord))
+                        ) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            if (!searchInput) return;
+
+            searchInput.addEventListener('input', function () {
+                const query = normalizeText(this.value);
+                let visibleRows = 0;
+                let visibleCards = 0;
+
+                if (query === '') {
+                    tableRows.forEach(row => row.style.display = '');
+                    mobileCards.forEach(card => card.classList.remove('hidden'));
+                    noResultsRow?.classList.add('hidden');
+                    noResultsMobile?.classList.add('hidden');
+
+                    if (backendEmptyRow) {
+                        backendEmptyRow.style.display = '';
                     }
 
-                    // Schakel de database lege melding uit tijdens het zoeken
-                    if (backendEmptyRow) backendEmptyRow.style.display = 'none';
+                    return;
+                }
 
-                    const flatQuery = query.replace(/ /g, '');
+                if (backendEmptyRow) {
+                    backendEmptyRow.style.display = 'none';
+                }
 
-                    tableRows.forEach(row => {
-                        const nameEl = row.querySelector('.material-name');
-                        const categoryEl = row.querySelector('.material-category');
+                tableRows.forEach(row => {
+                    const name = normalizeText(row.querySelector('.material-name')?.textContent || '');
+                    const category = normalizeText(row.querySelector('.material-category')?.textContent || '');
 
-                        const name = normalizeText(nameEl ? nameEl.textContent : '');
-                        const category = normalizeText(categoryEl ? categoryEl.textContent : '');
-                        
-                        const flatName = name.replace(/ /g, '');
-                        const flatCategory = category.replace(/ /g, '');
-
-                        let isMatch = false;
-
-                        // 1. Directe of spatieloze match (zoekt zowel in Naam als in Categorie)
-                        if (name.includes(query) || category.includes(query) || 
-                            flatName.includes(flatQuery) || flatCategory.includes(flatQuery)) {
-                            isMatch = true;
-                        }
-
-                        // 2. Fuzzy logica voor typfouten (vanaf 3 letters)
-                        if (!isMatch && flatQuery.length >= 3) {
-                            const allowedDistance = getAllowedDistance(flatQuery);
-                            
-                            if (levenshtein(flatQuery, flatName) <= allowedDistance || 
-                                levenshtein(flatQuery, flatCategory) <= allowedDistance) {
-                                isMatch = true;
-                            }
-
-                            // Losse woorden checken
-                            if (!isMatch) {
-                                const queryWords = query.split(' ');
-                                const nameWords = name.split(' ');
-
-                                queryWords.forEach(qWord => {
-                                    nameWords.forEach(nWord => {
-                                        if (nWord.includes(qWord) || qWord.includes(nWord)) {
-                                            isMatch = true;
-                                        } else if (qWord.length >= 3 && levenshtein(qWord, nWord) <= getAllowedDistance(qWord)) {
-                                            isMatch = true;
-                                        }
-                                    });
-                                });
-                            }
-                        }
-
-                        // Update de display status
-                        if (isMatch) {
-                            row.style.display = '';
-                            visibleCount++;
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    });
-
-                    // Toon melding bij 0 resultaten
-                    if (noResultsRow) {
-                        if (visibleCount === 0) {
-                            noResultsRow.classList.remove('hidden');
-                        } else {
-                            noResultsRow.classList.add('hidden');
-                        }
+                    if (isMaterialMatch(name, category, query)) {
+                        row.style.display = '';
+                        visibleRows++;
+                    } else {
+                        row.style.display = 'none';
                     }
                 });
-            }
+
+                mobileCards.forEach(card => {
+                    const name = normalizeText(card.querySelector('.material-name-mobile')?.textContent || '');
+                    const category = normalizeText(card.querySelector('.material-category-mobile')?.textContent || '');
+
+                    if (isMaterialMatch(name, category, query)) {
+                        card.classList.remove('hidden');
+                        visibleCards++;
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+
+                if (visibleRows === 0) {
+                    noResultsRow?.classList.remove('hidden');
+                } else {
+                    noResultsRow?.classList.add('hidden');
+                }
+
+                if (visibleCards === 0) {
+                    noResultsMobile?.classList.remove('hidden');
+                } else {
+                    noResultsMobile?.classList.add('hidden');
+                }
+            });
         });
     </script>
 </x-app-layout>

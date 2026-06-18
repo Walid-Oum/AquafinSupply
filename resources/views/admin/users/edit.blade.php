@@ -5,154 +5,215 @@
     Laat een administrator toe om bestaande
     gebruikersgegevens te wijzigen.
 
-    Functionaliteiten:
-    - Wijzigen van naam en e-mailadres
-    - Wijzigen van gebruikersrol
-    - Wijzigen van depotlocatie
-    - Activeren of deactiveren van accounts
-    - Wijzigen van wachtwoord
-    - Bescherming tegen het wijzigen van eigen rol
-    - Bescherming tegen het wijzigen van eigen accountstatus
-
     Gebruikersrol:
     - Admin
-
-    Opmerking:
-    Administrators kunnen hun eigen rol of
-    accountstatus niet aanpassen om fouten
-    in het toegangsbeheer te voorkomen.
 --}}
-<x-app-layout>
-<div class="container mx-auto px-6 py-8">
 
-    <div class="mb-6">
-        <a href="{{ route('admin.users.index') }}" class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+<x-app-layout>
+    <div class="mx-auto w-full max-w-4xl space-y-6">
+        <a
+            href="{{ route('admin.users.index') }}"
+            class="inline-flex items-center gap-1 text-sm text-gray-500 transition-colors hover:text-gray-700"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
             Terug naar overzicht
         </a>
-    </div>
 
-    <div class="w-full bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
-            <h3 class="text-gray-800 text-xl font-bold">Gebruiker Aanpassen</h3>
-            <p class="text-gray-500 text-xs mt-0.5">Wijzig de accountgegevens van <span class="font-semibold text-gray-700">{{ $user->name }}</span>.</p>
-        </div>
-        {{-- Formulier voor het aanpassen van gebruikersgegevens --}}
-        <form action="{{ route('admin.users.update', $user->id) }}" method="POST" class="p-6 space-y-5">
-            @csrf
-            @method('PUT')
-            {{-- Basisgegevens van de gebruiker --}}
-            <div>
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Naam</label>
-                <input type="text" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" value="{{ old('name', $user->name) }}" required>
-                @error('name') <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p> @enderror
+        <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <div class="border-b border-gray-200 bg-gray-50 px-4 py-4 sm:px-6">
+                <h3 class="text-xl font-bold text-gray-800">
+                    Gebruiker aanpassen
+                </h3>
+
+                <p class="mt-1 text-sm text-gray-500">
+                    Wijzig de accountgegevens van
+                    <span class="font-semibold text-gray-700">{{ $user->name }}</span>.
+                </p>
             </div>
 
-            <div>
-                <label class="block text-gray-700 text-sm font-semibold mb-2">E-mailadres</label>
-                <input type="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" value="{{ old('email', $user->email) }}" required>
-                @error('email') <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p> @enderror
-            </div>
+            <form action="{{ route('admin.users.update', $user->id) }}" method="POST" class="space-y-5 p-4 sm:p-6">
+                @csrf
+                @method('PUT')
 
-            <div>
+                <div class="grid gap-5 md:grid-cols-2">
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-gray-700">
+                            Naam
+                        </label>
 
+                        <input
+                            type="text"
+                            name="name"
+                            class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm shadow-sm transition-all focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
+                            value="{{ old('name', $user->name) }}"
+                            required
+                        >
 
-                {{-- Beheer van gebruikersrollen --}}
-@if(Auth::id() != $user->id)
+                        @error('name')
+                        <p class="mt-1 text-xs font-medium text-rose-500">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-<label class="block text-gray-700 text-sm font-semibold mb-2">
-    Rol
-</label>
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-gray-700">
+                            E-mailadres
+                        </label>
 
-<select
-    name="role"
-    class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-    required>
+                        <input
+                            type="email"
+                            name="email"
+                            class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm shadow-sm transition-all focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
+                            value="{{ old('email', $user->email) }}"
+                            required
+                        >
 
-    @foreach($roles as $role)
-        <option value="{{ $role }}"
-            {{ old('role', $user->role) == $role ? 'selected' : '' }}>
-            {{ ucfirst($role) }}
-        </option>
-    @endforeach
+                        @error('email')
+                        <p class="mt-1 text-xs font-medium text-rose-500">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-</select>
+                    <div>
+                        @if(Auth::id() != $user->id)
+                            <label class="mb-2 block text-sm font-semibold text-gray-700">
+                                Rol
+                            </label>
 
-@error('role')
-<p class="text-rose-500 text-xs mt-1 font-medium">
-    {{ $message }}
-</p>
-@enderror
+                            <select
+                                name="role"
+                                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm transition-all focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
+                                required
+                            >
+                                @foreach($roles as $role)
+                                    <option value="{{ $role }}" {{ old('role', $user->role) == $role ? 'selected' : '' }}>
+                                        {{ ucfirst($role) }}
+                                    </option>
+                                @endforeach
+                            </select>
 
-@else
+                            @error('role')
+                            <p class="mt-1 text-xs font-medium text-rose-500">{{ $message }}</p>
+                            @enderror
+                        @else
+                            <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+                                Je kunt je eigen rol niet wijzigen.
+                            </div>
+                        @endif
+                    </div>
 
-<p class="text-gray-500 text-sm">
-    U kunt uw eigen rol niet wijzigen.
-</p>
+                    <div>
+                        <label for="location_id" class="mb-2 block text-sm font-semibold text-gray-700">
+                            Locatie
+                        </label>
 
-@endif
+                        <select
+                            id="location_id"
+                            name="location_id"
+                            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm transition-all focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
+                        >
+                            <option value="">Geen locatie</option>
 
-            </div>
-            {{-- Koppeling van gebruiker aan een depotlocatie --}}
-            <div>
-                <label for="location_id" class="block text-gray-700 text-sm font-semibold mb-2">
-                    Locatie
-                </label>
+                            @foreach ($locations as $location)
+                                <option value="{{ $location->id }}" @selected(old('location_id', $user->location_id) == $location->id)>
+                                    {{ $location->province }} - {{ $location->name }} ({{ $location->city }})
+                                </option>
+                            @endforeach
+                        </select>
 
-                <select
-                    id="location_id"
-                    name="location_id"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                >
-                    <option value="">Geen locatie</option>
+                        @error('location_id')
+                        <p class="mt-1 text-xs font-medium text-rose-500">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                    @foreach ($locations as $location)
-                        <option value="{{ $location->id }}"
-                            @selected(old('location_id', $user->location_id) == $location->id)>
-                            {{ $location->province }} - {{ $location->name }} ({{ $location->city }})
-                        </option>
-                    @endforeach
-                </select>
+                    <div>
+                        @if(Auth::id() != $user->id)
+                            <label class="mb-2 block text-sm font-semibold text-gray-700">
+                                Accountstatus
+                            </label>
 
-                @error('location_id')
-                <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p>
-                @enderror
-            </div>
-            {{-- Activeren of deactiveren van gebruikersaccounts --}}
-            @if(Auth::id() != $user->id)
-                <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-2">Accountstatus</label>
-                    <select name="is_active" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                        <option value="1" {{ $user->is_active ? 'selected' : '' }}>Actief</option>
-                        <option value="0" {{ !$user->is_active ? 'selected' : '' }}>Inactief</option>
-                    </select>
+                            <select
+                                name="is_active"
+                                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm transition-all focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
+                            >
+                                <option value="1" {{ $user->is_active ? 'selected' : '' }}>
+                                    Actief
+                                </option>
 
+                                <option value="0" {{ !$user->is_active ? 'selected' : '' }}>
+                                    Inactief
+                                </option>
+                            </select>
+                        @else
+                            <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+                                Je kunt je eigen accountstatus niet wijzigen.
+                            </div>
+
+                            <input type="hidden" name="is_active" value="1">
+                        @endif
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                            <label class="mb-1 block text-xs font-bold uppercase tracking-wider text-gray-600">
+                                Wachtwoord wijzigen optioneel
+                            </label>
+
+                            <p class="mb-4 text-xs text-gray-400">
+                                Laat deze velden leeg als je het huidige wachtwoord wilt behouden.
+                            </p>
+
+                            <div class="grid gap-5 md:grid-cols-2">
+                                <div>
+                                    <label class="mb-2 block text-sm font-semibold text-gray-700">
+                                        Nieuw wachtwoord
+                                    </label>
+
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm shadow-sm transition-all focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
+                                        placeholder="Nieuw wachtwoord"
+                                    >
+
+                                    @error('password')
+                                    <p class="mt-1 text-xs font-medium text-rose-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label class="mb-2 block text-sm font-semibold text-gray-700">
+                                        Nieuw wachtwoord bevestigen
+                                    </label>
+
+                                    <input
+                                        type="password"
+                                        name="password_confirmation"
+                                        class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm shadow-sm transition-all focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
+                                        placeholder="Herhaal nieuw wachtwoord"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            @else
-                <div>
-                    <p class="text-gray-500 text-sm">Je kunt je eigen accountstatus niet wijzigen.</p>
-                    <input type="hidden" name="is_active" value="1">
+
+                <div class="flex flex-col-reverse gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:justify-end">
+                    <a
+                        href="{{ route('admin.users.index') }}"
+                        class="inline-flex w-full items-center justify-center rounded-xl bg-gray-100 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-200 sm:w-auto"
+                    >
+                        Annuleren
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="inline-flex w-full items-center justify-center rounded-xl bg-[#0F4C81] px-5 py-3 font-semibold text-white shadow transition hover:bg-[#1E6BA8] sm:w-auto"
+                    >
+                        Opslaan
+                    </button>
                 </div>
-            @endif
-            {{-- Optionele wijziging van gebruikerswachtwoord --}}
-            <div class="mb-4 border-t border-gray-100 pt-4">
-                <label class="block text-gray-600 text-xs font-bold mb-1 uppercase tracking-wider">Wachtwoord Wijzigen (Optioneel)</label>
-                <p class="text-gray-400 text-xs mb-3">Laat deze velden leeg als je het huidige wachtwoord wilt behouden.</p>
-                <input type="password" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="Nieuw wachtwoord">
-                @error('password') <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p> @enderror
-            </div>
-
-            <div>
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Nieuw Wachtwoord Bevestigen</label>
-                <input type="password" name="password_confirmation" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="Herhaal nieuw wachtwoord">
-            </div>
-            {{-- Actieknoppen voor opslaan of annuleren --}}
-            <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <a href="{{ route('admin.users.index') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg transition-colors duration-150">Annuleren</a>
-                <button type="submit" class="bg-[#0F4C81] hover:bg-[#1E6BA8] text-white font-semibold py-2 px-5 rounded-lg transition-all duration-150 shadow">Opslaan</button>
-            </div>
-        </form>
+            </form>
+        </section>
     </div>
-</div>
-
 </x-app-layout>
