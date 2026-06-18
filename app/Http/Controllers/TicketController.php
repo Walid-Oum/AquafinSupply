@@ -12,12 +12,15 @@ use Illuminate\Validation\Rule;
 
 class TicketController extends Controller
 {
+    /** de hardcoded statussen voor tickets */
     private const TICKET_STATUSES = [
         'Open',
         'In behandeling',
         'Opgelost',
     ];
-
+/**
+     * Toon een overzicht van de tickets van de ingelogde klant.
+     */
     public function index(Request $request)
     {
         $tickets = Ticket::with(['order', 'location'])
@@ -209,13 +212,16 @@ class TicketController extends Controller
             'ticket' => $ticket,
         ]);
     }
-
+/**
+     * Update de status en/of de magazijnnotitie van een ticket, en stel de klant op de hoogte.
+     */
     public function updateStatus(Ticket $ticket, Request $request)
     {
+        // Beveiliging: Controleer locatie-overeenkomst
         if ($ticket->location_id !== auth()->user()->location_id) {
             abort(403);
         }
-
+// valideer wijziging
         $validated = $request->validate([
             'status' => [
                 'required',
@@ -227,7 +233,7 @@ class TicketController extends Controller
                 'max:2000',
             ],
         ]);
-
+// Bewaar de oude waarden voor vergelijking
         $oldStatus = $ticket->status;
         $oldWarehouseNote = $ticket->warehouse_note;
 
@@ -238,7 +244,7 @@ class TicketController extends Controller
             'status' => $newStatus,
             'warehouse_note' => $newWarehouseNote,
         ]);
-
+// Controleer wat er veranderd is ten behoeve van de notificatietekst
         $statusChanged = $oldStatus !== $newStatus;
         $noteChanged = $oldWarehouseNote !== $newWarehouseNote && ! empty($newWarehouseNote);
 
@@ -263,7 +269,10 @@ class TicketController extends Controller
             ->route('tickets.warehouse.show', $ticket)
             ->with('success', 'Ticket succesvol bijgewerkt.');
     }
-
+/**
+     * Private helper: Combineert alle doorzoekbare velden van een ticket tot één string.
+     * Dit zorgt ervoor dat FuzzySearch op alle relevante data kan zoeken.
+     */
     private function ticketSearchText(Ticket $ticket): string
     {
         return collect([

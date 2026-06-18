@@ -12,30 +12,36 @@ use Illuminate\Support\Facades\Storage;
 
 class MaterialController extends Controller
 {
+    /** Toon hoofdindex van materialen voor beheerders
+     * inclusief complexe database filters op voorraadstatus en categorie
+     */
     public function index(Request $request)
     {
+        /** start de query en laad direct de gekoppelde voorraden en risiconiveaus */
         $query = Material::with(['stocks', 'riskLevels']);
-
+/** filteren op vooraadstatus */
         if ($request->filled('stock_status')) {
             if ($request->stock_status === 'low') {
+                /** alleen materialen waarvan de voorraad kleiner of gelijk is aan het minimum */
                 $query->whereHas('stocks', function ($q) {
                     $q->whereColumn('stock', '<=', 'minimum_stock');
                 });
             } elseif ($request->stock_status === 'ok') {
+                /** alleen materialen die overal voldoende voorraad hebben */
                 $query->whereDoesntHave('stocks', function ($q) {
                     $q->whereColumn('stock', '<=', 'minimum_stock');
                 });
             }
         }
-
+/** filteren op categorie */
         if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
-
+/** filteren op zoekterm */
         $materials = $query
             ->orderBy('name')
             ->get();
-
+/** pas fuzzy zoekfilter toe als er een zoekterm is */
         if ($request->filled('search')) {
             $search = $request->search;
 
@@ -45,7 +51,7 @@ class MaterialController extends Controller
                 })
                 ->values();
         }
-
+/** haal unieke categorieën op voor filter dropdown */
         $lowStockMaterials = Material::with('stocks')
             ->get()
             ->filter(function (Material $material) {
@@ -53,7 +59,7 @@ class MaterialController extends Controller
                     return $stock->stock <= $stock->minimum_stock;
                 });
             });
-
+/** Haal unieke categorieën op voor filter dropdown */
         $categories = Material::select('category')
             ->distinct()
             ->orderBy('category')
@@ -65,7 +71,7 @@ class MaterialController extends Controller
             'lowStockMaterials' => $lowStockMaterials,
         ]);
     }
-
+/** Toon het formulier voor het aanmaken van een nieuw materiaal */
     public function create()
     {
         $categories = Material::select('category')
@@ -80,9 +86,12 @@ class MaterialController extends Controller
             'riskLevels' => $riskLevels,
         ]);
     }
-
+/** Sla een nieuw materiaal op in de database
+ * en genereer voorraadregels voor alle bestaande locaties
+*/
     public function store(Request $request)
     {
+        /** validatie van de invoergevens */
         $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
@@ -93,13 +102,13 @@ class MaterialController extends Controller
         ]);
 
         $imagePath = null;
-
+/** sla de afbeelding op in de public storage onder de materials directory */
         if ($request->hasFile('image')) {
             $imagePath = $request
                 ->file('image')
                 ->store('materials', 'public');
         }
-
+/** Maak het hoofd-materiaal aan */
         $material = Material::create([
             'name' => $request->name,
             'category' => $request->category,
@@ -109,7 +118,7 @@ class MaterialController extends Controller
             'is_active' => true,
             'image' => $imagePath,
         ]);
-
+/** initialiseer voorraadregels voor alle locaties */
         foreach (Location::all() as $location) {
             MaterialStock::updateOrCreate(
                 [
@@ -122,7 +131,7 @@ class MaterialController extends Controller
                 ]
             );
         }
-
+/** koppel de geselecteerde risiconiveaus aan het materiaal */
         $material->riskLevels()->sync(
             $request->risk_levels ?? []
         );
@@ -131,9 +140,10 @@ class MaterialController extends Controller
             ->route('materials.index')
             ->with('success', 'Materiaal toegevoegd!');
     }
-
+/** Toon details van een specifiek materiaal */
     public function show($id)
     {
+        /** als de gebruiker een magazijnmedewerker is */
         if (auth()->user()->role === 'magazijn') {
             $locationId = auth()->user()->location_id;
 
@@ -145,7 +155,7 @@ class MaterialController extends Controller
                 'material' => $material,
             ]);
         }
-
+/** voor admin/andere rollen: toon alle locaties */
         $material = Material::with(['stocks.location', 'riskLevels'])
             ->findOrFail($id);
 
@@ -153,7 +163,7 @@ class MaterialController extends Controller
             'material' => $material,
         ]);
     }
-
+/** Toon het bewerkingsformulier voor een specifiek materiaal */
     public function edit($id)
     {
         $material = Material::with('riskLevels')
@@ -172,11 +182,11 @@ class MaterialController extends Controller
             'riskLevels' => $riskLevels,
         ]);
     }
-
+/** werk de materiaalgegevens bij een handhaaf de opslag van afbeeldingen (vervangen / verwijderen)*/
     public function update(Request $request, $id)
     {
         $material = Material::findOrFail($id);
-
+/** Specifieke afhandeling voor de losse actie 'afbeelding verwijderen' */
         if ($request->remove_image == 1) {
             if ($material->image) {
                 Storage::disk('public')->delete($material->image);
@@ -190,7 +200,7 @@ class MaterialController extends Controller
                 ->route('materials.edit', $material->id)
                 ->with('success', 'Afbeelding verwijderd!');
         }
-
+/** reguliere validatie */ 
         $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
@@ -200,7 +210,7 @@ class MaterialController extends Controller
             'risk_levels.*' => 'exists:risk_levels,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
-
+/** indienen een nieuwe afbeelding is geupload, verwijder de oude en sla de nieuwe op  */
         if ($request->hasFile('image')) {
             if ($material->image) {
                 Storage::disk('public')->delete($material->image);
@@ -210,7 +220,7 @@ class MaterialController extends Controller
                 ->file('image')
                 ->store('materials', 'public');
         }
-
+/** update de database-velden */
         $material->update([
             'name' => $request->name,
             'category' => $request->category,
@@ -227,7 +237,9 @@ class MaterialController extends Controller
             ->route('materials.index')
             ->with('success', 'Materiaal bijgewerkt!');
     }
-
+/**
+     * Verwijder het materiaal volledig, inclusief de fysieke afbeelding van de schijf.
+     */
     public function destroy($id)
     {
         $material = Material::findOrFail($id);
@@ -242,7 +254,10 @@ class MaterialController extends Controller
             ->route('materials.index')
             ->with('success', 'Materiaal verwijderd!');
     }
-
+/**
+     * Indexpagina specifiek voor magazijnmedewerkers.
+     * Filtert voorraden direct op de locatie van de ingelogde medewerker.
+     */
     public function warehouseIndex(Request $request)
     {
         $locationId = auth()->user()->location_id;
@@ -300,7 +315,9 @@ class MaterialController extends Controller
     ->pluck('category'),
         ]);
     }
-
+/**
+     * Update de voorraadstand of de minimum kritieke grens voor het eigen depot van de magazijnmedewerker.
+     */
     public function warehouseUpdate(Request $request, $id)
     {
         $request->validate([
@@ -330,7 +347,10 @@ class MaterialController extends Controller
             ->back()
             ->with('success', 'Voorraad bijgewerkt voor jouw depot.');
     }
-
+/**
+     * API Eindpunt: Levert realtime zoeksuggesties (JSON) op voor een AJAX typeahead/autocomplete component.
+     * Sorteert resultaten op basis van relevantie-scores en berekent voorraadaantallen rol-afhankelijk.
+     */
     public function searchSuggestions(Request $request)
     {
         $search = trim((string) $request->get('q', ''));
@@ -381,7 +401,9 @@ class MaterialController extends Controller
 
         return response()->json($materials);
     }
-
+/**
+     * Bepaal de juiste detail-route voor een zoeksuggestie op basis van de rol van de gebruiker.
+     */
     private function materialSuggestionUrl(Material $material): string
     {
         $role = auth()->user()->role;
@@ -396,7 +418,10 @@ class MaterialController extends Controller
 
         return route('materials.show', $material->id);
     }
-
+/**
+     * Bouw een samengestelde tekststring op met alle kenmerken van een materiaal
+     * om een brede in-memory fuzzy search mogelijk te maken.
+     */
     private function materialSearchText(Material $material): string
     {
         $stockStatuses = $material->stocks
@@ -421,7 +446,14 @@ class MaterialController extends Controller
             $stockStatuses,
         ])->filter()->implode(' ');
     }
-
+/**
+     * Bereken de relevantie-score voor de autocomplete suggesties (hoe lager de score, hoe relevanter).
+     * 0 = Exacte naam-match
+     * 1 = Zoekterm bevindt zich ergens in de naam
+     * 2 = Een van de losse woorden in de naam begint met de zoekterm
+     * 3 = Typfout/Fuzzy match op basis van de Levenshtein-afstand
+     * 4 = Zoekterm bevindt zich in de categorienaam
+     */
     private function materialSuggestionScore(string $search, Material $material): ?int
     {
         $search = $this->normalizeSearchValue($search);
@@ -456,7 +488,10 @@ class MaterialController extends Controller
 
         return null;
     }
-
+/**
+     * Geavanceerde fuzzy matching logica die controleert of een zoekterm (inclusief typfouten)
+     * dicht genoeg bij de materiaalnaam of delen daarvan ligt met behulp van de Levenshtein-afstand.
+     */
     private function isCloseMaterialNameMatch(string $search, string $name): bool
     {
         if (strlen($search) < 4) {
@@ -494,7 +529,10 @@ class MaterialController extends Controller
 
         return false;
     }
-
+/**
+     * Bepaal de maximaal toegestane Levenshtein-afstand (bewerkingsafstand)
+     * om de tolerantie voor typefouten dynamisch te schalen met de lengte van het woord.
+     */
     private function allowedMaterialDistance(string $word): int
     {
         $length = strlen($word);
@@ -510,6 +548,11 @@ class MaterialController extends Controller
         return 3;
     }
 
+ /**
+     * Saniteert en normaliseert invoerstrings ten behoeve van betrouwbare zoekopdrachten.
+     * Zet om naar kleine letters, vervangt alle diakritische tekens (accenten) en
+     * converteert alle speciale tekens/leestekens naar spaties.
+     */
     private function normalizeSearchValue(?string $value): string
     {
         $value = mb_strtolower($value ?? '');
