@@ -2,8 +2,25 @@
 
 namespace App\Support;
 
+/**
+ * FuzzySearch Class
+ * 
+ * Biedt fouttolerante zoekfunctionaliteit voor tekst.
+ * Gebruikt Levenshtein afstand, accent-normalisatie en 
+ * substring matching om spellingsfouten te tolereren.
+ *
+ * @author 
+ * @version 1.0
+ */
 class FuzzySearch
 {
+    /**
+     * Controleert of een query overeenkomt met een tekst.
+     *
+     * @param string|null $query
+     * @param string $text
+     * @return bool
+     */
     public static function matches(?string $query, string $text): bool
     {
         $query = self::normalize($query);
@@ -46,6 +63,13 @@ class FuzzySearch
         return true;
     }
 
+    /**
+     * Controleert of een woord overeenkomt met een van de tekstwoorden.
+     *
+     * @param string $queryWord
+     * @param array $textWords
+     * @return bool
+     */
     private static function wordMatches(string $queryWord, array $textWords): bool
     {
         foreach ($textWords as $textWord) {
@@ -65,6 +89,13 @@ class FuzzySearch
         return false;
     }
 
+    /**
+     * Bepaalt of twee woorden gelijkaardig zijn via Levenshtein afstand.
+     *
+     * @param string $queryWord
+     * @param string $textWord
+     * @return bool
+     */
     private static function isSimilar(string $queryWord, string $textWord): bool
     {
         $queryLength = strlen($queryWord);
@@ -96,6 +127,12 @@ class FuzzySearch
         return false;
     }
 
+    /**
+     * Berekent de maximaal toegestane Levenshtein afstand op basis van woordlengte.
+     *
+     * @param string $word
+     * @return int
+     */
     private static function allowedDistance(string $word): int
     {
         $length = strlen($word);
@@ -115,11 +152,24 @@ class FuzzySearch
         return 4;
     }
 
+    /**
+     * Splitst een tekst in woorden.
+     *
+     * @param string $value
+     * @return array
+     */
     private static function words(string $value): array
     {
         return array_values(array_filter(explode(' ', $value)));
     }
 
+    /**
+     * Normaliseert een tekst: kleine letters, accenten verwijderen,
+     * enkel alfanumerieke tekens behouden.
+     *
+     * @param string|null $value
+     * @return string
+     */
     private static function normalize(?string $value): string
     {
         $value = mb_strtolower($value ?? '');

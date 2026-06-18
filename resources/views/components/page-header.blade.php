@@ -1,3 +1,10 @@
+{{--
+    PAGE HEADER COMPONENT
+    Toont een paginatitel in de huisstijlkleur.
+    @author 
+    @version 1.0
+--}}
+
 @props(['title'])
 
 <div class="mb-6">

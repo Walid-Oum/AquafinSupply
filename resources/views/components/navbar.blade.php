@@ -1,3 +1,11 @@
+{{--
+    NAVBAR COMPONENT
+    Navigatiebalk met logo, winkelmandje, notificaties en profiel.
+    Toont verschillende elementen op basis van gebruikersrol.
+    @author 
+    @version 1.0
+--}}
+
 @php
     $user = Auth::user();
 
@@ -56,6 +64,7 @@
     {{-- Right actions --}}
     <div class="ml-auto flex items-center gap-3 sm:gap-5 lg:gap-6">
 
+        {{-- Winkelmandje (enkel voor technieker) --}}
         @if($user->role === 'technieker')
             <a
                 href="{{ route('cart.index') }}"
@@ -83,6 +92,7 @@
             </a>
         @endif
 
+        {{-- Notificaties (enkel voor technieker en magazijn) --}}
         @if($canSeeNotifications)
             <div
                 x-data="{
@@ -136,6 +146,7 @@
                     </span>
                 </button>
 
+                {{-- Dropdown notificaties --}}
                 <div
                     x-show="open"
                     @click.outside="open = false"
