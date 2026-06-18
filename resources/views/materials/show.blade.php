@@ -1,3 +1,19 @@
+{{--
+
+Pagina: Materiaal detail
+
+Beschrijving:
+Toont de detailinformatie van een specifiek materiaal en de voorraadverdeling over verschillende depots.
+
+Functionaliteiten:
+- Weergeven van materiaalgegevens
+- Tonen van gekoppelde risiconiveaus
+- Weergeven van materiaalafbeeldingen
+- Overzicht van voorraad per depot
+- Signaleren van lage voorraadniveaus
+- Navigeren naar de bewerkpagina van het materiaal
+
+--}}
 @php
     $categoryImages = [
         'Aquafin tools' => 'aquafintools.png',
