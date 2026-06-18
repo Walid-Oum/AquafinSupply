@@ -1,5 +1,15 @@
+{{--
+    MAGAZIJN - ALLE SUPPORTAANVRAGEN (TICKETS)
+    Deze view toont alle supportaanvragen van techniekers voor magazijnmedewerkers.
+    Magazijnmedewerkers kunnen tickets bekijken, filteren op status,
+    zoeken op onderwerp, technieker of bestelling.
+    Tickets worden gegroepeerd per status en per provincie/depot.
+    Magazijnmedewerkers kunnen ook een antwoord toevoegen aan tickets.
+--}}
+
 <x-app-layout>
     <div class="space-y-6">
+        {{-- HEADER --}}
         <div>
             <x-page-header title="Supportaanvragen" />
 
@@ -8,6 +18,7 @@
             </p>
         </div>
 
+        {{-- SUCCES & FOUTMELDINGEN --}}
         @if (session('success'))
             <div class="rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">
                 {{ session('success') }}
@@ -20,6 +31,7 @@
             </div>
         @endif
 
+        {{-- FILTERS EN ZOEKBALK --}}
         <section class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
             <form
                 id="ticket-search-form"
@@ -78,6 +90,7 @@
             </form>
         </section>
 
+        {{-- TICKETS PER STATUS --}}
         @if($tickets->isEmpty())
             <section class="rounded-2xl border border-gray-100 bg-white p-6 text-center shadow-sm">
                 <p class="text-gray-600 italic">
@@ -130,6 +143,7 @@
                                                     </div>
                                                 </div>
 
+                                                {{-- TICKET DETAILS --}}
                                                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
                                                     <div class="rounded-xl bg-gray-50 p-3">
                                                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
@@ -176,6 +190,7 @@
                                                     </div>
                                                 </div>
 
+                                                {{-- WAREHOUSE NOTE STATUS --}}
                                                 @if($ticket->warehouse_note)
                                                     <div class="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
                                                         <p class="font-semibold">
@@ -220,6 +235,7 @@
         @endif
     </div>
 
+    {{-- ZOEKFUNCTIE VOOR TICKETS --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const ticketSearchInput = document.getElementById('ticket-search-input');
