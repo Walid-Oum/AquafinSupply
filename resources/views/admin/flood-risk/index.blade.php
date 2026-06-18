@@ -15,163 +15,278 @@
 
     Gebruikersrol:
     - Admin
-
-    Opmerking:
-    De gegevens worden opgehaald via de Open-Meteo API
-    en verwerkt door de Admin FloodRiskController.
 --}}
+
 <x-app-layout>
-    <div class="p-8">
-        <div class="mb-6">
+    <div class="min-w-0 max-w-full space-y-6 overflow-x-hidden">
+        {{-- HEADER --}}
+        <div>
             <x-page-header title="Overstromingsrisico per provincie" />
 
-            <p class="mt-2 text-gray-600">
+            <p class="mt-2 text-sm text-gray-600 sm:text-base">
                 Bekijk de algemene risicosituatie per provinciaal depot.
             </p>
         </div>
 
+        {{-- CACHE MELDING --}}
         @if(collect($provinceStats)->contains(fn($stats) => $stats['fromCache'] ?? false))
-            <div class="mb-6 rounded-lg bg-yellow-100 border-l-4 border-yellow-500 p-4 text-yellow-800">
+            <div class="rounded-2xl border-l-4 border-yellow-500 bg-yellow-100 p-4 text-sm text-yellow-800">
                 Live weersgegevens zijn tijdelijk niet beschikbaar. We tonen voor sommige provincies de laatst opgeslagen gegevens.
             </div>
         @endif
 
+        {{-- ERROR MELDING --}}
         @if(session('error'))
-            <div class="mb-6 rounded-lg bg-red-100 p-4 text-red-700">
+            <div class="rounded-2xl bg-red-100 p-4 text-sm text-red-700">
                 {{ session('error') }}
             </div>
         @endif
-        {{-- Tabel met risico-overzicht per provincie --}}
+
         @if(count($provinceStats) > 0)
-            <div class="mb-6 rounded-xl bg-white p-6 shadow">
-                <div class="mb-4">
-                    <h2 class="text-xl font-semibold text-gray-900">
+            {{-- OVERZICHT --}}
+            <section class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+                <div class="mb-5">
+                    <h2 class="text-xl font-bold text-gray-900">
                         Algemeen overzicht per provincie
                     </h2>
 
-                    <p class="mt-1 text-sm text-gray-600">
+                    <p class="mt-1 text-sm leading-relaxed text-gray-600">
                         Dit overzicht helpt admins om te bepalen waar extra materiaalvoorbereiding of voorraadcontrole nodig is.
                     </p>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                {{-- DESKTOPTABEL --}}
+                <div class="hidden overflow-hidden rounded-2xl border border-gray-100 lg:block">
+                    <table class="w-full table-fixed divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Provincie</th>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Depot</th>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Neerslag volgende week</th>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Piekdag</th>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Risicodagen</th>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Prioriteit</th>
-                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Aanbevolen actie</th>
+                            <th class="w-[15%] px-4 py-3 text-left font-semibold text-gray-700">
+                                Provincie
+                            </th>
 
+                            <th class="w-[17%] px-4 py-3 text-left font-semibold text-gray-700">
+                                Depot
+                            </th>
+
+                            <th class="w-[15%] px-4 py-3 text-left font-semibold text-gray-700">
+                                Neerslag volgende week
+                            </th>
+
+                            <th class="w-[15%] px-4 py-3 text-left font-semibold text-gray-700">
+                                Piekdag
+                            </th>
+
+                            <th class="w-[10%] px-4 py-3 text-left font-semibold text-gray-700">
+                                Risicodagen
+                            </th>
+
+                            <th class="w-[12%] px-4 py-3 text-left font-semibold text-gray-700">
+                                Prioriteit
+                            </th>
+
+                            <th class="w-[16%] px-4 py-3 text-left font-semibold text-gray-700">
+                                Aanbevolen actie
+                            </th>
                         </tr>
                         </thead>
 
                         <tbody class="divide-y divide-gray-100 bg-white">
-                        @foreach($provinceStats as $stat)
-                            <tr>
-                                <td class="px-4 py-3 font-medium text-gray-900">
-                                    {{ $stat['province'] }}
+                        @foreach($provinceStats as $stats)
+                            <tr class="transition hover:bg-gray-50/70">
+                                <td class="px-4 py-4 font-semibold text-gray-900">
+                                    <div class="truncate">
+                                        {{ $stats['province'] }}
+                                    </div>
                                 </td>
 
-                                <td class="px-4 py-3 text-gray-700">
-                                    {{ $stat['depot'] }}
+                                <td class="px-4 py-4 text-gray-600">
+                                    <div class="truncate">
+                                        {{ $stats['depot'] }}
+                                    </div>
+
+                                    <p class="text-xs text-gray-400">
+                                        {{ $stats['city'] }}
+                                    </p>
                                 </td>
 
-                                <td class="px-4 py-3 text-gray-700">
-                                    {{ $stat['nextWeekRain'] }} mm
-                                </td>
+                                <td class="px-4 py-4 text-gray-700">
+                                        <span class="font-bold">
+                                            {{ $stats['nextWeekRain'] }} mm
+                                        </span>
 
-                                <td class="px-4 py-3 text-gray-700">
-                                    @if($stat['highestRainDayLabel'])
-                                        {{ $stat['highestRainDayLabel'] }} - {{ $stat['highestRainDay'] }} mm
-                                    @else
-                                        {{ $stat['highestRainDay'] }} mm
+                                    @if(!empty($stats['nextWeekPeriodLabel']))
+                                        <p class="text-xs text-gray-400">
+                                            {{ $stats['nextWeekPeriodLabel'] }}
+                                        </p>
                                     @endif
                                 </td>
 
-                                <td class="px-4 py-3 text-gray-700">
-                                    {{ $stat['riskDays'] }}
+                                <td class="px-4 py-4 text-gray-700">
+                                        <span class="font-bold">
+                                            {{ $stats['highestRainDay'] }} mm
+                                        </span>
+
+                                    <p class="text-xs text-gray-400">
+                                        {{ $stats['highestRainDayLabel'] ?? 'Geen datum' }}
+                                    </p>
                                 </td>
 
-                                <td class="px-4 py-3">
-                                    @if($stat['riskLevel'] === 'Hoog')
-                                        <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
-                                            Hoog
-                                        </span>
-                                    @elseif($stat['riskLevel'] === 'Gemiddeld')
-                                        <span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
-                                            Gemiddeld
-                                        </span>
+                                <td class="px-4 py-4 text-gray-700">
+                                    {{ $stats['riskDays'] }}
+                                </td>
+
+                                <td class="px-4 py-4">
+                                    @if($stats['riskLevel'] === 'Hoog')
+                                        <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                                                Hoog
+                                            </span>
+                                    @elseif($stats['riskLevel'] === 'Gemiddeld')
+                                        <span class="inline-flex rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
+                                                Gemiddeld
+                                            </span>
                                     @else
-                                        <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-                                            Laag
-                                        </span>
+                                        <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                                                Laag
+                                            </span>
                                     @endif
                                 </td>
 
-                                <td class="px-4 py-3">
-
-                                    @if($stat['riskLevel'] === 'Hoog')
-
-                                        <div class="text-red-700">
-                                            ⚠ Controleer voorraad overstromingsmateriaal.<br>
-                                            ⚠ Plan preventiev-e interventies.<br>
-                                            ⚠ Controleer pompen en noodmateriaal.
-                                        </div>
-
-                                    @elseif($stat['riskLevel'] === 'Gemiddeld')
-
-                                        <div class="text-yellow-700">
-                                            ⚠ Volg kritieke voorraad extra op.<br>
-                                            ⚠ Controleer voorspellingen dagelijks.
-                                        </div>
-
+                                <td class="px-4 py-4 text-sm">
+                                    @if($stats['riskLevel'] === 'Hoog')
+                                        <span class="font-semibold text-red-700">
+                                                Controleer voorraad en bereid extra materiaal voor.
+                                            </span>
+                                    @elseif($stats['riskLevel'] === 'Gemiddeld')
+                                        <span class="font-semibold text-yellow-700">
+                                                Volg kritieke voorraad extra op.
+                                            </span>
                                     @else
-
-                                        <div class="text-green-700">
-                                            ✓ Geen extra actie nodig.
-                                        </div>
-
+                                        <span class="font-semibold text-green-700">
+                                                Geen extra actie nodig.
+                                            </span>
                                     @endif
-
                                 </td>
-
                             </tr>
                         @endforeach
                         </tbody>
                     </table>
                 </div>
-            </div>
-        @else
-            <div class="mb-6 rounded-xl bg-white p-6 shadow">
-                <p class="text-gray-600">
-                    Er zijn momenteel geen weergegevens beschikbaar.
-                </p>
-            </div>
-        @endif
 
-        @if(count($provinceStats) > 0)
-            @php
-                $periodLabel = $provinceStats[0]['nextWeekPeriodLabel'] ?? null;
-            @endphp
-            {{-- Grafieken voor neerslag, piekbelasting en prioriteiten --}}
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <div class="rounded-xl bg-white p-6 shadow">
+                {{-- MOBIELE KAARTEN --}}
+                <div class="space-y-4 lg:hidden">
+                    @foreach($provinceStats as $stats)
+                        <article class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+                            <div class="flex flex-col gap-4">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900">
+                                            {{ $stats['province'] }}
+                                        </h3>
+
+                                        <p class="text-sm text-gray-500">
+                                            {{ $stats['depot'] }} - {{ $stats['city'] }}
+                                        </p>
+                                    </div>
+
+                                    <div class="shrink-0">
+                                        @if($stats['riskLevel'] === 'Hoog')
+                                            <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                                                Hoog
+                                            </span>
+                                        @elseif($stats['riskLevel'] === 'Gemiddeld')
+                                            <span class="inline-flex rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
+                                                Gemiddeld
+                                            </span>
+                                        @else
+                                            <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                                                Laag
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="grid gap-2 text-sm text-gray-700">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <span class="text-gray-500">
+                                            Neerslag volgende week
+                                        </span>
+
+                                        <span class="font-bold">
+                                            {{ $stats['nextWeekRain'] }} mm
+                                        </span>
+                                    </div>
+
+                                    @if(!empty($stats['nextWeekPeriodLabel']))
+                                        <div class="flex items-center justify-between gap-3">
+                                            <span class="text-gray-500">
+                                                Periode
+                                            </span>
+
+                                            <span class="text-right font-medium">
+                                                {{ $stats['nextWeekPeriodLabel'] }}
+                                            </span>
+                                        </div>
+                                    @endif
+
+                                    <div class="flex items-center justify-between gap-3">
+                                        <span class="text-gray-500">
+                                            Piekdag
+                                        </span>
+
+                                        <span class="text-right font-medium">
+                                            {{ $stats['highestRainDayLabel'] ?? 'Geen datum' }}
+                                            <span class="font-bold">
+                                                {{ $stats['highestRainDay'] }} mm
+                                            </span>
+                                        </span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-3">
+                                        <span class="text-gray-500">
+                                            Risicodagen
+                                        </span>
+
+                                        <span class="font-bold">
+                                            {{ $stats['riskDays'] }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="rounded-xl bg-gray-50 p-3 text-sm">
+                                    <p class="mb-1 font-semibold text-gray-700">
+                                        Aanbevolen actie
+                                    </p>
+
+                                    @if($stats['riskLevel'] === 'Hoog')
+                                        <p class="font-semibold text-red-700">
+                                            Controleer voorraad en bereid extra materiaal voor.
+                                        </p>
+                                    @elseif($stats['riskLevel'] === 'Gemiddeld')
+                                        <p class="font-semibold text-yellow-700">
+                                            Volg kritieke voorraad extra op.
+                                        </p>
+                                    @else
+                                        <p class="font-semibold text-green-700">
+                                            Geen extra actie nodig.
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+
+            {{-- GRAFIEKEN --}}
+            <section class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
                     <div class="mb-4">
-                        <h2 class="text-xl font-semibold text-gray-900">
-                            Neerslag per provincie
+                        <h2 class="text-xl font-bold text-gray-900">
+                            Neerslag volgende week
                         </h2>
 
                         <p class="mt-1 text-sm text-gray-600">
-                            Verwachte totale neerslag per provinciaal depot
-                            @if($periodLabel)
-                                voor de periode {{ $periodLabel }}.
-                            @else
-                                voor volgende week.
-                            @endif
+                            Totale voorspelde neerslag per provincie.
                         </p>
                     </div>
 
@@ -180,19 +295,14 @@
                     </div>
                 </div>
 
-                <div class="rounded-xl bg-white p-6 shadow">
+                <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
                     <div class="mb-4">
-                        <h2 class="text-xl font-semibold text-gray-900">
-                            Hoogste dagneerslag per provincie
+                        <h2 class="text-xl font-bold text-gray-900">
+                            Hoogste dagneerslag
                         </h2>
 
                         <p class="mt-1 text-sm text-gray-600">
-                            Toont per provincie de natste voorspelde dag
-                            @if($periodLabel)
-                                binnen de periode {{ $periodLabel }}.
-                            @else
-                                van volgende week.
-                            @endif
+                            Hoogste verwachte dagneerslag per provincie.
                         </p>
                     </div>
 
@@ -201,9 +311,9 @@
                     </div>
                 </div>
 
-                <div class="rounded-xl bg-white p-6 shadow">
+                <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6 xl:col-span-2">
                     <div class="mb-4">
-                        <h2 class="text-xl font-semibold text-gray-900">
+                        <h2 class="text-xl font-bold text-gray-900">
                             Prioriteitenverdeling
                         </h2>
 
@@ -216,10 +326,14 @@
                         <canvas id="priorityChart"></canvas>
                     </div>
                 </div>
+            </section>
+        @else
+            <div class="rounded-2xl border border-gray-100 bg-white p-6 text-center text-gray-500 shadow-sm">
+                Er zijn momenteel geen risicogegevens beschikbaar.
             </div>
         @endif
     </div>
-    {{-- Chart.js visualisaties --}}
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
