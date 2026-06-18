@@ -1,14 +1,14 @@
 <x-app-layout>
     <x-page-header title="Materialen overzicht"/>
 
-    <div class="mb-4 flex justify-between items-center">
+    <div class="mb-4 flex flex-col lg:flex-row gap-4 lg:justify-between lg:items-center">
         <a href="{{ route('materials.create') }}">
             <x-button>
                 + Nieuw materiaal
             </x-button>
         </a>
 
-        <div class="flex gap-4 items-center">
+        <div class="flex flex-col lg:flex-row gap-4 lg:items-center">
             <div class="relative">
                 <input
                     type="text"
@@ -39,7 +39,7 @@
             </form>
         </div>
     </div>
-
+<div class="hidden lg:block">
     <x-card>
         <div class="overflow-x-auto">
             <table class="min-w-[1100px] w-full text-sm">
@@ -124,8 +124,87 @@
                 </tbody>
             </table>
         </div>
-    </x-card>
+   </x-card>
+</div>
 
+<div class="lg:hidden space-y-4">
+    @forelse($materials as $material)
+
+        @php
+            $totalStock = $material->stocks->sum('stock');
+            $hasLowStock = $material->stocks->contains(function ($stock) {
+                return $stock->stock <= $stock->minimum_stock;
+            });
+        @endphp
+
+        <x-card>
+
+            <div class="space-y-2">
+
+                <p>
+                    <strong>Naam:</strong>
+                    {{ $material->name }}
+                </p>
+
+                <p>
+                    <strong>Categorie:</strong>
+                    {{ $material->category }}
+                </p>
+
+                <p>
+                    <strong>Totale voorraad:</strong>
+                    {{ $totalStock }}
+                </p>
+
+                <div>
+                    <strong>Voorraadstatus:</strong>
+
+                    @if($hasLowStock)
+                        <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">
+                            Lage voorraad
+                        </span>
+                    @else
+                        <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                            OK
+                        </span>
+                    @endif
+                </div>
+
+                <div>
+                    <strong>Status:</strong>
+
+                    @if($material->is_active)
+                        <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                            Actief
+                        </span>
+                    @else
+                        <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">
+                            Inactief
+                        </span>
+                    @endif
+                </div>
+
+                <div class="pt-2">
+                    <a href="{{ route('materials.show', $material->id) }}">
+                        <x-button>
+                            Bekijk
+                        </x-button>
+                    </a>
+                </div>
+
+            </div>
+
+        </x-card>
+
+    @empty
+
+        <x-card>
+            Geen materialen gevonden.
+        </x-card>
+
+    @endforelse
+
+</div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('global-material-search');

@@ -83,7 +83,7 @@
     Voorraad per depot
 </h3>
 
-<div class="mb-6">
+<div class="overflow-x-auto">
 
     <x-table>
 
@@ -153,7 +153,50 @@
 
 </div>
 
+<div class="lg:hidden space-y-4 mb-6">
 
+    @foreach($material->stocks as $stock)
+
+        <x-card>
+
+            <p>
+                <strong>Depot:</strong>
+                {{ $stock->location->name }}
+            </p>
+
+            <p>
+                <strong>Voorraad:</strong>
+                {{ $stock->stock }}
+            </p>
+
+            <p>
+                <strong>Minimum voorraad:</strong>
+                {{ $stock->minimum_stock }}
+            </p>
+
+            <div class="mt-2">
+
+                @if($stock->stock <= $stock->minimum_stock)
+
+                    <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">
+                        Lage voorraad
+                    </span>
+
+                @else
+
+                    <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                        OK
+                    </span>
+
+                @endif
+
+            </div>
+
+        </x-card>
+
+    @endforeach
+
+</div>
 
       <div class="flex justify-end gap-4">
             <a href="{{ route('materials.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded">Terug</a>
