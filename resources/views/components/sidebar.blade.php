@@ -1,162 +1,191 @@
 @php
-    $role = Auth::user()->role;
+    $mobile = $mobile ?? false;
+    $user = Auth::user();
+
+    $homeRoute = match ($user?->role) {
+        'admin' => route('materials.index'),
+        'magazijn' => route('magazijn.orders.index'),
+        'technieker' => route('technician.materials.index'),
+        default => route('login'),
+    };
+
+    $linkBaseClasses = 'flex items-center rounded-xl px-5 py-3 text-base font-bold transition';
+
+    $activeClasses = 'bg-white/20 text-white shadow-sm';
+    $inactiveClasses = 'text-white hover:bg-white/10';
+
+    $navLinkClasses = function (bool $active) use ($linkBaseClasses, $activeClasses, $inactiveClasses) {
+        return $linkBaseClasses . ' ' . ($active ? $activeClasses : $inactiveClasses);
+    };
 @endphp
 
-<div class="w-72 h-screen sticky top-0 text-white flex flex-col shadow-2xl relative overflow-hidden">
-
-    {{-- Background --}}
-    <div class="absolute inset-0">
-        <img
-            src="{{ asset('images/sidebar-bg.jpg') }}"
-            alt="Aquafin"
-            class="w-full h-full object-cover">
-    </div>
-
-    {{-- Overlay léger --}}
-    <div
-        class="absolute inset-0
-               bg-gradient-to-b
-               from-[#0F4C81]/70
-               via-[#1E6BA8]/50
-               to-[#0F4C81]/80">
-    </div>
-
-    <div class="relative z-10 flex flex-col h-full">
-
-        {{-- Logo --}}
-        <div class="p-6 border-b border-white/20 backdrop-blur-sm">
-
-            <div class="flex justify-center">
-
+<aside
+    class="flex h-screen w-72 flex-col overflow-y-auto bg-[#0F4C81] bg-cover bg-center text-white shadow-xl lg:sticky lg:top-0"
+    style="background-image: linear-gradient(rgba(15, 76, 129, 0.88), rgba(15, 76, 129, 0.88)), url('{{ asset('images/sidebar-bg.jpg') }}');"
+>
+    <div class="flex min-h-full flex-col">
+        <div class="border-b border-white/20 px-6 py-8">
+            <div class="flex items-center justify-between">
                 <a
-                    href="
-                @if($role == 'admin')
-                    {{ route('admin.users.index') }}
-                @elseif($role == 'magazijn')
-                    {{ route('magazijn.materials.index') }}
-                @else
-                    {{ route('technician.materials.index') }}
-                @endif
-            "
+                    href="{{ $homeRoute }}"
+                    class="block transition hover:scale-[1.02] hover:opacity-90"
+                    title="Naar startpagina"
+                    @click="mobileSidebarOpen = false"
                 >
                     <img
                         src="{{ asset('images/aquafin-logo.png') }}"
                         alt="Aquafin"
-                        class="w-44 object-contain hover:scale-105 transition-transform duration-200 cursor-pointer">
+                        class="mx-auto h-28 w-auto object-contain"
+                    >
                 </a>
 
+                @if($mobile)
+                    <button
+                        type="button"
+                        class="rounded-xl bg-white/10 p-2 text-white transition hover:bg-white/20 lg:hidden"
+                        @click="mobileSidebarOpen = false"
+                        aria-label="Menu sluiten"
+                    >
+                        ✕
+                    </button>
+                @endif
             </div>
-
         </div>
 
-        {{-- Menu --}}
-        <nav class="flex-1 px-4 py-6">
+        <nav class="flex-1 space-y-3 px-4 py-8">
+            @if($user?->role === 'admin')
+                <a
+                    href="{{ route('admin.users.index') }}"
+                    class="{{ $navLinkClasses(request()->routeIs('admin.users.*')) }}"
+                    @click="mobileSidebarOpen = false"
+                >
+                    Gebruikers
+                </a>
 
-            <ul class="space-y-3">
+                <a
+                    href="{{ route('materials.index') }}"
+                    class="{{ $navLinkClasses(request()->routeIs('materials.*')) }}"
+                    @click="mobileSidebarOpen = false"
+                >
+                    Materialen
+                </a>
 
-                @if($role == 'technieker')
+                <a
+                    href="{{ route('admin.orders.index') }}"
+                    class="{{ $navLinkClasses(request()->routeIs('admin.orders.*')) }}"
+                    @click="mobileSidebarOpen = false"
+                >
+                    Bestellingen
+                </a>
 
-                    <li>
-                        <a href="{{ route('technician.materials.index') }}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                <a
+                    href="{{ route('admin.flood-risk.index') }}"
+                    class="{{ $navLinkClasses(request()->routeIs('admin.flood-risk.*')) }}"
+                    @click="mobileSidebarOpen = false"
+                >
+                    Overstromingsrisico
+                </a>
+            @elseif($user?->role === 'magazijn')
+                <a
+                    href="{{ route('magazijn.orders.index') }}"
+                    class="{{ $navLinkClasses(request()->routeIs('magazijn.orders.*')) }}"
+                    @click="mobileSidebarOpen = false"
+                >
+                    Bestellingen
+                </a>
 
-                            <span>Materialen</span>
-                        </a>
-                    </li>
+                <a
+                    href="{{ route('magazijn.materials.index') }}"
+                    class="{{ $navLinkClasses(request()->routeIs('magazijn.materials.*')) }}"
+                    @click="mobileSidebarOpen = false"
+                >
+                    Voorraad
+                </a>
 
+                <a
+                    href="{{ route('tickets.warehouse.index') }}"
+                    class="{{ $navLinkClasses(request()->routeIs('tickets.warehouse.*')) }}"
+                    @click="mobileSidebarOpen = false"
+                >
+                    Support aanvragen
+                </a>
 
+                <a
+                    href="{{ route('flood-risk.index') }}"
+                    class="{{ $navLinkClasses(request()->routeIs('flood-risk.*')) }}"
+                    @click="mobileSidebarOpen = false"
+                >
+                    Overstromingsrisico
+                </a>
+            @elseif($user?->role === 'technieker')
+                <a
+                    href="{{ route('technician.materials.index') }}"
+                    class="{{ $navLinkClasses(request()->routeIs('technician.materials.*')) }}"
+                    @click="mobileSidebarOpen = false"
+                >
+                    Materialen
+                </a>
 
-                    <li>
-                        <a href="{{ route('orders.index') }}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
+                <a
+                    href="{{ route('orders.index') }}"
+                    class="{{ $navLinkClasses(request()->routeIs('orders.*')) }}"
+                    @click="mobileSidebarOpen = false"
+                >
+                    Bestellingen
+                </a>
 
-                            <span>Bestellingen</span>
-                        </a>
-                    </li>
+                <a
+                    href="{{ route('tickets.index') }}"
+                    class="{{ $navLinkClasses(request()->routeIs('tickets.index') || request()->routeIs('tickets.create')) }}"
+                    @click="mobileSidebarOpen = false"
+                >
+                    Support
+                </a>
 
-                    <li>
-                        <a href="{{ route('tickets.index') }}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-
-                            <span>Support</span>
-                        </a>
-                    </li>
-                     <li>
-                        <a href="{{ route('flood-risk.index')}}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                            Overstromingsrisico
-                        </a>
-                    </li>
-
-                @endif
-
-                @if($role == 'magazijn')
-
-                    <li>
-                        <a href="{{ route('magazijn.orders.index') }}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                         Bestellingen
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{{ route('magazijn.materials.index') }}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                             Voorraad
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{{ route('tickets.warehouse.index') }}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                             Support aanvragen
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{{route('flood-risk.index')}}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                            Overstromingsrisico
-                        </a>
-                    </li>
-
-                @endif
-
-                @if($role == 'admin')
-
-                    <li>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                            Gebruikers
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{{ route('materials.index') }}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                            Materialen
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{{ route('admin.orders.index') }}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                            Bestellingen
-                        </a>
-                    </li>
-                     <li>
-                        <a href="{{route('admin.flood-risk.index')}}"
-                           class="flex items-center font-bold gap-3 px-4 py-3 rounded-xl hover:bg-white/15 transition-all">
-                            Overstromingsrisico
-                        </a>
-                    </li>
-
-                @endif
-
-            </ul>
-
+                <a
+                    href="{{ route('flood-risk.index') }}"
+                    class="{{ $navLinkClasses(request()->routeIs('flood-risk.*')) }}"
+                    @click="mobileSidebarOpen = false"
+                >
+                    Overstromingsrisico
+                </a>
+            @endif
         </nav>
 
-    </div>
+        @if($mobile)
+            <div class="border-t border-white/20 px-4 py-5">
+                <a
+                    href="{{ route('profile.edit') }}"
+                    class="mb-3 flex items-center gap-3 rounded-2xl bg-white/10 p-3 transition hover:bg-white/20"
+                    @click="mobileSidebarOpen = false"
+                >
+                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-[#0F4C81]">
+                        {{ strtoupper(substr($user?->name ?? 'U', 0, 1)) }}
+                    </div>
 
-</div>
+                    <div class="min-w-0">
+                        <p class="truncate font-bold text-white">
+                            {{ $user?->name }}
+                        </p>
+
+                        <p class="text-sm capitalize text-white/70">
+                            {{ $user?->role }}
+                        </p>
+                    </div>
+                </a>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+
+                    <button
+                        type="submit"
+                        class="flex w-full items-center justify-center rounded-2xl bg-white px-5 py-3 font-bold text-[#0F4C81] transition hover:bg-blue-50"
+                    >
+                        Uitloggen
+                    </button>
+                </form>
+            </div>
+        @endif
+    </div>
+</aside>
+
