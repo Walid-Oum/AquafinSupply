@@ -67,7 +67,7 @@
         <div class="mb-4">
             <strong>Beschrijving:</strong> {{ $material->description ?? 'Geen beschrijving' }}
         </div>
-        
+
         <div class="mb-4">
             <strong>Status:</strong>
             @if($material->is_active)

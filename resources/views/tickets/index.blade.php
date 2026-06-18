@@ -1,7 +1,7 @@
 {{--
     TECHNIEKER - MIJN SUPPORTAANVRAGEN (TICKETS OVERZICHT)
 
-    @author      
+    @author
     @version     1.0
     @since       2026-06-18
 
@@ -26,11 +26,14 @@
                 </p>
             </div>
 
-            <a href="{{ route('tickets.create') }}" class="w-full shrink-0 sm:w-auto">
-                <x-button type="button" class="w-full justify-center sm:w-auto">
+            @if($tickets->count() > 0)
+                <a
+                    href="{{ route('tickets.create') }}"
+                    class="inline-flex w-full items-center justify-center rounded-xl bg-[#0F4C81] px-5 py-3 font-bold text-white transition hover:bg-[#0D3F6B] sm:w-auto"
+                >
                     Nieuwe supportaanvraag
-                </x-button>
-            </a>
+                </a>
+            @endif
         </div>
 
         {{-- FILTERS EN ZOEKBALK --}}

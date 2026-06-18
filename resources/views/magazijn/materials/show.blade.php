@@ -1,7 +1,7 @@
 {{--
     MAGAZIJN - MATERIAAL DETAILS
 
-    @author     
+    @author
     @version     1.0
     @since       2026-06-18
 
@@ -184,14 +184,5 @@
             </div>
         </section>
 
-        {{-- TERUG KNOP --}}
-        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <a
-                href="{{ route('magazijn.materials.index') }}"
-                class="inline-flex w-full items-center justify-center rounded-xl bg-gray-100 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-200 sm:w-auto"
-            >
-                Terug
-            </a>
-        </div>
     </div>
 </x-app-layout>

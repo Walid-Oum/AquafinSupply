@@ -162,7 +162,6 @@
     @endforeach
 
 </div>
-    {{-- Navigatie terug naar overzichtspagina --}}
 <div class="mt-6">
 
   <a href="{{ route('admin.orders.index') }}">
@@ -172,6 +171,6 @@
 </a>
 
 </div>
-    </div>
+
 
 </x-app-layout>
