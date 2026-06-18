@@ -1,3 +1,26 @@
+{{--
+    Pagina: Login
+
+    Doel:
+    Laat gebruikers aanmelden op het
+    Aquafin Supply platform.
+
+    Functionaliteiten:
+    - Inloggen met e-mailadres en wachtwoord
+    - Onthoud mij functionaliteit
+    - Wachtwoord vergeten link
+    - Weergave van fout- en succesmeldingen
+
+    Gebruikersrol:
+    - Admin
+    - Technieker
+    - Magazijn
+
+    Opmerking:
+    Na succesvolle authenticatie wordt de
+    gebruiker doorgestuurd naar zijn of haar
+    rolgebonden dashboard.
+--}}
 <x-guest-layout>
     <div class="mb-10 text-center">
         <h1 class="text-4xl font-extrabold text-[#0F4C81] sm:text-5xl">
@@ -31,10 +54,10 @@
             {{ $errors->first() }}
         </div>
     @endif
-
+    {{-- Aanmeldformulier voor gebruikers --}}
     <form method="POST" action="{{ route('login') }}">
         @csrf
-
+        {{-- Invoer van e-mailadres --}}
         <div>
             <label for="email" class="mb-2 block font-semibold text-gray-700">
                 Email
@@ -51,7 +74,7 @@
                 autofocus
             />
         </div>
-
+        {{-- Invoer van wachtwoord --}}
         <div class="mt-5">
             <label for="password" class="mb-2 block font-semibold text-gray-700">
                 Wachtwoord
@@ -66,7 +89,7 @@
                 required
             />
         </div>
-
+        {{-- Extra loginopties --}}
         <div class="mt-5 flex items-center justify-between gap-4">
             <label for="remember" class="flex items-center gap-2">
                 <input
