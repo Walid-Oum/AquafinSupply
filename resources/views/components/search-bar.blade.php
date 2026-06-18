@@ -1,7 +1,7 @@
 {{--
     SEARCH BAR COMPONENT
 
-    @author      Chayma 
+    @author      
     @version     1.0
     @since       2026-06-18
 
