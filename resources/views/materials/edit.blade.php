@@ -1,3 +1,19 @@
+{{--
+
+Pagina: Materiaal bewerken
+
+Beschrijving:
+Formulier voor het aanpassen van bestaande materiaalgegevens binnen het voorraadbeheersysteem.
+
+Functionaliteiten:
+- Bewerken van materiaalinformatie
+- Wijzigen van categorie en beschrijving
+- Uploaden van een nieuwe afbeelding
+- Verwijderen van bestaande afbeeldingen
+- Beheren van gekoppelde risiconiveaus
+- Activeren of deactiveren van materiaal
+
+--}}
 <x-app-layout>
 
     <x-page-header title="Materiaal bewerken" />

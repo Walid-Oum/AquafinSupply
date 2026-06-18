@@ -1,3 +1,19 @@
+{{--
+
+Pagina: Materialen overzicht
+
+Beschrijving:
+Toont een overzicht van alle geregistreerde materialen binnen het voorraadbeheersysteem.
+
+Functionaliteiten:
+- Overzicht van beschikbare materialen
+- Zoeken op materiaalnaam en categorie
+- Filteren op categorie en voorraadstatus
+- Detecteren van lage voorraadniveaus
+- Navigeren naar materiaaldetails
+- Ondersteuning voor desktop- en mobiele weergave
+
+--}}
 <x-app-layout>
     <x-page-header title="Materialen overzicht"/>
 
@@ -27,7 +43,7 @@
                         </option>
                     @endforeach
                 </select>
-                
+
                 <select name="stock_status" class="border rounded px-3 py-2 text-sm">
                     <option value="">Alle voorraadstatussen</option>
                     <option value="low" {{ request('stock_status') == 'low' ? 'selected' : '' }}>Lage voorraad</option>
@@ -205,6 +221,7 @@
     @endforelse
 
 </div>
+    {{-- Client-side zoekfunctionaliteit met fuzzy matching voor materiaalnamen en categorieën --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('global-material-search');
@@ -275,14 +292,14 @@
 
                         const name = normalizeText(nameEl ? nameEl.textContent : '');
                         const category = normalizeText(categoryEl ? categoryEl.textContent : '');
-                        
+
                         const flatName = name.replace(/ /g, '');
                         const flatCategory = category.replace(/ /g, '');
 
                         let isMatch = false;
 
                         // 1. Directe of spatieloze match (zoekt zowel in Naam als in Categorie)
-                        if (name.includes(query) || category.includes(query) || 
+                        if (name.includes(query) || category.includes(query) ||
                             flatName.includes(flatQuery) || flatCategory.includes(flatQuery)) {
                             isMatch = true;
                         }
@@ -290,8 +307,8 @@
                         // 2. Fuzzy logica voor typfouten (vanaf 3 letters)
                         if (!isMatch && flatQuery.length >= 3) {
                             const allowedDistance = getAllowedDistance(flatQuery);
-                            
-                            if (levenshtein(flatQuery, flatName) <= allowedDistance || 
+
+                            if (levenshtein(flatQuery, flatName) <= allowedDistance ||
                                 levenshtein(flatQuery, flatCategory) <= allowedDistance) {
                                 isMatch = true;
                             }

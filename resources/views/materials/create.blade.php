@@ -1,3 +1,18 @@
+{{--
+
+Pagina: Nieuw materiaal toevoegen
+
+Beschrijving:
+Formulier voor het registreren van nieuw materiaal binnen het voorraadbeheersysteem.
+
+Functionaliteiten:
+- Aanmaken van nieuw materiaal
+- Selecteren van een materiaalcategorie
+- Toevoegen van een beschrijving
+- Uploaden van een afbeelding
+- Koppelen van risiconiveaus aan materiaal
+
+--}}
 <x-app-layout>
     <x-page-header title="Nieuw materiaal toevoegen" />
 
