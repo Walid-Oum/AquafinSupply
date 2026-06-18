@@ -1,9 +1,17 @@
 {{--
     MAGAZIJN - BESTELLINGEN OVERZICHT
+
+    @author      Chayma (Team Aquafin)
+    @version     1.0
+    @since       2026-06-18
+
     Deze view toont een overzicht van alle bestellingen voor magazijnmedewerkers.
     Magazijnmedewerkers kunnen hier de status van bestellingen wijzigen,
     zoeken op bestellingnummer, technieker, status, depot of leverdatum.
     De view bevat zowel een mobile (card) als desktop (tabel) layout.
+
+    @see App\Http\Controllers\Userzone\OrderController::warehouseIndex()
+    @see App\Http\Controllers\Userzone\OrderController::warehouseUpdate()
 --}}
 
 <x-app-layout>
