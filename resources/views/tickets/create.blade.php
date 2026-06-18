@@ -1,7 +1,7 @@
 {{--
     TECHNIEKER - NIEUWE SUPPORTAANVRAAG (TICKET)
 
-    @author      
+    @author
     @version     1.0
     @since       2026-06-18
 
@@ -15,27 +15,18 @@
 --}}
 
 <x-app-layout>
-    <div class="space-y-6">
+    <div class="min-w-0 max-w-full space-y-6 overflow-x-hidden">
         {{-- HEADER --}}
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-                <x-page-header title="Nieuwe supportaanvraag" />
+        <div class="mx-auto w-full max-w-3xl">
+            <x-page-header title="Nieuwe supportaanvraag" />
 
-                <p class="mt-1 text-sm text-gray-600 sm:text-base">
-                    Meld een probleem over een bestelling zodat het magazijn dit kan opvolgen.
-                </p>
-            </div>
-
-            <a
-                href="{{ route('tickets.index') }}"
-                class="inline-flex w-full items-center justify-center rounded-xl bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 sm:w-auto"
-            >
-                ← Terug naar support
-            </a>
+            <p class="mt-1 text-sm text-gray-600 sm:text-base">
+                Meld een probleem over een bestelling zodat het magazijn dit kan opvolgen.
+            </p>
         </div>
 
         {{-- FORMULIER --}}
-        <section class="max-w-3xl rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+        <section class="mx-auto w-full max-w-3xl rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
             <div class="mb-6 rounded-2xl bg-blue-50 p-4">
                 <h2 class="font-bold text-[#0F4C81]">
                     Supportaanvraag aanmaken
@@ -122,7 +113,7 @@
                 </div>
 
                 {{-- ACTIES --}}
-                <div class="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
+                <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
                     <a
                         href="{{ route('tickets.index') }}"
                         class="inline-flex w-full items-center justify-center rounded-xl bg-gray-100 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-200 sm:w-auto"
