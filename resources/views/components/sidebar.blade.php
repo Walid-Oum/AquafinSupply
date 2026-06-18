@@ -1,13 +1,13 @@
 {{--
     SIDEBAR COMPONENT
 
-    @author      
+    @author
     @version     1.0
     @since       2026-06-18
 
     Zijbalk navigatie voor de applicatie. Toont verschillende menu-items
     op basis van de gebruikersrol (technieker, magazijn, admin).
-    Ondersteunt zowel desktop (sticky) als mobile (fullscreen) weergave.
+    Ondersteunt zowel desktop (sticky) als mobiele weergave.
 --}}
 
 @php
@@ -82,7 +82,6 @@
                     Materialen
                 </a>
 
-<<<<<<< HEAD
                 <a
                     href="{{ route('admin.orders.index') }}"
                     class="{{ $navLinkClasses(request()->routeIs('admin.orders.*')) }}"
@@ -90,10 +89,6 @@
                 >
                     Bestellingen
                 </a>
-=======
-                {{-- TECHNIEKER MENU --}}
-                @if($role == 'technieker')
->>>>>>> Doc/warehouse
 
                 <a
                     href="{{ route('admin.flood-risk.index') }}"
@@ -151,7 +146,6 @@
                     Bestellingen
                 </a>
 
-<<<<<<< HEAD
                 <a
                     href="{{ route('tickets.index') }}"
                     class="{{ $navLinkClasses(request()->routeIs('tickets.index') || request()->routeIs('tickets.create')) }}"
@@ -159,83 +153,6 @@
                 >
                     Support
                 </a>
-=======
-                {{-- MAGAZIJN MENU --}}
-                @if($role == 'magazijn')
-
-                    <li>
-                        <a href="{{ route('magazijn.orders.index') }}"
-                           @click="mobileSidebarOpen = false"
-                           class="flex items-center gap-3 rounded-xl px-4 py-3 font-bold transition-all hover:bg-white/15">
-                            <span>Bestellingen</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{{ route('magazijn.materials.index') }}"
-                           @click="mobileSidebarOpen = false"
-                           class="flex items-center gap-3 rounded-xl px-4 py-3 font-bold transition-all hover:bg-white/15">
-                            <span>Voorraad</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{{ route('tickets.warehouse.index') }}"
-                           @click="mobileSidebarOpen = false"
-                           class="flex items-center gap-3 rounded-xl px-4 py-3 font-bold transition-all hover:bg-white/15">
-                            <span>Support aanvragen</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{{ route('flood-risk.index') }}"
-                           @click="mobileSidebarOpen = false"
-                           class="flex items-center gap-3 rounded-xl px-4 py-3 font-bold transition-all hover:bg-white/15">
-                            <span>Overstromingsrisico</span>
-                        </a>
-                    </li>
-
-                @endif
-
-                {{-- ADMIN MENU --}}
-                @if($role == 'admin')
-
-                    <li>
-                        <a href="{{ route('admin.users.index') }}"
-                           @click="mobileSidebarOpen = false"
-                           class="flex items-center gap-3 rounded-xl px-4 py-3 font-bold transition-all hover:bg-white/15">
-                            <span>Gebruikers</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{{ route('materials.index') }}"
-                           @click="mobileSidebarOpen = false"
-                           class="flex items-center gap-3 rounded-xl px-4 py-3 font-bold transition-all hover:bg-white/15">
-                            <span>Materialen</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{{ route('admin.orders.index') }}"
-                           @click="mobileSidebarOpen = false"
-                           class="flex items-center gap-3 rounded-xl px-4 py-3 font-bold transition-all hover:bg-white/15">
-                            <span>Bestellingen</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{{ route('admin.flood-risk.index') }}"
-                           @click="mobileSidebarOpen = false"
-                           class="flex items-center gap-3 rounded-xl px-4 py-3 font-bold transition-all hover:bg-white/15">
-                            <span>Overstromingsrisico</span>
-                        </a>
-                    </li>
-
-                @endif
-
-            </ul>
->>>>>>> Doc/warehouse
 
                 <a
                     href="{{ route('flood-risk.index') }}"
@@ -283,8 +200,3 @@
         @endif
     </div>
 </aside>
-
-<<<<<<< HEAD
-=======
-</div>
->>>>>>> Doc/warehouse
