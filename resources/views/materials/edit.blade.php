@@ -134,7 +134,7 @@
                 @endif
             </div>
 
-           
+
 <div class="mb-4">
                 <label class="block font-bold mb-2">
                     Nieuwe afbeelding
@@ -346,7 +346,7 @@
         </div>
 
     </div>
-    </x-card>
+    
 </div>
 </x-app-layout>
 
