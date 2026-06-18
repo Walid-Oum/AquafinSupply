@@ -1,3 +1,11 @@
+{{--
+    MATERIAL CARD COMPONENT
+    Toont een materiaal als kaart met afbeelding, categorie, naam en voorraad.
+    Compacte variant voor grid-weergave en uitgebreide variant voor lijst-weergave.
+    @author 
+    @version 1.0
+--}}
+
 @props([
     'material',
     'compact' => false,
@@ -42,6 +50,7 @@
 @endphp
 
 @if($compact)
+    {{-- Compacte kaart weergave --}}
     <div class="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
         <a href="{{ route('technician.materials.show', $material->id) }}" class="block">
             <div class="mb-3 flex h-24 items-center justify-center rounded-xl bg-gray-50 p-3">
@@ -100,6 +109,7 @@
         </div>
     </div>
 @else
+    {{-- Uitgebreide kaart weergave --}}
     <div class="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-gray-100 transition hover:shadow-xl">
         <a href="{{ route('technician.materials.show', $material->id) }}" class="block">
             <div class="flex h-40 items-center justify-center bg-gray-50 p-4 sm:h-44 lg:h-48">
