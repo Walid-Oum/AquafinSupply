@@ -3,7 +3,8 @@
 
     $stock = $localStock?->stock ?? 0;
     $minimumStock = $localStock?->minimum_stock ?? $material->minimum_stock ?? 0;
-  $categoryImages = [
+
+    $categoryImages = [
         'Aquafin tools' => 'aquafintools.png',
         'Bevestigingsmateriaal' => 'bevestigingsmateriaal.png',
         'Gereedschap' => 'gereedschap.png',
@@ -11,118 +12,163 @@
         'Technisch onderhoud' => 'technischeonderhoud.png',
         'Verbruiksgoederen' => 'verbruiksgoederen.png',
     ];
-    @endphp
+
+    $fallbackImage = $categoryImages[$material->category] ?? 'sidebar-bg.jpg';
+
+    $imageUrl = $material->image
+        ? asset('storage/' . $material->image)
+        : asset('images/' . $fallbackImage);
+
+    if ($stock <= 0) {
+        $stockStatusText = 'Geen voorraad';
+        $stockStatusClasses = 'bg-red-100 text-red-700';
+        $stockColorClass = 'text-red-600';
+    } elseif ($stock <= $minimumStock) {
+        $stockStatusText = 'Lage voorraad';
+        $stockStatusClasses = 'bg-orange-100 text-orange-700';
+        $stockColorClass = 'text-orange-600';
+    } else {
+        $stockStatusText = 'OK';
+        $stockStatusClasses = 'bg-green-100 text-green-700';
+        $stockColorClass = 'text-green-600';
+    }
+@endphp
 
 <x-app-layout>
+    <div class="space-y-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <x-page-header title="Materiaal details" />
 
-    <x-page-header title="Materiaal details" />
+                <p class="mt-1 text-sm text-gray-600 sm:text-base">
+                    Bekijk de gegevens, voorraadstatus en risiconiveaus van dit materiaal.
+                </p>
+            </div>
 
-    <x-card>
-
-       @if($material->image)
-
-    <img
-        src="{{ Storage::url($material->image) }}"
-        class="w-full max-w-sm h-auto object-cover rounded mt-2">
-
-@else
-
-    <img
-        src="{{ asset('images/' . ($categoryImages[$material->category] ?? 'sidebar-bg.jpg')) }}"
-        class="w-full max-w-sm h-auto object-cover rounded mt-2"
-        alt="{{ $material->category }}">
-
-@endif
-
-        <div class="space-y-3">
-
-            <p>
-                <strong>Naam:</strong>
-                {{ $material->name }}
-            </p>
-
-            <p>
-                <strong>Categorie:</strong>
-                {{ $material->category }}
-            </p>
-            <div class="mb-4">
-
-    <strong>Risiconiveau:</strong>
-
-    <div class="mt-2 flex gap-2 flex-wrap">
-
-        @forelse($material->riskLevels as $riskLevel)
-
-            <span
-                class="inline-block px-3 py-1 rounded-full text-xs font-semibold
-
-                @if($riskLevel->name === 'Hoog')
-                    bg-red-100 text-red-700
-                @elseif($riskLevel->name === 'Gemiddeld')
-                    bg-yellow-100 text-yellow-700
-                @else
-                    bg-green-100 text-green-700
-                @endif">
-
-                {{ $riskLevel->name }}
-
-            </span>
-
-        @empty
-
-            <span class="text-gray-500">
-                Geen risiconiveau gekoppeld
-            </span>
-
-        @endforelse
-
-    </div>
-
-</div>
-
-            <p>
-                <strong>Beschrijving:</strong>
-                {{ $material->description }}
-            </p>
-
-            <p>
-                <strong>Voorraad in jouw depot:</strong>
-                {{ $stock }}
-            </p>
-
-            <p>
-                <strong>Minimumvoorraad in jouw depot:</strong>
-                {{ $minimumStock }}
-            </p>
-
-            <p>
-                <strong>Voorraadstatus:</strong>
-
-                @if($stock <= 0)
-                    <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">
-                        Geen voorraad
-                    </span>
-                @elseif($stock <= $minimumStock)
-                    <span class="inline-block bg-orange-100 text-orange-700 text-xs font-semibold px-3 py-1 rounded-full">
-                        Lage voorraad
-                    </span>
-                @else
-                    <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
-                        OK
-                    </span>
-                @endif
-            </p>
-
-        </div>
-
-        <div class="mt-6">
-            <a href="{{ route('magazijn.materials.index') }}">
-                <x-button>
-                    Terug
-                </x-button>
+            <a
+                href="{{ route('magazijn.materials.index') }}"
+                class="inline-flex w-full items-center justify-center rounded-xl bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 sm:w-auto"
+            >
+                ← Terug naar voorraad
             </a>
         </div>
 
-    </x-card>
+        <section class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+            <div class="mb-5 flex flex-col gap-3 border-b border-gray-100 pb-5 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-wide text-gray-400">
+                        {{ $material->category }}
+                    </p>
 
+                    <h2 class="mt-1 text-2xl font-bold text-[#0F4C81]">
+                        {{ $material->name }}
+                    </h2>
+                </div>
+
+                <span class="inline-flex w-fit rounded-full px-3 py-1 text-sm font-semibold {{ $stockStatusClasses }}">
+                    {{ $stockStatusText }}
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(260px,380px)_1fr] lg:items-start">
+                {{-- Afbeelding --}}
+                <div class="rounded-2xl bg-gray-50 p-4">
+                    <div class="flex min-h-56 items-center justify-center rounded-xl bg-white p-4 sm:min-h-72">
+                        <img
+                            src="{{ $imageUrl }}"
+                            class="max-h-72 max-w-full object-contain"
+                            alt="{{ $material->name }}"
+                        >
+                    </div>
+                </div>
+
+                {{-- Info --}}
+                <div class="space-y-5">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-500">
+                            Beschrijving
+                        </p>
+
+                        <p class="mt-1 leading-relaxed text-gray-900">
+                            {{ $material->description ?? 'Geen beschrijving beschikbaar.' }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="mb-2 text-sm font-semibold text-gray-500">
+                            Risiconiveau
+                        </p>
+
+                        <div class="flex flex-wrap gap-2">
+                            @forelse($material->riskLevels as $riskLevel)
+                                <span
+                                    class="inline-flex rounded-full px-3 py-1 text-xs font-semibold
+                                    @if($riskLevel->name === 'Hoog')
+                                        bg-red-100 text-red-700
+                                    @elseif($riskLevel->name === 'Gemiddeld')
+                                        bg-yellow-100 text-yellow-700
+                                    @else
+                                        bg-green-100 text-green-700
+                                    @endif"
+                                >
+                                    {{ $riskLevel->name }}
+                                </span>
+                            @empty
+                                <span class="text-sm text-gray-500">
+                                    Geen risiconiveau gekoppeld
+                                </span>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                        <p class="mb-4 text-sm font-semibold text-gray-700">
+                            Voorraadgegevens
+                        </p>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                                    Voorraad
+                                </p>
+
+                                <p class="mt-1 text-2xl font-bold {{ $stockColorClass }}">
+                                    {{ $stock }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                                    Minimum
+                                </p>
+
+                                <p class="mt-1 text-2xl font-bold text-gray-900">
+                                    {{ $minimumStock }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 border-t border-gray-200 pt-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                                Status
+                            </p>
+
+                            <span class="mt-2 inline-flex rounded-full px-3 py-1 text-sm font-semibold {{ $stockStatusClasses }}">
+                                {{ $stockStatusText }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <a
+                href="{{ route('magazijn.materials.index') }}"
+                class="inline-flex w-full items-center justify-center rounded-xl bg-gray-100 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-200 sm:w-auto"
+            >
+                Terug
+            </a>
+        </div>
+    </div>
 </x-app-layout>
