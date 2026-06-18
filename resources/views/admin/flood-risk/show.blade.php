@@ -1,3 +1,28 @@
+{{--
+    Pagina: Detailanalyse Overstromingsrisico
+
+    Doel:
+    Toont een gedetailleerde analyse van het
+    overstromingsrisico voor een geselecteerd depot.
+
+    Functionaliteiten:
+    - Overzicht van verwachte neerslag
+    - Weergave van hoogste dagneerslag
+    - Bepaling van risicodagen
+    - Prioriteitsniveau (Laag, Gemiddeld, Hoog)
+    - Depotinformatie
+    - Administratief advies op basis van risico
+    - Dagelijkse weersvoorspelling voor volgende week
+    - Grafische weergave van neerslaggegevens
+    - Ondersteuning van gecachte weersgegevens
+
+    Gebruikersrol:
+    - Admin
+
+    Opmerking:
+    De gegevens worden opgehaald via de Open-Meteo API
+    en verwerkt door de Admin FloodRiskController.
+--}}
 <x-app-layout>
     <div class="p-8">
         <div class="mb-6">
@@ -19,7 +44,7 @@
                 Live weersgegevens zijn tijdelijk niet beschikbaar. We tonen de laatst opgeslagen gegevens voor dit depot.
             </div>
         @endif
-
+        {{-- Samenvatting van de belangrijkste risico-indicatoren --}}
         <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-4">
             <div class="rounded-xl bg-white p-6 shadow">
                 <p class="text-sm text-gray-600">Neerslag volgende week</p>
@@ -65,7 +90,7 @@
                 </div>
             </div>
         </div>
-
+        {{-- Depotinformatie en administratief advies --}}
         <div class="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
             <div class="rounded-xl bg-white p-6 shadow">
                 <h2 class="text-xl font-semibold text-gray-900">
