@@ -1,10 +1,21 @@
 {{--
     MAGAZIJN - ALLE SUPPORTAANVRAGEN (TICKETS)
-    Deze view toont alle supportaanvragen van techniekers voor magazijnmedewerkers.
-    Magazijnmedewerkers kunnen tickets bekijken, filteren op status,
-    zoeken op onderwerp, technieker of bestelling.
+
+    @author      Chayma (Team Aquafin)
+    @version     1.0
+    @since       2026-06-18
+
+    Deze view toont alle supportaanvragen van techniekers voor
+    magazijnmedewerkers. Magazijnmedewerkers kunnen tickets bekijken,
+    filteren op status, zoeken op onderwerp, technieker of bestelling.
     Tickets worden gegroepeerd per status en per provincie/depot.
-    Magazijnmedewerkers kunnen ook een antwoord toevoegen aan tickets.
+
+    @see App\Http\Controllers\TicketController::all()
+    @see App\Http\Controllers\TicketController::showWarehouse()
+
+    @uses App\View\Components\AppLayout
+    @uses App\View\Components\PageHeader
+    @uses App\View\Components\StatusBadge
 --}}
 
 <x-app-layout>
