@@ -1,4 +1,5 @@
 <x-app-layout>
+    //hoofdcontainer 
     <div class="min-w-0 max-w-full space-y-6 overflow-x-hidden">
         <div>
             <x-page-header title="Materialen overzicht" />
@@ -7,7 +8,7 @@
                 Bekijk materialen, zoek op categorie en voeg materiaal toe aan je winkelmandje.
             </p>
         </div>
-
+//aanbevolen materialen sectie
         @if($recommendedMaterials->count() > 0)
             <section class="w-full max-w-full overflow-hidden rounded-2xl border border-green-200 bg-green-50 shadow-sm">
                 <div class="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
@@ -20,7 +21,7 @@
                             {{ $recommendedMaterials->count() }} materialen aanbevolen op basis van het overstromingsrisico.
                         </p>
                     </div>
-
+// toon/verberg aanbevelingen knop
                     <button
                         type="button"
                         onclick="toggleRecommendations()"
@@ -30,7 +31,7 @@
                         ▲ Verberg
                     </button>
                 </div>
-
+// aanbevolen materialen container
                 <div
                     id="recommendationsContainer"
                     class="w-full max-w-full overflow-hidden pb-4"
@@ -50,9 +51,10 @@
                 </div>
             </section>
         @endif
-
+// sorteer en zoek sectie
         <section class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
             <div class="grid grid-cols-1 gap-3 lg:grid-cols-4 lg:items-center">
+                // sorteer formulier
                 <form
                     method="GET"
                     action="{{ route('technician.materials.index') }}"
@@ -76,7 +78,7 @@
                         </option>
                     </select>
                 </form>
-
+// zoekbalk
                 <div class="min-w-0 lg:col-span-3">
                     <x-search-bar
                         id="global-material-search"
@@ -87,7 +89,7 @@
                 </div>
             </div>
         </section>
-
+// categorie filter knoppen
         <div class="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
             <div class="flex min-w-max gap-3 sm:min-w-0 sm:flex-wrap">
                 <button
@@ -109,7 +111,7 @@
                 @endforeach
             </div>
         </div>
-
+// materialen grid
         <div
             id="materials"
             class="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
@@ -135,7 +137,7 @@
                         $stockStatus,
                     ])->filter()->implode(' ');
                 @endphp
-
+// materiaal item
                 <div
                     class="js-material-item min-w-0"
                     data-category="{{ $material->category }}"
@@ -144,12 +146,13 @@
                     <x-material-card :material="$material" />
                 </div>
             @empty
+            // geen materialen gevonden
                 <div class="col-span-full rounded-xl border bg-white py-8 text-center text-gray-500 shadow-sm">
                     Geen materialen gevonden.
                 </div>
             @endforelse
         </div>
-
+// lege staat voor geen resultaten
         <div
             id="materials-empty-state"
             class="mt-4 hidden rounded-xl border bg-white py-8 text-center text-gray-500 shadow-sm"
@@ -169,7 +172,7 @@
             const emptyState = document.getElementById('materials-empty-state');
 
             let selectedCategory = 'all';
-
+// scrollpositie herstellen
             if (savedScroll !== null) {
                 requestAnimationFrame(function () {
                     window.scrollTo(0, parseInt(savedScroll, 10));
@@ -180,13 +183,13 @@
                     }, 100);
                 });
             }
-
+// scrollpositie opslaan bij formulierverzending
             document.querySelectorAll('.js-preserve-scroll').forEach(function (form) {
                 form.addEventListener('submit', function () {
                     sessionStorage.setItem(scrollKey, window.scrollY.toString());
                 });
             });
-
+// normaliseer tekst voor fuzzy matching
             function normalizeText(value) {
                 return (value || '')
                     .toLowerCase()
@@ -195,7 +198,7 @@
                     .replace(/[^a-z0-9]+/g, ' ')
                     .trim();
             }
-
+// levenshtein afstand berekenen
             function levenshtein(a, b) {
                 const matrix = [];
 
@@ -223,7 +226,7 @@
 
                 return matrix[b.length][a.length];
             }
-
+// bepaal toegestane afstand op basis van woordlengte
             function allowedDistance(word) {
                 if (word.length <= 5) {
                     return 1;
@@ -235,7 +238,7 @@
 
                 return 3;
             }
-
+// controleer of een querywoord overeenkomt met een lijst van tekstwoorden
             function wordMatches(queryWord, textWords) {
                 if (queryWord.length === 0) {
                     return true;
