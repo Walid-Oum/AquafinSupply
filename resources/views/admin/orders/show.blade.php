@@ -1,3 +1,25 @@
+{{--
+    Pagina: Bestelling detail
+
+    Doel:
+    Toont de details van een geselecteerde bestelling
+    zodat een administrator de bestelling kan raadplegen.
+
+    Functionaliteiten:
+    - Bekijken van bestelgegevens
+    - Bekijken van techniekergegevens
+    - Bekijken van bestelstatus
+    - Bekijken van opmerking
+    - Overzicht van bestelde materialen
+    - Responsieve weergave voor desktop en mobiel
+
+    Gebruikersrol:
+    - Admin
+
+    Opmerking:
+    Indien een materiaal geen eigen afbeelding heeft,
+    wordt automatisch een categorieafbeelding getoond.
+--}}
 @php
     $categoryImages = [
         'Aquafin tools' => 'aquafintools.png',
@@ -11,7 +33,7 @@
 <x-app-layout>
 
     <x-page-header title="Bestelling Detail" />
-
+    {{-- Algemene bestelinformatie --}}
     <x-card>
 
         <div class="space-y-4">
@@ -52,7 +74,7 @@
         </div>
 
     </x-card>
-
+    {{-- Desktopweergave van bestelde materialen --}}
    <div class="hidden lg:block mt-6">
 
 <x-card>
@@ -104,6 +126,7 @@
 
         </x-card>
         </div>
+    {{-- Mobiele weergave van bestelde materialen --}}
    <div class="lg:hidden space-y-4 mt-8">
 
     @foreach($order->items as $item)
@@ -138,7 +161,8 @@
 
     @endforeach
 
-</div>     
+</div>
+    {{-- Navigatie terug naar overzichtspagina --}}
 <div class="mt-6">
 
   <a href="{{ route('admin.orders.index') }}">
