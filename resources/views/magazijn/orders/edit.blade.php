@@ -1,3 +1,15 @@
+{{--
+|--------------------------------------------------------------------------
+| MAGAZIJN - BESTELLING WIJZIGEN
+|--------------------------------------------------------------------------
+| Deze view toont een formulier waarmee magazijnmedewerkers de status
+| en inhoud van een bestelling kunnen aanpassen.
+| Magazijnmedewerkers kunnen de status wijzigen (Nieuw, In voorbereiding,
+| Klaar om af te halen, Afgehaald) en de hoeveelheden van materialen
+| aanpassen of materialen uit de bestelling verwijderen.
+|--------------------------------------------------------------------------
+--}}
+
 @php
     $categoryImages = [
         'Aquafin tools' => 'aquafintools.png',
@@ -11,6 +23,7 @@
 
 <x-app-layout>
     <div class="space-y-6">
+        {{-- HEADER --}}
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
                 <x-page-header title="Bestelling wijzigen" />
@@ -36,7 +49,7 @@
             @csrf
             @method('PATCH')
 
-            {{-- Bestelgegevens --}}
+            {{-- BESTELGEGEVENS --}}
             <section class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
                 <div class="mb-5 flex flex-col gap-3 border-b border-gray-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -79,6 +92,7 @@
                         >
                     </div>
 
+                    {{-- STATUS DROPDOWN --}}
                     <div class="md:col-span-2">
                         <label for="status" class="mb-2 block text-sm font-semibold text-gray-700">
                             Status
@@ -121,7 +135,7 @@
                 </div>
             </section>
 
-            {{-- Materialen --}}
+            {{-- MATERIALEN --}}
             <section class="rounded-2xl border border-gray-100 bg-white shadow-sm">
                 <div class="border-b border-gray-100 px-4 py-4 sm:px-6">
                     <h2 class="text-xl font-bold text-[#0F4C81]">
@@ -172,6 +186,7 @@
                                         </div>
                                     </div>
 
+                                    {{-- Hoeveelheid aanpassen --}}
                                     <div class="sm:w-36">
                                         <label
                                             for="quantity-{{ $item->id }}"
@@ -204,7 +219,7 @@
                 @endif
             </section>
 
-            {{-- Waarschuwing + bevestiging --}}
+            {{-- WAARSCHUWING --}}
             <section class="rounded-2xl border border-yellow-200 bg-yellow-50 p-4 shadow-sm sm:p-5">
                 <div class="flex gap-3">
                     <div class="text-xl">
@@ -224,6 +239,7 @@
                 </div>
             </section>
 
+            {{-- BEVESTIGING --}}
             <section class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
                 <label class="flex items-start gap-3">
                     <input
@@ -239,7 +255,7 @@
                 </label>
             </section>
 
-            {{-- Acties --}}
+            {{-- ACTIES --}}
             <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <a
                     href="{{ route('magazijn.orders.show', $order->id) }}"
