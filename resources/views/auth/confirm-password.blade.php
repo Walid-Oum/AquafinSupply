@@ -1,3 +1,25 @@
+{{--
+    Pagina: Wachtwoord bevestigen
+
+    Doel:
+    Extra beveiligingscontrole waarbij een
+    gebruiker zijn wachtwoord opnieuw moet
+    invoeren voordat gevoelige acties worden
+    uitgevoerd.
+
+    Functionaliteiten:
+    - Bevestigen van huidige wachtwoord
+    - Validatie van ingevoerd wachtwoord
+    - Toegang verlenen tot beveiligde acties
+
+    Gebruikersrol:
+    - Alle gebruikers
+
+    Opmerking:
+    Deze pagina maakt deel uit van Laravel
+    Breeze authenticatie en wordt gebruikt
+    voor extra beveiliging.
+--}}
 <x-guest-layout>
     <div class="mb-4 text-sm text-gray-600">
         {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
