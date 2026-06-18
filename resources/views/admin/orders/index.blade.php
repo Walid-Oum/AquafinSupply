@@ -2,23 +2,24 @@
 
     <x-page-header title="Alle Bestellingen" />
 
-   <div class="mb-4 flex justify-end items-center">
+   
 
-    <div class="flex gap-4 items-center">
-
+ <div class="mb-3 flex flex-col lg:flex-row gap-4 lg:justify-end lg:items-center">
+ <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
         <div class="relative">
             <input
                 type="text"
                 id="global-order-search"
                 autocomplete="off"
                 placeholder="Bestelling zoeken..."
-                class="border rounded px-3 py-2 w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]">
-        </div>
+              class="border rounded px-3 py-2 w-full sm:w-64 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]">
+     
+</div>
 
-        <form
-            method="GET"
-            action="{{ route('admin.orders.index') }}"
-            class="flex gap-2">
+       <form
+    method="GET"
+    action="{{ route('admin.orders.index') }}"
+    class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
 
             <select
                 name="status"
@@ -83,8 +84,9 @@
     </div>
 
 </div>
-    <x-card>
-        <table class="w-full">
+   <div class="hidden lg:block">
+<x-card>
+    <table class="w-full">
 
             <thead>
 
@@ -177,7 +179,62 @@
 
         </table>
 
-    </x-card>
+   </x-card>
+</div>
+    <div class="lg:hidden space-y-4">
+
+    @forelse($orders as $order)
+
+        <x-card>
+
+            <div class="space-y-2">
+
+                <p>
+                    <strong>ID:</strong>
+                    #{{ $order->id }}
+                </p>
+
+                <p>
+                    <strong>Technieker:</strong>
+                    {{ $order->user->name }}
+                </p>
+
+                <p>
+                    <strong>Besteld op:</strong>
+                    {{ $order->created_at->format('d/m/Y') }}
+                </p>
+
+                <p>
+                    <strong>Leverdatum:</strong>
+                    {{ $order->delivery_date }}
+                </p>
+
+                <div>
+                    <strong>Status:</strong>
+                    <x-status-badge :status="$order->status" />
+                </div>
+
+                <div class="pt-2">
+                    <a href="{{ route('admin.orders.show', $order->id) }}">
+                        <x-button>
+                            Bekijken
+                        </x-button>
+                    </a>
+                </div>
+
+            </div>
+
+        </x-card>
+
+    @empty
+
+        <x-card>
+            Geen bestellingen gevonden.
+        </x-card>
+
+    @endforelse
+
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
