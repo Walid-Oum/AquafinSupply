@@ -1,7 +1,7 @@
 {{--
     MAGAZIJN - BESTELLING WIJZIGEN
 
-    @author      Chayma (Team Aquafin)
+    @author      
     @version     1.0
     @since       2026-06-18
 

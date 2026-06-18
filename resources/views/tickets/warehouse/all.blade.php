@@ -1,7 +1,7 @@
 {{--
     MAGAZIJN - ALLE SUPPORTAANVRAGEN (TICKETS)
 
-    @author      Chayma (Team Aquafin)
+    @author      Walid
     @version     1.0
     @since       2026-06-18
 
