@@ -1,12 +1,17 @@
 {{--
-|--------------------------------------------------------------------------
-| MAGAZIJN - VOORRAAD OVERZICHT
-|--------------------------------------------------------------------------
-| Deze view toont het voorraad overzicht voor magazijnmedewerkers.
-| Magazijnmedewerkers kunnen hier de voorraad van materialen in hun eigen depot
-| bekijken en aanpassen. De view bevat zoek-, filter- en sorteer functionaliteit.
-| Ook wordt de voorraadstatus (laag/OK) weergegeven met kleurindicatie.
-|--------------------------------------------------------------------------
+    MAGAZIJN - VOORRAAD OVERZICHT
+
+    @author      Chayma (Team Aquafin)
+    @version     1.0
+    @since       2026-06-18
+
+    Deze view toont het voorraad overzicht voor magazijnmedewerkers.
+    Magazijnmedewerkers kunnen hier de voorraad van materialen in hun eigen depot
+    bekijken en aanpassen. De view bevat zoek-, filter- en sorteer functionaliteit.
+    Ook wordt de voorraadstatus (laag/OK) weergegeven met kleurindicatie.
+
+    @see App\Http\Controllers\MaterialController::warehouseIndex()
+    @see App\Http\Controllers\MaterialController::warehouseUpdate()
 --}}
 
 @php
