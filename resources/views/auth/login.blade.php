@@ -1,104 +1,99 @@
 <x-guest-layout>
-
-<div class="bg-white rounded-3xl shadow-2xl p-10">
-
-    <div class="text-center mb-10">
-
-        <h1 class="text-5xl font-extrabold text-[#0F4C81]">
+    <div class="mb-10 text-center">
+        <h1 class="text-4xl font-extrabold text-[#0F4C81] sm:text-5xl">
             Aquafin
         </h1>
 
-        <p class="text-gray-500 mt-2">
+        <p class="mt-2 text-gray-500">
             Supply App
         </p>
-
     </div>
 
     <x-breeze.auth-session-status
         class="mb-4"
-        :status="session('status')" />
-        @if(session('success'))
-    <div class="mb-4 rounded-lg bg-green-100 border border-green-300 text-green-800 px-4 py-3">
-        {{ session('success') }}
-    </div>
-@endif
+        :status="session('status')"
+    />
 
-@if(session('error'))
-    <div class="mb-4 rounded-lg bg-red-100 border border-red-300 text-red-800 px-4 py-3">
-        {{ session('error') }}
-    </div>
-@endif
+    @if(session('success'))
+        <div class="mb-4 rounded-lg border border-green-300 bg-green-100 px-4 py-3 text-green-800">
+            {{ session('success') }}
+        </div>
+    @endif
 
-@if ($errors->any())
-    <div class="mb-4 rounded-lg bg-red-100 border border-red-300 text-red-800 px-4 py-3">
-        {{ $errors->first() }}
-    </div>
-@endif
+    @if(session('error'))
+        <div class="mb-4 rounded-lg border border-red-300 bg-red-100 px-4 py-3 text-red-800">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="mb-4 rounded-lg border border-red-300 bg-red-100 px-4 py-3 text-red-800">
+            {{ $errors->first() }}
+        </div>
+    @endif
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
         <div>
-            <label class="block mb-2 font-semibold text-gray-700">
+            <label for="email" class="mb-2 block font-semibold text-gray-700">
                 Email
             </label>
 
             <x-breeze.text-input
                 id="email"
-                class="w-full"
+                class="w-full rounded-xl px-4 py-3"
                 type="email"
                 name="email"
                 :value="old('email')"
-                required />
+                autocomplete="username"
+                required
+                autofocus
+            />
         </div>
 
         <div class="mt-5">
-            <label class="block mb-2 font-semibold text-gray-700">
+            <label for="password" class="mb-2 block font-semibold text-gray-700">
                 Wachtwoord
             </label>
 
             <x-breeze.text-input
                 id="password"
-                class="w-full"
+                class="w-full rounded-xl px-4 py-3"
                 type="password"
                 name="password"
-                required />
+                autocomplete="current-password"
+                required
+            />
         </div>
 
-        <div class="mt-5 flex items-center">
+        <div class="mt-5 flex items-center justify-between gap-4">
+            <label for="remember" class="flex items-center gap-2">
+                <input
+                    id="remember"
+                    type="checkbox"
+                    name="remember"
+                    class="rounded border-gray-300 text-[#0F4C81] focus:ring-[#0F4C81]"
+                >
 
-            <input
-                type="checkbox"
-                name="remember">
+                <span class="text-gray-600">
+                    Onthoud mij
+                </span>
+            </label>
 
-            <span class="ml-2 text-gray-600">
-                Onthoud mij
-            </span>
-
+            <a
+                href="{{ route('password.request') }}"
+                class="font-semibold text-[#1E6BA8] hover:underline"
+            >
+                Wachtwoord vergeten?
+            </a>
         </div>
 
         <button
             type="submit"
-            class="w-full mt-6 bg-[#0F4C81] hover:bg-[#1E6BA8] text-white py-3 rounded-xl font-semibold">
-
+            class="mt-6 w-full rounded-xl bg-[#0F4C81] py-3 font-semibold text-white transition hover:bg-[#1E6BA8]"
+        >
             Inloggen
-
         </button>
-
-        <div class="text-center mt-4">
-
-            <a
-                href="{{ route('password.request') }}"
-                class="text-[#1E6BA8] hover:underline">
-
-                Wachtwoord vergeten?
-
-            </a>
-
-        </div>
-
     </form>
-
-</div>
-
 </x-guest-layout>

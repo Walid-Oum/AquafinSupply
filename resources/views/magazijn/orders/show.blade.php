@@ -8,153 +8,236 @@
         'Verbruiksgoederen' => 'verbruiksgoederen.png',
     ];
 @endphp
+
 <x-app-layout>
+    <div class="space-y-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <x-page-header title="Bestelling details" />
 
-    <x-page-header title="Bestelling details" />
+                <p class="mt-1 text-sm text-gray-600 sm:text-base">
+                    Bekijk de gegevens en materialen van deze bestelling.
+                </p>
+            </div>
 
-    <x-card>
-
-        <div class="space-y-3">
-
-            <p>
-                <strong>Bestelling:</strong>
-                #{{ $order->id }}
-            </p>
-
-            <p>
-                <strong>Technieker:</strong>
-                {{ $order->user->name }}
-            </p>
-
-            <p>
-                <strong>Depot/provincie:</strong>
-                {{ $order->location->province ?? 'Geen provincie ingesteld' }}
-            </p>
-
-            <p>
-                <strong>Depot:</strong>
-                {{ $order->location->name ?? 'Geen depot gekoppeld' }}
-            </p>
-
-            <p>
-                <strong>Stad:</strong>
-                {{ $order->location->city ?? 'Geen stad gekoppeld' }}
-            </p>
-
-            <p>
-                <strong>Leverdatum:</strong>
-                {{ $order->delivery_date }}
-            </p>
-
-            <p>
-                <strong>Status:</strong>
-                <x-status-badge :status="$order->status"/>
-            </p>
-
-            <p>
-                <strong>Opmerking:</strong>
-                {{ $order->comment ?? '-' }}
-            </p>
-
+            <a
+                href="{{ route('magazijn.orders.index') }}"
+                class="inline-flex w-full items-center justify-center rounded-xl bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 sm:w-auto"
+            >
+                ← Terug
+            </a>
         </div>
 
-        <div class="mt-8">
+        <section class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+            <div class="mb-5 flex flex-col gap-3 border-b border-gray-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-wide text-gray-400">
+                        Bestelling
+                    </p>
 
-            <h2 class="text-xl font-bold mb-4">
-                Materialen
-            </h2>
+                    <h2 class="mt-1 text-2xl font-bold text-[#0F4C81]">
+                        #{{ $order->id }}
+                    </h2>
+                </div>
 
-            <table class="w-full">
+                <x-status-badge :status="$order->status" />
+            </div>
 
-                <thead>
+            <div class="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">
+                        Technieker
+                    </p>
 
-                <tr>
-                    <th class="text-left">Foto</th>
-                    <th class="text-left">Materiaal</th>
-                    <th class="text-left">Aantal</th>
-                </tr>
+                    <p class="mt-1 font-semibold text-gray-900">
+                        {{ $order->user?->name ?? 'Onbekend' }}
+                    </p>
+                </div>
 
-                </thead>
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">
+                        Leverdatum
+                    </p>
 
-                <tbody>
+                    <p class="mt-1 font-semibold text-gray-900">
+                        {{ $order->delivery_date ?? 'Geen leverdatum' }}
+                    </p>
+                </div>
 
-                @forelse($order->items as $item)
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">
+                        Depot/provincie
+                    </p>
 
-                    <tr>
+                    <p class="mt-1 font-semibold text-gray-900">
+                        {{ $order->location?->province ?? 'Geen provincie ingesteld' }}
+                    </p>
+                </div>
 
-                        <td class="py-2">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">
+                        Depot
+                    </p>
 
-                          @if($item->material->image)
+                    <p class="mt-1 font-semibold text-gray-900">
+                        {{ $order->location?->name ?? 'Geen depot gekoppeld' }}
+                    </p>
+                </div>
 
-    <img
-        src="{{ asset('storage/' . $item->material->image) }}"
-        class="w-16 h-16 object-cover rounded-lg border">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">
+                        Stad
+                    </p>
 
-@else
+                    <p class="mt-1 font-semibold text-gray-900">
+                        {{ $order->location?->city ?? 'Geen stad gekoppeld' }}
+                    </p>
+                </div>
 
-    <img
-        src="{{ asset('images/' . ($categoryImages[$item->material->category] ?? 'sidebar-bg.jpg')) }}"
-        class="w-16 h-16 object-cover rounded-lg border"
-        alt="{{ $item->material->category }}">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">
+                        Opmerking
+                    </p>
 
-@endif
+                    <p class="mt-1 font-semibold text-gray-900">
+                        {{ $order->comment ?? '-' }}
+                    </p>
+                </div>
+            </div>
+        </section>
 
-                        </td>
+        <section class="rounded-2xl border border-gray-100 bg-white shadow-sm">
+            <div class="border-b border-gray-100 px-4 py-4 sm:px-6">
+                <h2 class="text-xl font-bold text-[#0F4C81]">
+                    Materialen
+                </h2>
+            </div>
 
-                        <td>
-                            {{ $item->material->name }}
-                        </td>
+            @if($order->items->count() > 0)
+                {{-- Mobiel --}}
+                <div class="space-y-3 p-4 md:hidden">
+                    @foreach($order->items as $item)
+                        @php
+                            $material = $item->material;
+                            $category = $material?->category ?? 'Onbekende categorie';
+                            $fallbackImage = $categoryImages[$category] ?? 'sidebar-bg.jpg';
 
-                        <td>
-                            {{ $item->quantity }}
-                        </td>
+                            $imageUrl = $material?->image
+                                ? asset('storage/' . $material->image)
+                                : asset('images/' . $fallbackImage);
+                        @endphp
 
-                    </tr>
+                        <article class="flex gap-4 rounded-xl border border-gray-100 bg-gray-50 p-3">
+                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-white p-2">
+                                <img
+                                    src="{{ $imageUrl }}"
+                                    class="max-h-full max-w-full object-contain"
+                                    alt="{{ $material?->name ?? 'Materiaal' }}"
+                                >
+                            </div>
 
-                @empty
+                            <div class="min-w-0 flex-1">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                                    {{ $category }}
+                                </p>
 
-                    <tr>
+                                <p class="mt-1 font-bold text-gray-900">
+                                    {{ $material?->name ?? 'Onbekend materiaal' }}
+                                </p>
 
-                        <td colspan="3" class="text-center py-4 text-gray-500">
+                                <p class="mt-2 text-sm font-semibold text-[#0F4C81]">
+                                    Aantal: {{ $item->quantity }}
+                                </p>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
 
-                            Geen materialen gevonden.
+                {{-- Desktop --}}
+                <div class="hidden overflow-x-auto md:block">
+                    <table class="w-full min-w-[620px]">
+                        <thead>
+                        <tr class="border-b bg-gray-50 text-sm text-gray-600">
+                            <th class="p-4 text-left">
+                                Foto
+                            </th>
 
-                        </td>
+                            <th class="p-4 text-left">
+                                Materiaal
+                            </th>
 
-                    </tr>
+                            <th class="p-4 text-left">
+                                Categorie
+                            </th>
 
-                @endforelse
+                            <th class="p-4 text-left">
+                                Aantal
+                            </th>
+                        </tr>
+                        </thead>
 
-                </tbody>
+                        <tbody>
+                        @foreach($order->items as $item)
+                            @php
+                                $material = $item->material;
+                                $category = $material?->category ?? 'Onbekende categorie';
+                                $fallbackImage = $categoryImages[$category] ?? 'sidebar-bg.jpg';
 
-            </table>
+                                $imageUrl = $material?->image
+                                    ? asset('storage/' . $material->image)
+                                    : asset('images/' . $fallbackImage);
+                            @endphp
 
-        </div>
+                            <tr class="border-b border-gray-100 last:border-0">
+                                <td class="p-4">
+                                    <div class="flex h-16 w-16 items-center justify-center rounded-lg border border-gray-100 bg-gray-50 p-2">
+                                        <img
+                                            src="{{ $imageUrl }}"
+                                            class="max-h-full max-w-full object-contain"
+                                            alt="{{ $material?->name ?? 'Materiaal' }}"
+                                        >
+                                    </div>
+                                </td>
 
-        <div class="mt-6 flex gap-3">
+                                <td class="p-4 font-semibold text-gray-900">
+                                    {{ $material?->name ?? 'Onbekend materiaal' }}
+                                </td>
 
-            <a href="{{ route('magazijn.orders.edit', $order->id) }}">
+                                <td class="p-4 text-gray-700">
+                                    {{ $category }}
+                                </td>
 
-                <x-button>
+                                <td class="p-4 font-bold text-gray-900">
+                                    {{ $item->quantity }}
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="px-4 py-10 text-center text-gray-500 italic">
+                    Geen materialen gevonden.
+                </div>
+            @endif
+        </section>
 
+        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <a
+                href="{{ route('magazijn.orders.edit', $order->id) }}"
+                class="inline-flex w-full items-center justify-center sm:w-auto"
+            >
+                <x-button type="button" class="w-full justify-center sm:w-auto">
                     Bewerk
-
                 </x-button>
-
             </a>
 
-            <a href="{{ route('magazijn.orders.index') }}">
-
-                <x-button>
-
-                    Terug
-
-                </x-button>
-
+            <a
+                href="{{ route('magazijn.orders.index') }}"
+                class="inline-flex w-full items-center justify-center rounded-xl bg-gray-100 px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-200 sm:w-auto"
+            >
+                Terug
             </a>
-
         </div>
-
-    </x-card>
-
+    </div>
 </x-app-layout>

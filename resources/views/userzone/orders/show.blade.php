@@ -18,7 +18,7 @@
 
 <x-app-layout>
     <div class="space-y-6">
-        <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
                 <x-page-header title="Bestelling #{{ $order->id }}" />
 
@@ -36,34 +36,24 @@
         </div>
 
         {{-- Bestelgegevens --}}
-        <section class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
-            <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <section class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+            <div class="mb-5 flex flex-col gap-3 border-b border-gray-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 class="text-lg font-bold text-[#0F4C81]">
-                        Bestelgegevens
-                    </h2>
-
-                    <p class="text-sm text-gray-500">
-                        Algemene informatie over deze bestelling.
+                    <p class="text-sm font-semibold uppercase tracking-wide text-gray-400">
+                        Bestelling
                     </p>
+
+                    <h2 class="mt-1 text-2xl font-bold text-[#0F4C81]">
+                        #{{ $order->id }}
+                    </h2>
                 </div>
 
                 <x-status-badge :status="$order->status" />
             </div>
 
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                <div class="rounded-xl bg-gray-50 p-4">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                        Bestelling ID
-                    </p>
-
-                    <p class="mt-1 text-lg font-bold text-gray-900">
-                        #{{ $order->id }}
-                    </p>
-                </div>
-
-                <div class="rounded-xl bg-gray-50 p-4">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+            <div class="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">
                         Besteld op
                     </p>
 
@@ -72,8 +62,8 @@
                     </p>
                 </div>
 
-                <div class="rounded-xl bg-gray-50 p-4">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">
                         Leverdatum
                     </p>
 
@@ -82,8 +72,8 @@
                     </p>
                 </div>
 
-                <div class="rounded-xl bg-gray-50 p-4">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">
                         Technieker
                     </p>
 
@@ -92,8 +82,8 @@
                     </p>
                 </div>
 
-                <div class="rounded-xl bg-gray-50 p-4">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">
                         Depot/provincie
                     </p>
 
@@ -102,8 +92,8 @@
                     </p>
                 </div>
 
-                <div class="rounded-xl bg-gray-50 p-4">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">
                         Depot
                     </p>
 
@@ -113,8 +103,8 @@
                 </div>
 
                 @if($order->location?->depot_address)
-                    <div class="rounded-xl bg-gray-50 p-4 sm:col-span-2 xl:col-span-3">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-500">
                             Depotadres
                         </p>
 
@@ -124,12 +114,12 @@
                     </div>
                 @endif
 
-                <div class="rounded-xl bg-gray-50 p-4 sm:col-span-2 xl:col-span-3">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <div class="sm:col-span-2">
+                    <p class="text-sm font-semibold text-gray-500">
                         Opmerking
                     </p>
 
-                    <p class="mt-1 font-semibold text-gray-900">
+                    <p class="mt-1 rounded-xl bg-gray-50 p-3 font-semibold text-gray-900">
                         {{ $order->comment ?? 'Geen opmerking' }}
                     </p>
                 </div>
@@ -138,18 +128,18 @@
 
         {{-- Bestelde materialen --}}
         <section class="rounded-2xl border border-gray-100 bg-white shadow-sm">
-            <div class="border-b border-gray-100 px-4 py-4 sm:px-5">
-                <h2 class="text-lg font-bold text-[#0F4C81]">
+            <div class="border-b border-gray-100 px-4 py-4 sm:px-6">
+                <h2 class="text-xl font-bold text-[#0F4C81]">
                     Bestelde materialen
                 </h2>
 
-                <p class="text-sm text-gray-500">
+                <p class="mt-1 text-sm text-gray-500">
                     Overzicht van alle materialen in deze bestelling.
                 </p>
             </div>
 
             @if($order->items->count() > 0)
-                {{-- Mobile card layout --}}
+                {{-- Mobiel --}}
                 <div class="space-y-3 p-4 md:hidden">
                     @foreach($order->items as $item)
                         @php
@@ -158,39 +148,37 @@
                             $fallbackImage = $categoryImages[$category] ?? 'sidebar-bg.jpg';
 
                             $imageUrl = $material?->image
-                                ? \Illuminate\Support\Facades\Storage::url($material->image)
+                                ? asset('storage/' . $material->image)
                                 : asset('images/' . $fallbackImage);
                         @endphp
 
-                        <article class="rounded-2xl border border-gray-100 bg-gray-50 p-4 shadow-sm">
-                            <div class="flex gap-4">
-                                <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-white p-2">
-                                    <img
-                                        src="{{ $imageUrl }}"
-                                        class="max-h-full max-w-full object-contain"
-                                        alt="{{ $material?->name ?? 'Materiaal' }}"
-                                    >
-                                </div>
+                        <article class="flex gap-4 rounded-xl border border-gray-100 bg-gray-50 p-3">
+                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-white p-2">
+                                <img
+                                    src="{{ $imageUrl }}"
+                                    class="max-h-full max-w-full object-contain"
+                                    alt="{{ $material?->name ?? 'Materiaal' }}"
+                                >
+                            </div>
 
-                                <div class="min-w-0 flex-1">
-                                    <h3 class="font-bold leading-snug text-gray-900">
-                                        {{ $material?->name ?? 'Onbekend materiaal' }}
-                                    </h3>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                                    {{ $category }}
+                                </p>
 
-                                    <p class="mt-1 text-sm text-gray-500">
-                                        {{ $category }}
-                                    </p>
+                                <p class="mt-1 font-bold leading-snug text-gray-900">
+                                    {{ $material?->name ?? 'Onbekend materiaal' }}
+                                </p>
 
-                                    <div class="mt-3 inline-flex rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
-                                        Hoeveelheid: {{ $item->quantity }}
-                                    </div>
-                                </div>
+                                <p class="mt-2 inline-flex rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
+                                    Hoeveelheid: {{ $item->quantity }}
+                                </p>
                             </div>
                         </article>
                     @endforeach
                 </div>
 
-                {{-- Desktop table layout --}}
+                {{-- Desktop --}}
                 <div class="hidden overflow-x-auto md:block">
                     <table class="w-full min-w-[620px]">
                         <thead>
@@ -221,13 +209,13 @@
                                 $fallbackImage = $categoryImages[$category] ?? 'sidebar-bg.jpg';
 
                                 $imageUrl = $material?->image
-                                    ? \Illuminate\Support\Facades\Storage::url($material->image)
+                                    ? asset('storage/' . $material->image)
                                     : asset('images/' . $fallbackImage);
                             @endphp
 
                             <tr class="border-b border-gray-100 transition hover:bg-gray-50 last:border-0">
                                 <td class="p-4">
-                                    <div class="flex h-16 w-16 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 p-2">
+                                    <div class="flex h-16 w-16 items-center justify-center rounded-lg border border-gray-100 bg-gray-50 p-2">
                                         <img
                                             src="{{ $imageUrl }}"
                                             class="max-h-full max-w-full object-contain"
@@ -236,7 +224,7 @@
                                     </div>
                                 </td>
 
-                                <td class="p-4 font-medium text-gray-900">
+                                <td class="p-4 font-semibold text-gray-900">
                                     {{ $material?->name ?? 'Onbekend materiaal' }}
                                 </td>
 
@@ -244,7 +232,7 @@
                                     {{ $category }}
                                 </td>
 
-                                <td class="p-4 font-semibold text-gray-900">
+                                <td class="p-4 font-bold text-gray-900">
                                     {{ $item->quantity }}
                                 </td>
                             </tr>
