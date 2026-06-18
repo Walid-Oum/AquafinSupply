@@ -1,13 +1,13 @@
-<{{--
+{{--
 
     Pagina: Materialen overzicht technieker
- 
+
     User Stories:
 
     US8 - Materialen bekijken
 
     US9 - Materiaal toevoegen aan winkelmandje
- 
+
     Opmerking:
 
     De aanbevolen materialen worden getoond op basis van het overstromingsrisico.
@@ -15,20 +15,20 @@
     De technieker kan zoeken, filteren op categorie en materialen toevoegen aan de winkelmand.
 
 --}}
- 
+
        <x-app-layout>
         <div class="min-w-0 max-w-full space-y-6 overflow-x-hidden">
 
         {{-- Pagina-header --}}
        <div>
         <x-page-header title="Materialen overzicht" />
- 
+
             <p class="mt-1 text-sm text-gray-600 sm:text-base">
 
                 Bekijk materialen, zoek op categorie en voeg materiaal toe aan je winkelmandje.
          </p>
           </div>
- 
+
         {{-- Aanbevolen materialen op basis van overstromingsrisico --}}
 
         @if($recommendedMaterials->count() > 0)
@@ -39,13 +39,13 @@
 
                             Aanbevolen materialen
     </h2>
- 
+
                         <p class="mt-1 text-sm text-green-700">
 
                             {{ $recommendedMaterials->count() }} materialen aanbevolen op basis van het overstromingsrisico.
       </p>
         </div>
- 
+
                     <button
 
                         type="button"
@@ -60,7 +60,7 @@
                         ▲ Verberg
        </button>
          </div>
- 
+
                 <div
 
                     id="recommendationsContainer"
@@ -88,7 +88,7 @@
 </section>
 
         @endif
- 
+
         {{-- Sorteer- en zoeksectie --}}
 <section class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
 <div class="grid grid-cols-1 gap-3 lg:grid-cols-4 lg:items-center">
@@ -112,19 +112,19 @@
 
                             Sorteer op naam
             </option>
- 
+
                         <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>
 
                             A-Z
           </option>
- 
+
                         <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>
 
                             Z-A
            </option>
          </select>
          </form>
- 
+
                 <div class="min-w-0 lg:col-span-3">
           <x-search-bar
 
@@ -140,7 +140,7 @@
            </div>
          </div>
           </section>
- 
+
           {{-- Categoriefilters --}}
         <div class="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
         <div class="flex min-w-max gap-3 sm:min-w-0 sm:flex-wrap">
@@ -155,7 +155,7 @@
 
                     Alles
             </button>
- 
+
                 @foreach($categories as $category)
              <button
 
@@ -172,7 +172,7 @@
                 @endforeach
           </div>
           </div>
- 
+
         {{-- Materialen grid --}}
        <div
 
@@ -190,7 +190,7 @@
                     $stock = $localStock?->stock ?? 0;
 
                     $minimumStock = $localStock?->minimum_stock ?? 0;
- 
+
                     if ($stock <= 0) {
 
                         $stockStatus = 'geen voorraad';
@@ -204,7 +204,7 @@
                         $stockStatus = 'beschikbaar';
 
                     }
- 
+
                     $searchText = collect([
 
                         $material->name,
@@ -218,7 +218,7 @@
                     ])->filter()->implode(' ');
 
                 @endphp
- 
+
                 <div
 
                     class="js-material-item min-w-0"
@@ -238,7 +238,7 @@
 
             @endforelse
             </div>
- 
+
                 {{-- Lege staat bij zoeken/filteren --}}
          <div
 
@@ -250,7 +250,7 @@
             Geen materialen gevonden voor deze zoekterm of categorie.
           </div>
          </div>
- 
+
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -258,7 +258,7 @@
             const scrollKey = 'technician-materials-scroll-position';
 
             const savedScroll = sessionStorage.getItem(scrollKey);
- 
+
             const searchInput = document.getElementById('global-material-search');
 
             const materialItems = document.querySelectorAll('.js-material-item');
@@ -266,15 +266,15 @@
             const categoryButtons = document.querySelectorAll('.js-category-filter');
 
             const emptyState = document.getElementById('materials-empty-state');
- 
+
             let selectedCategory = 'all';
- 
+
             if (savedScroll !== null) {
 
                 requestAnimationFrame(function () {
 
                     window.scrollTo(0, parseInt(savedScroll, 10));
- 
+
                     setTimeout(function () {
 
                         window.scrollTo(0, parseInt(savedScroll, 10));
@@ -286,7 +286,7 @@
                 });
 
             }
- 
+
             document.querySelectorAll('.js-preserve-scroll').forEach(function (form) {
 
                 form.addEventListener('submit', function () {
@@ -296,7 +296,7 @@
                 });
 
             });
- 
+
             /**
 
              * Normaliseert tekst zodat zoeken hoofdletterongevoelig en accentongevoelig werkt.
@@ -324,7 +324,7 @@
                     .trim();
 
             }
- 
+
             /**
 
              * Berekent de Levenshtein-afstand tussen twee strings.
@@ -344,19 +344,19 @@
             function levenshtein(a, b) {
 
                 const matrix = [];
- 
+
                 for (let i = 0; i <= b.length; i++) {
 
                     matrix[i] = [i];
 
                 }
- 
+
                 for (let j = 0; j <= a.length; j++) {
 
                     matrix[0][j] = j;
 
                 }
- 
+
                 for (let i = 1; i <= b.length; i++) {
 
                     for (let j = 1; j <= a.length; j++) {
@@ -382,11 +382,11 @@
                     }
 
                 }
- 
+
                 return matrix[b.length][a.length];
 
             }
- 
+
             /**
 
              * Bepaalt hoeveel typfouten toegelaten zijn op basis van de woordlengte.
@@ -406,17 +406,17 @@
                     return 1;
 
                 }
- 
+
                 if (word.length <= 9) {
 
                     return 2;
 
                 }
- 
+
                 return 3;
 
             }
- 
+
             /**
 
              * Controleert of een zoekwoord overeenkomt met een van de woorden in de tekst.
@@ -438,7 +438,7 @@
                     return true;
 
                 }
- 
+
                 for (const textWord of textWords) {
 
                     if (textWord.includes(queryWord)) {
@@ -446,35 +446,35 @@
                         return true;
 
                     }
- 
+
                     if (queryWord.length < 4) {
 
                         continue;
 
                     }
- 
+
                     const distance = allowedDistance(queryWord);
 
                     const queryLength = queryWord.length;
 
                     const textLength = textWord.length;
- 
+
                     if (levenshtein(queryWord, textWord) <= distance) {
 
                         return true;
 
                     }
- 
+
                     const minWindowLength = queryLength;
 
                     const maxWindowLength = Math.min(textLength, queryLength + 1);
- 
+
                     for (let windowLength = minWindowLength; windowLength <= maxWindowLength; windowLength++) {
 
                         for (let start = 0; start <= textLength - windowLength; start++) {
 
                             const part = textWord.substring(start, start + windowLength);
- 
+
                             if (levenshtein(queryWord, part) <= distance) {
 
                                 return true;
@@ -486,11 +486,11 @@
                     }
 
                 }
- 
+
                 return false;
 
             }
- 
+
             /**
 
              * Controleert of de zoekterm overeenkomt met de tekst van een materiaal.
@@ -510,23 +510,23 @@
                 const normalizedQuery = normalizeText(query);
 
                 const normalizedText = normalizeText(text);
- 
+
                 if (normalizedQuery === '') {
 
                     return true;
 
                 }
- 
+
                 if (normalizedText.includes(normalizedQuery)) {
 
                     return true;
 
                 }
- 
+
                 const queryWords = normalizedQuery.split(' ').filter(Boolean);
 
                 const textWords = normalizedText.split(' ').filter(Boolean);
- 
+
                 return queryWords.every(function (queryWord) {
 
                     return wordMatches(queryWord, textWords);
@@ -534,7 +534,7 @@
                 });
 
             }
- 
+
             /**
 
              * Werkt de visuele actieve staat van de categoriefilters bij.
@@ -556,13 +556,13 @@
                     button.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
 
                 });
- 
+
                 activeButton.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
 
                 activeButton.classList.add('bg-[#0F4C81]', 'text-white', 'shadow-sm');
 
             }
- 
+
             /**
 
              * Past de zoekterm en categoriefilter toe op alle materiaalkaarten.
@@ -578,13 +578,13 @@
                 const searchValue = searchInput ? searchInput.value : '';
 
                 let visibleCount = 0;
- 
+
                 materialItems.forEach(function (item) {
 
                     const matchesCategory = selectedCategory === 'all' || item.dataset.category === selectedCategory;
 
                     const matchesSearch = fuzzyMatches(searchValue, item.dataset.search);
- 
+
                     if (matchesCategory && matchesSearch) {
 
                         item.classList.remove('hidden');
@@ -598,7 +598,7 @@
                     }
 
                 });
- 
+
                 if (emptyState) {
 
                     if (visibleCount === 0 && materialItems.length > 0) {
@@ -614,7 +614,7 @@
                 }
 
             }
- 
+
             categoryButtons.forEach(function (button) {
 
                 button.addEventListener('click', function () {
@@ -628,7 +628,7 @@
                 });
 
             });
- 
+
             if (searchInput) {
 
                 searchInput.addEventListener('input', function () {
@@ -638,21 +638,21 @@
                 });
 
             }
- 
+
             document.querySelectorAll('.js-add-to-cart').forEach(function (form) {
 
                 form.addEventListener('submit', async function (event) {
 
                     event.preventDefault();
- 
+
                     const button = form.querySelector('button[type="submit"]');
 
                     const originalText = button.textContent.trim();
- 
+
                     button.disabled = true;
 
                     button.textContent = 'Toevoegen...';
- 
+
                     try {
 
                         const response = await fetch(form.action, {
@@ -670,23 +670,23 @@
                             },
 
                         });
- 
+
                         const data = await response.json();
- 
+
                         if (! response.ok || ! data.success) {
 
                             throw new Error(data.message || 'Er ging iets mis.');
 
                         }
- 
+
                         button.textContent = 'Toegevoegd ✓';
- 
+
                         const cartCountElement = document.getElementById('cart-count');
- 
+
                         if (cartCountElement && data.cart_count !== undefined) {
 
                             cartCountElement.textContent = data.cart_count;
- 
+
                             if (data.cart_count > 0) {
 
                                 cartCountElement.classList.remove('hidden');
@@ -694,7 +694,7 @@
                             }
 
                         }
- 
+
                         setTimeout(function () {
 
                             button.disabled = false;
@@ -716,11 +716,11 @@
                 });
 
             });
- 
+
             applyMaterialFilters();
 
         });
- 
+
         /**
 
          * Toont of verbergt de sectie met aanbevolen materialen.
@@ -738,13 +738,13 @@
             const container = document.getElementById('recommendationsContainer');
 
             const icon = document.getElementById('recommendationIcon');
- 
+
             if (! container || ! icon) {
 
                 return;
 
             }
- 
+
             if (container.classList.contains('hidden')) {
 
                 container.classList.remove('hidden');
@@ -762,4 +762,3 @@
         }
 </script>
 </x-app-layout>
- 
