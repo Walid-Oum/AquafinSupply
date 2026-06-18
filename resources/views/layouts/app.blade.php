@@ -24,10 +24,10 @@
 <div
     x-data="{ mobileSidebarOpen: false }"
     @keydown.escape.window="mobileSidebarOpen = false"
-    class="min-h-screen lg:flex"
+    class="flex min-h-screen min-w-0 bg-[#F5F8FC]"
 >
     {{-- Desktop sidebar --}}
-    <div class="hidden lg:block">
+    <div class="hidden lg:block lg:w-72 lg:shrink-0">
         @include('components.sidebar', ['mobile' => false])
     </div>
 
@@ -49,8 +49,8 @@
         @include('components.sidebar', ['mobile' => true])
     </div>
 
-    <div class="flex min-h-screen flex-1 flex-col">
-
+    {{-- Main content wrapper --}}
+    <div class="flex min-h-screen min-w-0 flex-1 flex-col bg-[#F5F8FC]">
         @include('components.navbar')
 
         @if(session('success'))
@@ -121,10 +121,9 @@
             </script>
         @endif
 
-        <main class="flex-1 p-4 sm:p-6 lg:p-8">
+        <main class="min-w-0 max-w-full flex-1 overflow-x-hidden p-4 sm:p-6 lg:p-8">
             {{ $slot }}
         </main>
-
     </div>
 </div>
 

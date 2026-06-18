@@ -1,151 +1,161 @@
 <x-app-layout>
-    <x-page-header title="Materialen overzicht" />
+    <div class="min-w-0 max-w-full space-y-6 overflow-x-hidden">
+        <div>
+            <x-page-header title="Materialen overzicht" />
 
-    @if($recommendedMaterials->count() > 0)
-        <section class="mb-6 rounded-2xl border border-green-200 bg-green-50 p-4 shadow-sm sm:p-5">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                    <h2 class="text-lg font-bold text-green-700 sm:text-xl">
-                        Aanbevolen materialen
-                    </h2>
+            <p class="mt-1 text-sm text-gray-600 sm:text-base">
+                Bekijk materialen, zoek op categorie en voeg materiaal toe aan je winkelmandje.
+            </p>
+        </div>
 
-                    <p class="mt-1 text-sm leading-relaxed text-green-700">
-                        {{ $recommendedMaterials->count() }} materialen aanbevolen op basis van het overstromingsrisico.
-                    </p>
+        @if($recommendedMaterials->count() > 0)
+            <section class="w-full max-w-full overflow-hidden rounded-2xl border border-green-200 bg-green-50 shadow-sm">
+                <div class="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
+                    <div class="min-w-0">
+                        <h2 class="text-lg font-bold text-green-700">
+                            Aanbevolen materialen
+                        </h2>
+
+                        <p class="mt-1 text-sm text-green-700">
+                            {{ $recommendedMaterials->count() }} materialen aanbevolen op basis van het overstromingsrisico.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        onclick="toggleRecommendations()"
+                        id="recommendationIcon"
+                        class="inline-flex w-fit shrink-0 items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-green-700 shadow-sm transition hover:bg-green-100"
+                    >
+                        ▲ Verberg
+                    </button>
                 </div>
 
-                <button
-                    type="button"
-                    onclick="toggleRecommendations()"
-                    id="recommendationIcon"
-                    class="inline-flex w-fit items-center rounded-full bg-white px-3 py-2 text-sm font-semibold text-green-700 shadow-sm ring-1 ring-green-200 transition hover:bg-green-100"
+                <div
+                    id="recommendationsContainer"
+                    class="w-full max-w-full overflow-hidden pb-4"
                 >
-                    ▲ Verberg
-                </button>
-            </div>
-
-            <div
-                id="recommendationsContainer"
-                class="-mx-4 mt-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0"
-            >
-                <div class="flex w-max snap-x snap-mandatory gap-4">
-                    @foreach($recommendedMaterials as $material)
-                        <div class="w-[220px] flex-none snap-start sm:w-56">
-                            <x-material-card
-                                :material="$material"
-                                :compact="true"
-                            />
+                    <div class="w-full max-w-full overflow-x-auto overscroll-x-contain px-4 pb-3 sm:px-5">
+                        <div class="flex w-max gap-4">
+                            @foreach($recommendedMaterials as $material)
+                                <div class="w-56 shrink-0">
+                                    <x-material-card
+                                        :material="$material"
+                                        :compact="true"
+                                    />
+                                </div>
+                            @endforeach
                         </div>
-                    @endforeach
+                    </div>
+                </div>
+            </section>
+        @endif
+
+        <section class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
+            <div class="grid grid-cols-1 gap-3 lg:grid-cols-4 lg:items-center">
+                <form
+                    method="GET"
+                    action="{{ route('technician.materials.index') }}"
+                    class="js-preserve-scroll min-w-0 lg:col-span-1"
+                >
+                    <select
+                        name="sort"
+                        onchange="this.form.submit()"
+                        class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
+                    >
+                        <option value="">
+                            Sorteer op naam
+                        </option>
+
+                        <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>
+                            A-Z
+                        </option>
+
+                        <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>
+                            Z-A
+                        </option>
+                    </select>
+                </form>
+
+                <div class="min-w-0 lg:col-span-3">
+                    <x-search-bar
+                        id="global-material-search"
+                        placeholder="Zoeken op naam, categorie of voorraadstatus..."
+                        value="{{ request('search') }}"
+                        endpoint="{{ route('api.materials.search') }}"
+                    />
                 </div>
             </div>
         </section>
-    @endif
 
-    <section class="mb-5 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm sm:p-4">
-        <div class="grid grid-cols-1 gap-3 md:grid-cols-3 md:items-center">
-            <form
-                method="GET"
-                action="{{ route('technician.materials.index') }}"
-                class="js-preserve-scroll md:col-span-1"
-            >
-                <select
-                    name="sort"
-                    onchange="this.form.submit()"
-                    class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-[#0F4C81] focus:outline-none focus:ring-2 focus:ring-[#0F4C81]/20"
-                >
-                    <option value="">
-                        Sorteer op naam
-                    </option>
-
-                    <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>
-                        A-Z
-                    </option>
-
-                    <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>
-                        Z-A
-                    </option>
-                </select>
-            </form>
-
-            <div class="md:col-span-2">
-                <x-search-bar
-                    id="global-material-search"
-                    placeholder="Zoeken op naam, categorie of voorraadstatus..."
-                    value="{{ request('search') }}"
-                    endpoint="{{ route('api.materials.search') }}"
-                />
-            </div>
-        </div>
-    </section>
-
-    <div class="-mx-4 mb-6 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
-        <div class="flex min-w-max gap-2 sm:min-w-0 sm:flex-wrap sm:gap-3">
-            <button
-                type="button"
-                data-category-filter="all"
-                class="js-category-filter whitespace-nowrap rounded-full border border-[#0F4C81] bg-[#0F4C81] px-4 py-2 text-sm font-semibold text-white shadow-sm transition"
-            >
-                Alles
-            </button>
-
-            @foreach($categories as $category)
+        <div class="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+            <div class="flex min-w-max gap-3 sm:min-w-0 sm:flex-wrap">
                 <button
                     type="button"
-                    data-category-filter="{{ $category }}"
-                    class="js-category-filter whitespace-nowrap rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                    data-category-filter="all"
+                    class="js-category-filter whitespace-nowrap rounded-full bg-[#0F4C81] px-5 py-2 text-xs font-medium text-white shadow-sm transition"
                 >
-                    {{ $category }}
+                    Alles
                 </button>
-            @endforeach
+
+                @foreach($categories as $category)
+                    <button
+                        type="button"
+                        data-category-filter="{{ $category }}"
+                        class="js-category-filter whitespace-nowrap rounded-full bg-gray-100 px-5 py-2 text-xs font-medium text-gray-600 transition hover:bg-gray-200"
+                    >
+                        {{ $category }}
+                    </button>
+                @endforeach
+            </div>
         </div>
-    </div>
 
-    <div
-        id="materials"
-        class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
-    >
-        @forelse($materials as $material)
-            @php
-                $localStock = $material->stocks->first();
-                $stock = $localStock?->stock ?? 0;
-                $minimumStock = $localStock?->minimum_stock ?? 0;
+        <div
+            id="materials"
+            class="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        >
+            @forelse($materials as $material)
+                @php
+                    $localStock = $material->stocks->first();
+                    $stock = $localStock?->stock ?? 0;
+                    $minimumStock = $localStock?->minimum_stock ?? 0;
 
-                if ($stock <= 0) {
-                    $stockStatus = 'geen voorraad';
-                } elseif ($stock <= $minimumStock) {
-                    $stockStatus = 'lage voorraad';
-                } else {
-                    $stockStatus = 'beschikbaar';
-                }
+                    if ($stock <= 0) {
+                        $stockStatus = 'geen voorraad';
+                    } elseif ($stock <= $minimumStock) {
+                        $stockStatus = 'lage voorraad';
+                    } else {
+                        $stockStatus = 'beschikbaar';
+                    }
 
-                $searchText = collect([
-                    $material->name,
-                    $material->category,
-                    $stock,
-                    $stockStatus,
-                ])->filter()->implode(' ');
-            @endphp
+                    $searchText = collect([
+                        $material->name,
+                        $material->category,
+                        $stock,
+                        $stockStatus,
+                    ])->filter()->implode(' ');
+                @endphp
 
-            <div
-                class="js-material-item"
-                data-category="{{ $material->category }}"
-                data-search="{{ $searchText }}"
-            >
-                <x-material-card :material="$material" />
-            </div>
-        @empty
-            <div class="col-span-full rounded-2xl border border-gray-100 bg-white py-10 text-center text-gray-500 shadow-sm">
-                Geen materialen gevonden.
-            </div>
-        @endforelse
-    </div>
+                <div
+                    class="js-material-item min-w-0"
+                    data-category="{{ $material->category }}"
+                    data-search="{{ $searchText }}"
+                >
+                    <x-material-card :material="$material" />
+                </div>
+            @empty
+                <div class="col-span-full rounded-xl border bg-white py-8 text-center text-gray-500 shadow-sm">
+                    Geen materialen gevonden.
+                </div>
+            @endforelse
+        </div>
 
-    <div
-        id="materials-empty-state"
-        class="mt-4 hidden rounded-2xl border border-gray-100 bg-white py-10 text-center text-gray-500 shadow-sm"
-    >
-        Geen materialen gevonden voor deze zoekterm of categorie.
+        <div
+            id="materials-empty-state"
+            class="mt-4 hidden rounded-xl border bg-white py-8 text-center text-gray-500 shadow-sm"
+        >
+            Geen materialen gevonden voor deze zoekterm of categorie.
+        </div>
     </div>
 
     <script>
@@ -287,12 +297,12 @@
 
             function updateCategoryButtons(activeButton) {
                 categoryButtons.forEach(function (button) {
-                    button.classList.remove('border-[#0F4C81]', 'bg-[#0F4C81]', 'text-white', 'shadow-sm');
-                    button.classList.add('border-gray-200', 'bg-white', 'text-gray-700', 'hover:bg-gray-50');
+                    button.classList.remove('bg-[#0F4C81]', 'text-white', 'shadow-sm');
+                    button.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
                 });
 
-                activeButton.classList.remove('border-gray-200', 'bg-white', 'text-gray-700', 'hover:bg-gray-50');
-                activeButton.classList.add('border-[#0F4C81]', 'bg-[#0F4C81]', 'text-white', 'shadow-sm');
+                activeButton.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+                activeButton.classList.add('bg-[#0F4C81]', 'text-white', 'shadow-sm');
             }
 
             function applyMaterialFilters() {
@@ -366,7 +376,10 @@
 
                         if (cartCountElement && data.cart_count !== undefined) {
                             cartCountElement.textContent = data.cart_count;
-                            cartCountElement.classList.remove('hidden');
+
+                            if (data.cart_count > 0) {
+                                cartCountElement.classList.remove('hidden');
+                            }
                         }
 
                         setTimeout(function () {
@@ -388,6 +401,10 @@
         {
             const container = document.getElementById('recommendationsContainer');
             const icon = document.getElementById('recommendationIcon');
+
+            if (! container || ! icon) {
+                return;
+            }
 
             if (container.classList.contains('hidden')) {
                 container.classList.remove('hidden');
