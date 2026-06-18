@@ -1,13 +1,18 @@
 {{--
-|--------------------------------------------------------------------------
-| MAGAZIJN - BESTELLING WIJZIGEN
-|--------------------------------------------------------------------------
-| Deze view toont een formulier waarmee magazijnmedewerkers de status
-| en inhoud van een bestelling kunnen aanpassen.
-| Magazijnmedewerkers kunnen de status wijzigen (Nieuw, In voorbereiding,
-| Klaar om af te halen, Afgehaald) en de hoeveelheden van materialen
-| aanpassen of materialen uit de bestelling verwijderen.
-|--------------------------------------------------------------------------
+    MAGAZIJN - BESTELLING WIJZIGEN
+
+    @author      Chayma (Team Aquafin)
+    @version     1.0
+    @since       2026-06-18
+
+    Deze view toont een formulier waarmee magazijnmedewerkers de status
+    en inhoud van een bestelling kunnen aanpassen.
+    Magazijnmedewerkers kunnen de status wijzigen (Nieuw, In voorbereiding,
+    Klaar om af te halen, Afgehaald) en de hoeveelheden van materialen
+    aanpassen of materialen uit de bestelling verwijderen.
+
+    @see App\Http\Controllers\Userzone\OrderController::warehouseEdit()
+    @see App\Http\Controllers\Userzone\OrderController::warehouseUpdate()
 --}}
 
 @php
