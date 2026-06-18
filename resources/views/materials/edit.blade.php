@@ -2,6 +2,7 @@
 
     <x-page-header title="Materiaal bewerken" />
 
+    <div class="max-w-4xl">
     <x-card>
 
         <form
@@ -229,7 +230,7 @@
 
             </div>
 
-            <div class="flex gap-3">
+            <div class="flex flex-col sm:flex-row gap-3">
 
                 <a
                     href="{{ route('materials.index') }}"
@@ -345,6 +346,7 @@
         </div>
 
     </div>
-
+    </x-card>
+</div>
 </x-app-layout>
 
