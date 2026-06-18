@@ -1,10 +1,17 @@
 {{--
     MAGAZIJN - BESTELLING DETAILS
+
+    @author      
+    @version     1.0
+    @since       2026-06-18
+
     Deze view toont alle details van een specifieke bestelling voor
     magazijnmedewerkers. Hier worden bestelgegevens getoond zoals:
     bestellingnummer, technieker, leverdatum, depot, stad en opmerking.
     Ook worden alle materialen in de bestelling weergegeven met afbeelding,
     categorie en hoeveelheid. De view bevat een mobiele en desktop layout.
+
+    @see App\Http\Controllers\Userzone\OrderController::warehouseShow()
 --}}
 
 @php
