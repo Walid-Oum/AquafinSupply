@@ -1,4 +1,50 @@
 <x-app-layout>
+    <x-page-header title="Materialen overzicht" />
+
+    @if($recommendedMaterials->count() > 0)
+        <div class="mb-4">
+
+    <span class="font-semibold">
+        Huidig overstromingsrisico:
+    </span>
+
+            <span
+                class="
+        inline-block px-3 py-1 rounded-full text-xs font-semibold
+
+        @if($riskLevel === 'Hoog')
+            bg-red-100 text-red-700
+        @elseif($riskLevel === 'Gemiddeld')
+            bg-yellow-100 text-yellow-700
+        @else
+            bg-green-100 text-green-700
+        @endif
+        "
+            >
+        {{ $riskLevel }}
+    </span>
+        </div>
+        <p class="mb-2 text-sm font-semibold text-[#0F4C81]">
+            {{ $recommendedMaterials->count() }} aanbevolen materialen gevonden
+        </p>
+        <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-lg font-bold text-green-700">
+                    Aanbevolen materialen (op basis van overstromingsrisico)
+                </h2>
+
+                <button
+                    type="button"
+                    onclick="toggleRecommendations()"
+                    id="recommendationIcon"
+                    class="text-sm font-medium text-green-700 hover:text-green-900 hover:underline"
+                >
+                    ▲ Verberg
+                </button>
+            </div>
+
+            <div id="recommendationsContainer">
+                <div class="relative">
     //hoofdcontainer 
     <div class="min-w-0 max-w-full space-y-6 overflow-x-hidden">
         <div>
