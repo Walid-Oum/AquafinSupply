@@ -1,3 +1,18 @@
+{{--
+
+Pagina: Overstromingsrisico
+
+Beschrijving:
+Toont een indicatief overzicht van het overstromingsrisico voor het gekoppelde depot van de gebruiker op basis van weersvoorspellingen.
+
+Functionaliteiten:
+- Weergeven van depotinformatie
+- Tonen van risico- en prioriteitsniveaus
+- Genereren van rolgebonden advies voor medewerkers
+- Overzicht van verwachte neerslag voor de komende week
+- Visualisatie van neerslaggegevens via een grafiek
+
+--}}
 <x-app-layout>
     <div class="space-y-6">
         <div>
