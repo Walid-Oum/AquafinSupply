@@ -8,15 +8,44 @@ use App\Models\MaterialStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * CartController
+ *
+ * Beheert het winkelmandje van techniekers.
+ *
+ * Functionaliteiten:
+ * - Materiaal toevoegen aan winkelmandje
+ * - Aantal aanpassen
+ * - Materiaal verwijderen
+ * - Winkelmandje leegmaken
+ * - Voorraadcontrole per depot
+ *
+ * Het winkelmandje wordt opgeslagen in de sessie
+ * van de ingelogde gebruiker.
+ */
 class CartController extends Controller
 {
+    /**
+     * Toon het winkelmandje van de gebruiker.
+     *
+     * Controleert eerst of de voorraadgegevens
+     * nog actueel zijn.
+     */
     public function index()
     {
         $this->refreshCartStock();
 
         return view('userzone.orders.cart');
     }
-
+    /**
+     * Voeg een materiaal toe aan het winkelmandje.
+     *
+     * Controleert:
+     * - gekoppeld depot
+     * - beschikbaarheid materiaal
+     * - voorraad in depot
+     * - maximale hoeveelheid
+     */
     public function add($id)
     {
         $user = Auth::user();
@@ -61,7 +90,12 @@ class CartController extends Controller
             'quantity' => $newQuantity,
         ]);
     }
-
+    /**
+     * Werk de hoeveelheid van een materiaal
+     * in het winkelmandje bij.
+     *
+     * Valideert de voorraad van het gekozen depot.
+     */
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -114,7 +148,9 @@ class CartController extends Controller
             'quantity' => (int) $request->quantity,
         ]);
     }
-
+    /**
+     * Verwijder een materiaal uit het winkelmandje.
+     */
     public function remove($id)
     {
         $cart = session()->get('cart', []);
@@ -128,14 +164,21 @@ class CartController extends Controller
             'item_id' => $id,
         ]);
     }
-
+    /**
+     * Maak het volledige winkelmandje leeg.
+     */
     public function clear()
     {
         session()->forget('cart');
 
         return $this->cartSuccess('Winkelmandje leeggemaakt.');
     }
-
+    /**
+     * Genereer een succesvolle response
+     * voor winkelmand-acties.
+     *
+     * Ondersteunt zowel JSON als redirects.
+     */
     private function cartSuccess(string $message, array $extraData = [])
     {
         $cart = session()->get('cart', []);
@@ -155,7 +198,12 @@ class CartController extends Controller
             ->back()
             ->with('success', $message);
     }
-
+    /**
+     * Genereer een foutmelding
+     * voor winkelmand-acties.
+     *
+     * Ondersteunt zowel JSON als redirects.
+     */
     private function cartError(string $message)
     {
         if (request()->expectsJson()) {
@@ -170,19 +218,31 @@ class CartController extends Controller
             ->back()
             ->with('error', $message);
     }
-
+    /**
+     * Geef het aantal unieke materialen
+     * in het winkelmandje terug.
+     */
     private function getCartCount(): int
     {
         return count(session('cart', []));
     }
-
+    /**
+     * Haal de voorraad van een materiaal op
+     * voor een specifiek depot.
+     */
     private function getDepotStock(int $materialId, int $locationId): ?MaterialStock
     {
         return MaterialStock::where('material_id', $materialId)
             ->where('location_id', $locationId)
             ->first();
     }
-
+    /**
+     * Synchroniseer het winkelmandje
+     * met de actuele voorraad.
+     *
+     * Niet-beschikbare materialen worden verwijderd
+     * en hoeveelheden worden aangepast indien nodig.
+     */
     private function refreshCartStock(): void
     {
         $user = Auth::user();
