@@ -7,29 +7,41 @@ use App\Models\Material;
 use App\Support\FuzzySearch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+
 /**
- * Controller voor technici om materialen te bekijken.
+ * Controller voor techniekers om materialen te bekijken.
+ *
+ * Deze controller beheert de materiaalflow van de technieker.
+ * Techniekers kunnen actieve materialen bekijken, zoeken, filteren,
+ * sorteren en detailinformatie raadplegen.
+ *
+ * Daarnaast worden aanbevolen materialen getoond op basis van het
+ * berekende overstromingsrisico voor de locatie van de technieker.
  *
  * Functionaliteiten:
- * - Materialen overzicht tonen
+ * - Materialenoverzicht tonen
  * - Materialen zoeken via fuzzy search
  * - Materialen filteren op categorie
  * - Materiaaldetails bekijken
  * - Aanbevolen materialen tonen op basis van overstromingsrisico
  */
-
-
 class MaterialController extends Controller
 {
-    // Toon lijst van materialen met zoek- en filtermogelijkheden
     /**
      * Toon een overzicht van alle actieve materialen.
+     *
+     * Deze methode haalt alle actieve materialen op voor de ingelogde
+     * technieker en toont daarbij enkel de voorraad van het depot
+     * waaraan de technieker gekoppeld is.
      *
      * Ondersteunt:
      * - Sorteren op naam
      * - Zoeken via fuzzy search
      * - Filteren op categorie
      * - Aanbevolen materialen op basis van overstromingsrisico
+     *
+     * @param Request $request De HTTP-request met optionele zoek- en sorteerparameters.
+     * @return \Illuminate\View\View De view met materialen, categorieën en aanbevelingen.
      */
     public function index(Request $request)
     {
@@ -39,14 +51,16 @@ class MaterialController extends Controller
         $locationId = $user->location_id;
 
         $sortDirection = $request->sort === 'desc' ? 'desc' : 'asc';
-// Haal actieve materialen op met voorraad voor huidige locatie
+
+        // Haal actieve materialen op met voorraad voor huidige locatie
         $materials = Material::where('is_active', true)
             ->with(['stocks' => function ($query) use ($locationId) {
                 $query->where('location_id', $locationId);
             }])
             ->orderBy('name', $sortDirection)
             ->get();
-// Pas fuzzy zoekfilter toe als er een zoekterm is
+
+        // Pas fuzzy zoekfilter toe als er een zoekterm is
         if ($request->filled('search')) {
             $search = $request->search;
 
@@ -56,7 +70,8 @@ class MaterialController extends Controller
                     $localStock = $material->stocks->first();
                     $stock = $localStock?->stock ?? 0;
                     $minimumStock = $localStock?->minimum_stock ?? 0;
-// Bepaal voorraadstatus op basis van stock en minimum_stock
+
+                    // Bepaal voorraadstatus op basis van stock en minimum_stock
                     if ($stock <= 0) {
                         $stockStatus = 'geen voorraad';
                     } elseif ($stock <= $minimumStock) {
@@ -64,29 +79,32 @@ class MaterialController extends Controller
                     } else {
                         $stockStatus = 'beschikbaar';
                     }
-// Combineer relevante tekstvelden tot één string voor fuzzy matching
+
+                    // Combineer relevante tekstvelden tot één string voor fuzzy matching
                     $searchableText = collect([
                         $material->name,
                         $material->category,
                         $stock,
                         $stockStatus,
                     ])->filter()->implode(' ');
-// Gebruik FuzzySearch om te bepalen of de zoekterm overeenkomt met de samengestelde tekst
+
+                    // Gebruik FuzzySearch om te bepalen of de zoekterm overeenkomt met de samengestelde tekst
                     return FuzzySearch::matches($search, $searchableText);
                 })
                 ->values();
         }
-// Haal unieke categorieën op voor filter dropdown
+
+        // Haal unieke categorieën op voor filter dropdown
         $categories = Material::where('is_active', true)
             ->select('category')
             ->distinct()
             ->orderBy('category')
             ->pluck('category');
-// Bepaal het overstromingsrisiconiveau op basis van de locatie van de gebruiker
+
+        // Bepaal het overstromingsrisiconiveau op basis van de locatie van de gebruiker
         $riskLevel = $this->calculateFloodRiskLevel($location);
-// Haal aanbevolen materialen op die overeenkomen met het risiconiveau en beschikbaar zijn in de huidige locatie
-        // Selecteer materialen die relevant zijn
-// voor het berekende overstromingsrisico.
+
+        // Haal aanbevolen materialen op die overeenkomen met het risiconiveau en beschikbaar zijn in de huidige locatie
         $recommendedMaterials = Material::where('is_active', true)
             ->whereHas('riskLevels', function ($query) use ($riskLevel) {
                 $query->where('name', $riskLevel);
@@ -97,7 +115,8 @@ class MaterialController extends Controller
             ->inRandomOrder()
             ->take(8)
             ->get();
-// geef de data door aan de blade view voor weergave
+
+        // Geef de data door aan de Blade-view voor weergave
         return view('technician.materials.index', [
             'materials' => $materials,
             'categories' => $categories,
@@ -105,16 +124,21 @@ class MaterialController extends Controller
             'riskLevel' => $riskLevel,
         ]);
     }
+
     /**
      * Toon de detailpagina van een specifiek materiaal.
      *
-     * Enkel de voorraad van het depot van de
-     * ingelogde technieker wordt weergegeven.
+     * Enkel de voorraad van het depot van de ingelogde technieker
+     * wordt weergegeven.
+     *
+     * @param int|string $id Het ID van het materiaal.
+     * @return \Illuminate\View\View De detailpagina van het materiaal.
      */
     public function show($id)
     {
         $locationId = auth()->user()->location_id;
-// Haal het materiaal op met voorraad voor de huidige locatie
+
+        // Haal het materiaal op met voorraad voor de huidige locatie
         $material = Material::with(['stocks' => function ($query) use ($locationId) {
             $query->where('location_id', $locationId);
         }])->findOrFail($id);
@@ -122,16 +146,24 @@ class MaterialController extends Controller
         return view('technician.materials.show', [
             'material' => $material,
         ]);
-}
+    }
+
     /**
      * Bepaal het overstromingsrisico voor de locatie
      * van de technieker op basis van weersgegevens
      * afkomstig van de Open-Meteo API.
      *
+     * De methode haalt de verwachte neerslag voor de komende
+     * 7 dagen op en telt deze waarden op. Op basis van de totale
+     * verwachte neerslag wordt een risiconiveau teruggegeven.
+     *
      * Mogelijke waarden:
      * - Laag
      * - Gemiddeld
      * - Hoog
+     *
+     * @param mixed $location De locatie van de ingelogde technieker.
+     * @return string Het berekende risiconiveau.
      */
     private function calculateFloodRiskLevel($location): string
     {
@@ -141,7 +173,7 @@ class MaterialController extends Controller
         }
 
         try {
-            // Maak een API-aanroep naar Open-Meteo om de neerslaggegevens van de afgelopen week op te halen voor de locatie van de gebruiker
+            // Maak een API-aanroep naar Open-Meteo om de verwachte neerslag voor de komende 7 dagen op te halen
             $response = Http::timeout(5)->get(
                 'https://api.open-meteo.com/v1/forecast',
                 [
@@ -158,8 +190,8 @@ class MaterialController extends Controller
             }
 
             $data = $response->json();
-            // Bereken de totale neerslag van de afgelopen week door de dagelijkse neerslagwaarden op te tellen
 
+            // Bereken de totale verwachte neerslag voor de komende 7 dagen
             $weekRain = array_sum($data['daily']['precipitation_sum'] ?? []);
 
             if ($weekRain < 20) {

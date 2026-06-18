@@ -13,21 +13,31 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use App\Models\UserNotification;
 use App\Models\User;
+
 /**
  * Controller voor het beheren van bestellingen.
  *
- * Functionaliteiten:
- * - Bestellingen bekijken
- * - Bestellingen plaatsen
- * - Bestellingen raadplegen
- * - Magazijnbestellingen beheren
- * - Voorraad automatisch aanpassen
- * - Notificaties versturen bij wijzigingen
+ * Deze controller bevat zowel de flow voor techniekers als de flow
+ * voor magazijnmedewerkers.
+ *
+ * Techniekers kunnen:
+ * - Eigen bestellingen bekijken
+ * - Bestellingen plaatsen op basis van hun winkelmandje
+ * - Details van hun eigen bestellingen bekijken
+ *
+ * Magazijnmedewerkers kunnen:
+ * - Bestellingen van hun depot bekijken
+ * - Bestellingen in detail openen
+ * - Bestelstatussen aanpassen
+ * - Hoeveelheden aanpassen
+ * - Voorraad automatisch laten herberekenen
+ * - Notificaties naar techniekers sturen bij statuswijzigingen
  */
-
 class OrderController extends Controller
 {
-
+    /**
+     * Toegestane statussen voor bestellingen in het magazijn.
+     */
     private const WAREHOUSE_ORDER_STATUSES = [
         'Nieuw',
         'In voorbereiding',
@@ -35,11 +45,14 @@ class OrderController extends Controller
         'Afgehaald',
         'Geannuleerd',
     ];
-    /**
-     * Toon een overzicht van alle bestellingen
-     * van de ingelogde gebruiker.
-     */
 
+    /**
+     * Toon een overzicht van alle bestellingen van de ingelogde gebruiker.
+     *
+     * Enkel de bestellingen van de huidige technieker worden opgehaald.
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
         $orders = Order::where('user_id', Auth::id())
@@ -52,19 +65,25 @@ class OrderController extends Controller
             compact('orders')
         );
     }
+
     /**
-     * Maak een nieuwe bestelling aan op basis
-     * van de inhoud van het winkelmandje.
+     * Maak een nieuwe bestelling aan op basis van de inhoud van het winkelmandje.
      *
      * Controleert:
-     * - Leverdatum
-     * - Beschikbaarheid van materialen
-     * - Voorraad van het gekoppelde depot
+     * - Of een leverdatum aanwezig is
+     * - Of de leverdatum niet in het verleden ligt
+     * - Of de gebruiker gekoppeld is aan een depot
+     * - Of het winkelmandje niet leeg is
+     * - Of alle materialen nog actief zijn
+     * - Of er voldoende voorraad is in het gekoppelde depot
      *
-     * Verlaagt de voorraad automatisch en
-     * verstuurt een melding naar het magazijn.
+     * De bestelling wordt aangemaakt binnen een database-transactie.
+     * Hierdoor blijven bestelling, order items en voorraad consistent
+     * als er tijdens het proces een fout optreedt.
+     *
+     * @param Request $request De request met leverdatum en optionele opmerking.
+     * @return \Illuminate\Http\RedirectResponse
      */
-
     public function store(Request $request)
     {
         $request->validate([
@@ -91,8 +110,8 @@ class OrderController extends Controller
                 ->withInput()
                 ->with('error', 'Winkelmandje is leeg.');
         }
-// Controleer of alle materialen nog bestaan
-// en voldoende voorraad hebben.
+
+        // Controleer of alle materialen nog bestaan en voldoende voorraad hebben.
         foreach ($cart as $item) {
             $material = Material::find($item['id']);
 
@@ -128,8 +147,9 @@ class OrderController extends Controller
                     ->with('error', 'Onvoldoende voorraad in jouw depot voor ' . $material->name . '.');
             }
         }
-// Maak bestelling aan binnen een database-transactie.
-// Hierdoor blijft de voorraad consistent bij fouten.
+
+        // Maak bestelling aan binnen een database-transactie.
+        // Hierdoor blijft de voorraad consistent bij fouten.
         try {
             $order = DB::transaction(function () use ($cart, $user, $request) {
                 $order = Order::create([
@@ -172,12 +192,11 @@ class OrderController extends Controller
 
         session()->forget('cart');
 
-
         $warehouseUsers = User::where('role', 'magazijn')
             ->where('location_id', $order->location_id)
             ->get();
-// Verstuur een notificatie naar alle
-// magazijnmedewerkers van hetzelfde depot.
+
+        // Verstuur een notificatie naar alle magazijnmedewerkers van hetzelfde depot.
         foreach ($warehouseUsers as $warehouseUser) {
             UserNotification::create([
                 'user_id' => $warehouseUser->id,
@@ -191,11 +210,16 @@ class OrderController extends Controller
             ->route('orders.index')
             ->with('success', 'Bestelling succesvol geplaatst.');
     }
-    /**
-     * Toon de details van één bestelling
-     * van de ingelogde gebruiker.
-     */
 
+    /**
+     * Toon de details van één bestelling van de ingelogde gebruiker.
+     *
+     * Er wordt gecontroleerd dat de bestelling effectief behoort tot
+     * de ingelogde technieker.
+     *
+     * @param int|string $id Het ID van de bestelling.
+     * @return \Illuminate\View\View
+     */
     public function show($id)
     {
         $order = Order::with('items.material', 'location')
@@ -207,13 +231,19 @@ class OrderController extends Controller
             compact('order')
         );
     }
+
     /**
-     * Toon alle bestellingen van het depot
-     * van de magazijnmedewerker.
+     * Toon alle bestellingen van het depot van de magazijnmedewerker.
+     *
+     * Alleen bestellingen van hetzelfde depot als de magazijnmedewerker
+     * worden opgehaald.
      *
      * Ondersteunt zoeken op:
      * - Bestelnummer
      * - Naam van gebruiker
+     *
+     * @param Request $request De request met optionele zoekterm.
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function warehouseIndex(Request $request)
     {
@@ -257,15 +287,21 @@ class OrderController extends Controller
             compact('orders')
         );
     }
+
     /**
      * Werk een bestelling bij vanuit het magazijn.
      *
      * Mogelijkheden:
      * - Status wijzigen
      * - Hoeveelheden aanpassen
-     * - Materialen verwijderen
+     * - Materialen verwijderen door hoeveelheid op 0 te zetten
      *
-     * De voorraad wordt automatisch herberekend.
+     * De voorraad wordt automatisch herberekend op basis van het verschil
+     * tussen de oude en nieuwe hoeveelheden.
+     *
+     * @param Request $request De request met status en optionele hoeveelheden.
+     * @param Order $order De bestelling die aangepast wordt.
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function warehouseUpdate(Request $request, Order $order)
     {
@@ -286,8 +322,8 @@ class OrderController extends Controller
         $newStatus = $validated['status'];
         $statusChanged = false;
 
-        try {// Voer alle voorraad- en orderwijzigingen
-// atomair uit binnen één transactie.
+        try {
+            // Voer alle voorraad- en orderwijzigingen atomair uit binnen één transactie.
             DB::transaction(function () use ($validated, $order, $oldStatus, $newStatus, &$statusChanged) {
                 $order->status = $newStatus;
                 $order->save();
@@ -348,8 +384,8 @@ class OrderController extends Controller
                 ->back()
                 ->with('error', $exception->getMessage());
         }
-// Informeer de gebruiker wanneer
-// de status van de bestelling gewijzigd is.
+
+        // Informeer de gebruiker wanneer de status van de bestelling gewijzigd is.
         if ($statusChanged) {
             UserNotification::create([
                 'user_id' => $order->user_id,
@@ -363,9 +399,15 @@ class OrderController extends Controller
             ->back()
             ->with('success', 'Bestelling succesvol gewijzigd.');
     }
+
     /**
-     * Toon de details van een bestelling
-     * voor een magazijnmedewerker.
+     * Toon de details van een bestelling voor een magazijnmedewerker.
+     *
+     * Enkel bestellingen van hetzelfde depot als de magazijnmedewerker
+     * kunnen worden geopend.
+     *
+     * @param int|string $id Het ID van de bestelling.
+     * @return \Illuminate\View\View
      */
     public function warehouseShow($id)
     {
@@ -378,9 +420,15 @@ class OrderController extends Controller
             compact('order')
         );
     }
+
     /**
-     * Toon het bewerkingsscherm voor een
-     * bestelling van het magazijn.
+     * Toon het bewerkingsscherm voor een bestelling van het magazijn.
+     *
+     * Enkel bestellingen van hetzelfde depot als de magazijnmedewerker
+     * kunnen worden bewerkt.
+     *
+     * @param int|string $id Het ID van de bestelling.
+     * @return \Illuminate\View\View
      */
     public function warehouseEdit($id)
     {

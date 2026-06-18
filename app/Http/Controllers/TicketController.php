@@ -10,16 +10,43 @@ use App\Support\FuzzySearch;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
+/**
+ * Controller voor supportaanvragen.
+ *
+ * Deze controller beheert de ticketflow tussen techniekers en
+ * magazijnmedewerkers.
+ *
+ * Techniekers kunnen:
+ * - Eigen tickets bekijken
+ * - Tickets zoeken via fuzzy search
+ * - Nieuwe tickets aanmaken voor eigen bestellingen
+ *
+ * Magazijnmedewerkers kunnen:
+ * - Tickets van hun eigen depot bekijken
+ * - Tickets zoeken en filteren
+ * - Ticketstatussen aanpassen
+ * - Een magazijnnotitie toevoegen
+ * - Notificaties versturen naar techniekers
+ */
 class TicketController extends Controller
 {
-    /** de hardcoded statussen voor tickets */
+    /**
+     * Toegestane statussen voor tickets.
+     */
     private const TICKET_STATUSES = [
         'Open',
         'In behandeling',
         'Opgelost',
     ];
-/**
-     * Toon een overzicht van de tickets van de ingelogde klant.
+
+    /**
+     * Toon een overzicht van de tickets van de ingelogde technieker.
+     *
+     * Enkel tickets van de huidige gebruiker worden opgehaald.
+     * Indien een zoekterm aanwezig is, wordt fuzzy search toegepast.
+     *
+     * @param Request $request De request met optionele zoekterm.
+     * @return \Illuminate\View\View
      */
     public function index(Request $request)
     {
@@ -43,6 +70,14 @@ class TicketController extends Controller
         ]);
     }
 
+    /**
+     * Toon het formulier om een nieuw ticket aan te maken.
+     *
+     * Enkel de eigen bestellingen van de ingelogde technieker
+     * worden als mogelijke gekoppelde bestelling getoond.
+     *
+     * @return \Illuminate\View\View
+     */
     public function create()
     {
         $orders = Order::with('location')
@@ -55,6 +90,17 @@ class TicketController extends Controller
         ]);
     }
 
+    /**
+     * Sla een nieuw ticket op.
+     *
+     * Het ticket wordt gekoppeld aan de ingelogde technieker,
+     * aan een eigen bestelling en aan het depot van die bestelling.
+     * Na het aanmaken worden magazijnmedewerkers van hetzelfde depot
+     * verwittigd via een notificatie.
+     *
+     * @param Request $request De request met bestelling, onderwerp en beschrijving.
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -94,6 +140,15 @@ class TicketController extends Controller
             ->with('success', 'Ticket succesvol aangemaakt.');
     }
 
+    /**
+     * Toon alle tickets voor het depot van de magazijnmedewerker.
+     *
+     * De methode ondersteunt filteren op status en zoeken via fuzzy search.
+     * Enkel tickets van hetzelfde depot als de magazijnmedewerker worden getoond.
+     *
+     * @param Request $request De request met optionele zoekterm en statusfilter.
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
     public function all(Request $request)
     {
         $user = auth()->user();
@@ -147,6 +202,17 @@ class TicketController extends Controller
         ]);
     }
 
+    /**
+     * Geef zoeksuggesties terug voor tickets.
+     *
+     * Deze methode wordt gebruikt voor dynamische zoeksuggesties.
+     * De resultaten houden rekening met de rol van de gebruiker:
+     * magazijnmedewerkers zien tickets van hun depot, techniekers
+     * zien enkel hun eigen tickets.
+     *
+     * @param Request $request De request met zoekterm.
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function searchSuggestions(Request $request)
     {
         $search = trim((string) $request->get('q', ''));
@@ -200,6 +266,15 @@ class TicketController extends Controller
         return response()->json($tickets);
     }
 
+    /**
+     * Toon de detailpagina van een ticket voor het magazijn.
+     *
+     * De methode controleert of het ticket bij hetzelfde depot hoort
+     * als de ingelogde magazijnmedewerker.
+     *
+     * @param Ticket $ticket Het ticket dat geopend wordt.
+     * @return \Illuminate\View\View
+     */
     public function showWarehouse(Ticket $ticket)
     {
         if ($ticket->location_id !== auth()->user()->location_id) {
@@ -212,16 +287,25 @@ class TicketController extends Controller
             'ticket' => $ticket,
         ]);
     }
-/**
-     * Update de status en/of de magazijnnotitie van een ticket, en stel de klant op de hoogte.
+
+    /**
+     * Update de status en/of de magazijnnotitie van een ticket.
+     *
+     * Wanneer de status of magazijnnotitie wijzigt, wordt de technieker
+     * automatisch op de hoogte gebracht via een notificatie.
+     *
+     * @param Ticket $ticket Het ticket dat aangepast wordt.
+     * @param Request $request De request met nieuwe status en optionele magazijnnotitie.
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function updateStatus(Ticket $ticket, Request $request)
     {
-        // Beveiliging: Controleer locatie-overeenkomst
+        // Beveiliging: controleer locatie-overeenkomst
         if ($ticket->location_id !== auth()->user()->location_id) {
             abort(403);
         }
-// valideer wijziging
+
+        // Valideer wijziging
         $validated = $request->validate([
             'status' => [
                 'required',
@@ -233,7 +317,8 @@ class TicketController extends Controller
                 'max:2000',
             ],
         ]);
-// Bewaar de oude waarden voor vergelijking
+
+        // Bewaar de oude waarden voor vergelijking
         $oldStatus = $ticket->status;
         $oldWarehouseNote = $ticket->warehouse_note;
 
@@ -244,7 +329,8 @@ class TicketController extends Controller
             'status' => $newStatus,
             'warehouse_note' => $newWarehouseNote,
         ]);
-// Controleer wat er veranderd is ten behoeve van de notificatietekst
+
+        // Controleer wat er veranderd is ten behoeve van de notificatietekst
         $statusChanged = $oldStatus !== $newStatus;
         $noteChanged = $oldWarehouseNote !== $newWarehouseNote && ! empty($newWarehouseNote);
 
@@ -269,9 +355,15 @@ class TicketController extends Controller
             ->route('tickets.warehouse.show', $ticket)
             ->with('success', 'Ticket succesvol bijgewerkt.');
     }
-/**
-     * Private helper: Combineert alle doorzoekbare velden van een ticket tot één string.
-     * Dit zorgt ervoor dat FuzzySearch op alle relevante data kan zoeken.
+
+    /**
+     * Combineer alle doorzoekbare velden van een ticket tot één string.
+     *
+     * Dit zorgt ervoor dat FuzzySearch op alle relevante data kan zoeken,
+     * zoals onderwerp, beschrijving, status, technieker, bestelling en locatie.
+     *
+     * @param Ticket $ticket Het ticket waarvoor de zoektekst wordt opgebouwd.
+     * @return string De samengestelde zoektekst.
      */
     private function ticketSearchText(Ticket $ticket): string
     {

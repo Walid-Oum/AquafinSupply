@@ -9,27 +9,30 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * CartController
+ * Controller voor het winkelmandje van techniekers.
  *
- * Beheert het winkelmandje van techniekers.
+ * Deze controller beheert alle acties rond het winkelmandje
+ * van de ingelogde technieker. Het winkelmandje wordt opgeslagen
+ * in de sessie van de gebruiker.
  *
  * Functionaliteiten:
+ * - Winkelmandje tonen
  * - Materiaal toevoegen aan winkelmandje
  * - Aantal aanpassen
  * - Materiaal verwijderen
  * - Winkelmandje leegmaken
  * - Voorraadcontrole per depot
- *
- * Het winkelmandje wordt opgeslagen in de sessie
- * van de ingelogde gebruiker.
  */
 class CartController extends Controller
 {
     /**
      * Toon het winkelmandje van de gebruiker.
      *
-     * Controleert eerst of de voorraadgegevens
-     * nog actueel zijn.
+     * Voor het winkelmandje wordt weergegeven, wordt eerst
+     * gecontroleerd of de materialen nog actief zijn en of de
+     * voorraadgegevens nog actueel zijn.
+     *
+     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -37,14 +40,16 @@ class CartController extends Controller
 
         return view('userzone.orders.cart');
     }
+
     /**
      * Voeg een materiaal toe aan het winkelmandje.
      *
-     * Controleert:
-     * - gekoppeld depot
-     * - beschikbaarheid materiaal
-     * - voorraad in depot
-     * - maximale hoeveelheid
+     * Deze methode controleert eerst of de gebruiker gekoppeld is
+     * aan een depot, of het materiaal actief is en of er voldoende
+     * voorraad beschikbaar is in het depot van de gebruiker.
+     *
+     * @param int|string $id Het ID van het materiaal.
+     * @return mixed JSON-response of redirect, afhankelijk van de request.
      */
     public function add($id)
     {
@@ -90,11 +95,17 @@ class CartController extends Controller
             'quantity' => $newQuantity,
         ]);
     }
+
     /**
-     * Werk de hoeveelheid van een materiaal
-     * in het winkelmandje bij.
+     * Werk de hoeveelheid van een materiaal in het winkelmandje bij.
      *
-     * Valideert de voorraad van het gekozen depot.
+     * De methode valideert de nieuwe hoeveelheid en controleert opnieuw
+     * of het materiaal nog actief en beschikbaar is in het depot van
+     * de gebruiker.
+     *
+     * @param Request $request De request met de nieuwe hoeveelheid.
+     * @param int|string $id Het ID van het materiaal.
+     * @return mixed JSON-response of redirect, afhankelijk van de request.
      */
     public function update(Request $request, $id)
     {
@@ -148,8 +159,12 @@ class CartController extends Controller
             'quantity' => (int) $request->quantity,
         ]);
     }
+
     /**
      * Verwijder een materiaal uit het winkelmandje.
+     *
+     * @param int|string $id Het ID van het materiaal.
+     * @return mixed JSON-response of redirect, afhankelijk van de request.
      */
     public function remove($id)
     {
@@ -164,8 +179,11 @@ class CartController extends Controller
             'item_id' => $id,
         ]);
     }
+
     /**
      * Maak het volledige winkelmandje leeg.
+     *
+     * @return mixed JSON-response of redirect, afhankelijk van de request.
      */
     public function clear()
     {
@@ -173,11 +191,16 @@ class CartController extends Controller
 
         return $this->cartSuccess('Winkelmandje leeggemaakt.');
     }
+
     /**
-     * Genereer een succesvolle response
-     * voor winkelmand-acties.
+     * Genereer een succesvolle response voor winkelmand-acties.
      *
-     * Ondersteunt zowel JSON als redirects.
+     * Deze methode ondersteunt zowel JSON-responses voor AJAX
+     * als gewone redirects voor klassieke formulierrequests.
+     *
+     * @param string $message De succesboodschap.
+     * @param array $extraData Extra data die aan de response wordt toegevoegd.
+     * @return mixed JSON-response of redirect.
      */
     private function cartSuccess(string $message, array $extraData = [])
     {
@@ -198,11 +221,15 @@ class CartController extends Controller
             ->back()
             ->with('success', $message);
     }
+
     /**
-     * Genereer een foutmelding
-     * voor winkelmand-acties.
+     * Genereer een foutmelding voor winkelmand-acties.
      *
-     * Ondersteunt zowel JSON als redirects.
+     * Deze methode ondersteunt zowel JSON-responses voor AJAX
+     * als gewone redirects voor klassieke formulierrequests.
+     *
+     * @param string $message De foutmelding.
+     * @return mixed JSON-response of redirect.
      */
     private function cartError(string $message)
     {
@@ -218,17 +245,26 @@ class CartController extends Controller
             ->back()
             ->with('error', $message);
     }
+
     /**
-     * Geef het aantal unieke materialen
-     * in het winkelmandje terug.
+     * Geef het aantal unieke materialen in het winkelmandje terug.
+     *
+     * Hierbij wordt niet de totale hoeveelheid geteld, maar het aantal
+     * verschillende materiaalsoorten in het winkelmandje.
+     *
+     * @return int Het aantal unieke materialen in het winkelmandje.
      */
     private function getCartCount(): int
     {
         return count(session('cart', []));
     }
+
     /**
-     * Haal de voorraad van een materiaal op
-     * voor een specifiek depot.
+     * Haal de voorraad van een materiaal op voor een specifiek depot.
+     *
+     * @param int $materialId Het ID van het materiaal.
+     * @param int $locationId Het ID van het depot.
+     * @return MaterialStock|null De voorraadrecord voor dit materiaal en depot.
      */
     private function getDepotStock(int $materialId, int $locationId): ?MaterialStock
     {
@@ -236,12 +272,15 @@ class CartController extends Controller
             ->where('location_id', $locationId)
             ->first();
     }
+
     /**
-     * Synchroniseer het winkelmandje
-     * met de actuele voorraad.
+     * Synchroniseer het winkelmandje met de actuele voorraad.
      *
-     * Niet-beschikbare materialen worden verwijderd
-     * en hoeveelheden worden aangepast indien nodig.
+     * Niet-beschikbare materialen worden verwijderd uit het winkelmandje.
+     * Hoeveelheden worden aangepast wanneer ze hoger zijn dan de actuele
+     * voorraad in het depot van de gebruiker.
+     *
+     * @return void
      */
     private function refreshCartStock(): void
     {
